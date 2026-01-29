@@ -1,0 +1,246 @@
+.bt-site-titlebar {
+  position: relative;
+  padding: 60px 0;
+  overflow: hidden;
+  background: #F6F6F4;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  @media(max-width: $break-tl) {
+    padding: 40px 0;
+  }
+  @media(max-width: $break-sm) {
+    padding: 30px 0;
+  }
+  .bt-titlebar-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .bt-page-titlebar {
+    display: flex;
+    flex-direction: column;
+    &--breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      line-height: 22px;
+      color: #a0a0a0;
+      position: relative;
+      z-index: 3;
+      a {
+        color: $color-primary;
+        &:hover {
+          color: $color-accent;
+        }
+      }
+      .bt-deli {
+        display: flex;
+      }
+      .current {
+        color: #a0a0a0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .bt-pages {
+        color: #a0a0a0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        .bt-deli {
+          display: none;
+        }
+      }
+    }
+    &--title {
+      margin: 16px 0 0;
+      font-size: 40px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 48px;
+      text-transform: capitalize;
+      color: $color-primary;
+      position: relative;
+      z-index: 3;
+      @media(max-width: $break-tl) {
+        margin: 12px 0 0;
+        font-size: 36px;
+      }
+      @media (max-width: $break-sm) {
+        margin: 8px 0 0;
+        font-size: 32px;
+        line-height: 1.2em;
+      }
+    }
+  }
+}
+
+// Shop Titlebar
+.bt-shop-titlebar {
+  position: relative;
+  padding: 60px 0;
+  overflow: hidden;
+  background: #F6F6F4;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  @media(max-width: $break-tl) {
+    padding: 40px 0;
+  }
+  @media(max-width: $break-sm) {
+    padding: 30px 0;
+  }
+  
+  .bt-titlebar-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .bt-page-titlebar {
+    display: flex;
+    flex-direction: column;
+    
+    &--breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      line-height: 22px;
+      color: #a0a0a0;
+      position: relative;
+      z-index: 3;
+      
+      a {
+        color: $color-primary;
+        &:hover {
+          color: $color-accent;
+        }
+      }
+      
+      .bt-deli {
+        display: flex;
+      }
+      
+      .current {
+        color: #a0a0a0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      
+      .bt-pages {
+        color: #a0a0a0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        .bt-deli {
+          display: none;
+        }
+      }
+    }
+    
+    &--content {
+      position: relative;
+      z-index: 3;
+    }
+    
+    &--title {
+      margin: 16px 0 0;
+      font-size: 40px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 48px;
+      text-transform: capitalize;
+      color: $color-primary;
+      
+      @media(max-width: $break-tl) {
+        margin: 12px 0 0;
+        font-size: 36px;
+      }
+      
+      @media (max-width: $break-sm) {
+        margin: 8px 0 0;
+        font-size: 32px;
+        line-height: 1.2em;
+      }
+    }
+    
+    &--description {
+      margin: 12px 0 0;
+      font-size: 16px;
+      line-height: 24px;
+      color: $color-text;
+      max-width: 800px;
+      
+      @media(max-width: $break-sm) {
+        margin: 8px 0 0;
+        font-size: 14px;
+        line-height: 22px;
+      }
+    }
+  }
+  
+  // Breadcrumb Position - Left (default)
+  &.bt-breadcrumb-left {
+    .bt-page-titlebar {
+      align-items: flex-start;
+      text-align: left;
+      
+      &--breadcrumb {
+        justify-content: flex-start;
+      }
+    }
+  }
+  
+  // Breadcrumb Position - Center
+  &.bt-breadcrumb-center {
+    .bt-page-titlebar {
+      align-items: center;
+      text-align: center;
+      
+      &--breadcrumb {
+        justify-content: center;
+      }
+      
+      &--description {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  }
+  
+  // Breadcrumb Position - Right
+  &.bt-breadcrumb-right {
+    .bt-page-titlebar {
+      align-items: flex-end;
+      text-align: right;
+      
+      &--breadcrumb {
+        justify-content: flex-end;
+      }
+      
+      &--description {
+        margin-left: auto;
+      }
+    }
+  }
+}
+
+// Shop Titlebar Section Bottom
+.bt-shop-titlebar-section-bottom {
+  position: relative;
+  z-index: 2;
+}

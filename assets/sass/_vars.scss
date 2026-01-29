@@ -1,0 +1,40 @@
+/*
+ * Fonts
+ */
+$text-font: var(--e-global-typography-text-font-family, "Jost"), sans-serif;
+$primary-font: var(--e-global-typography-primary-font-family, "Jost"), sans-serif;
+$secondary-font: var(--e-global-typography-secondary-font-family, "Jost"), sans-serif;
+$accent-font: var(--e-global-typography-accent-font-family, "Jost"), sans-serif;
+/*
+ * colors
+ */
+
+$color-primary: var(--e-global-color-primary, #183F91);
+$color-secondary: var(--e-global-color-secondary, #FFCE52);
+$color-text: var(--e-global-color-text, #6D7587);
+$color-accent: var(--e-global-color-accent, #183F91);
+
+$color-secondary-2: #8A99BA;
+
+$color-rating: #FDCC0D;
+$color-green: #3dab25;
+$color-blue: #1e85be;
+$color-red: #f03e3e;
+$color-orange: #f0a750;
+
+
+/* Layout */
+$container: var(--container-max-width, 1320px);
+$padding-start: var(--container-default-padding-block-start, 15px);
+$padding-end: var(--container-default-padding-block-end, 15px);
+$grid-column-gap: var(--grid-column-gap, 30px);
+$grid-row-gap: var(--grid-row-gap, 30px);
+
+/* Breakpoints */
+$break-lg: 1200px - 0.02;
+$break-tl: 1025px - 0.02;
+$break-md: 992px - 0.02;
+$break-sm: 768px - 0.02;
+$break-xs: 520px - 0.02;
+
+$transition: all 0.25s ease-in-out;

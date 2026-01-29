@@ -1,0 +1,101 @@
+#verify_purchase_code:disabled {
+  -webkit-text-security: disc;
+  text-security: disc;
+}
+.verifytheme-wrap {
+  max-width: 640px;
+  margin: 60px auto;
+  padding-right: 10px;
+}
+.verifytheme-wrap .__header {
+  text-align: center;
+}
+.verifytheme-wrap .__header .notice {
+  display: none;
+}
+.verifytheme-wrap h1 {
+  font-size: 46px;
+  font-weight: 600;
+}
+.verifytheme-wrap h2 {
+  font-size: 22px;
+  font-weight: 500;
+}
+.verifytheme-wrap > p {
+  font-size: 16px;
+}
+.verifytheme-wrap a {
+  display: inline-block;
+  font-weight: 600;
+}
+.verifytheme-wrap button.button {
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 40px;
+  padding: 0 20px;
+}
+.verifytheme-form {
+  background-color: #f8f8f8;
+  margin-top: 48px;
+  padding: 30px 40px;
+  border: 1px solid #eee;
+  border-radius: 15px;
+}
+.verifytheme-form label {
+  font-size: 16px;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+}
+.verifytheme-form input {
+  width: 100%;
+  min-height: 40px;
+}
+.verifytheme-form .description {
+  font-size: 14px;
+  font-style: italic;
+  margin-top: 4px;
+}
+.verifytheme-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+#verifytheme_message .notice {
+  margin-top: 16px;
+  margin-bottom: 0;
+  background-color: #f5f5f5;
+  box-shadow: none;
+  border-width: 0 0 0 4px;
+}
+.verifytheme-success {
+  margin-top: 16px;
+}
+.verifytheme-help {
+  text-align: center;
+  margin-top: 24px;
+}
+.verifytheme-help ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+}
+.verifytheme-help a {
+  font-size: 14px;
+  text-decoration: none;
+}
+
+@media(max-width: 560px) {
+  .verifytheme-wrap h1 {
+    font-size: 32px;
+  }
+  .verifytheme-wrap h2 {
+    font-size: 18px;
+  }
+  .verifytheme-form {
+    padding: 20px 25px;
+  }
+}

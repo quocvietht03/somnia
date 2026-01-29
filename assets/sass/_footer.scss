@@ -1,0 +1,66 @@
+.bt-site-footer {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #fff;
+  background: $color-primary;
+  padding: 30px 0;
+  .bt-copyright a {
+    color: #fff;
+  }
+}
+.elementor-location-footer {
+  .elementor-element {
+    .elementor-icon-list-items {
+      li.elementor-icon-list-item {
+        a {
+          &:hover {
+            color: $color-accent;
+            span {
+              color: $color-accent;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.elementor-element {
+  &.bt-footer-wellness {
+    .bt-elwg-switcher {
+      .bt-dropdown {
+        .bt-has-dropdown {
+          ul.sub-dropdown {
+            max-width: 100%;
+            width: 100%;
+            li {
+              a {
+                padding: 11px 12px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  &.bt-footer-bottom-kid-fashion {
+    .bt-elwg-switcher {
+      .bt-dropdown {
+        .bt-has-dropdown {
+          line-height: 26px;
+        }
+      }
+    }
+  }
+  &.bt-footer-slogan-food {
+    @media (max-width: 1500px) and (min-width: 1367px) {
+      .elementor-widget-bt-heading-animation {
+        --container-widget-width: 900px !important;
+        .bt-elwg-heading-animation {
+          h3 {
+            font-size: 100px !important;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,439 @@
+html :where(.editor-styles-wrapper) {
+  font-family: $text-font;
+}
+
+.widget {
+  *:focus {
+    outline: 0;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+    &:hover, &:focus {
+      color: $color-accent;
+    }
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $primary-font;
+    font-weight: 500;
+    line-height: 130%;
+    color: $color-primary;
+  }
+  input, input[type="search"], input[type="text"], input[type="password"],
+  input[type="email"], input[type="tel"], select, textarea {
+    font-size: 16px;
+    line-height: 24px;
+    background: #FFFFFF;
+    padding: 16px 24px;
+    border: 1px solid #C7C7C7;
+    border-radius: 15px;
+  }
+  input {
+    min-height: 58px;
+  }
+  select {
+    height: 58px;
+    width: 100%;
+    cursor: pointer;
+    padding-right: 35px;
+    background-image: url('../images/alt-arrow-down.svg');
+    background-repeat: no-repeat;
+    background-position: center right 15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  button, input[type="submit"] {
+    @extend .__bt-button-style;
+    min-height: 58px;
+    cursor: pointer;
+  }
+  label {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
+.bt-comment-stars {
+  display: flex;
+  gap: 4px;
+  font-size: 0;
+  line-height: 0;
+  span {
+    &.bt-filled svg {
+      fill: #EFCF0A;
+    }
+    svg {
+      fill: #CDCDCD;
+      width: 16px;
+      height: auto;
+    }
+  }
+}
+div[data-name="more_information"] {
+  .acf-editor-wrap.delay .wp-editor-area {
+    height: 85px !important;
+  }
+}
+._product_start_datetime_field{
+  display: none;
+}
+.variation-gallery-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+.variation-gallery-images .image {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.variation-gallery-images .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.delete-variation-gallery-image {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3232;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 18px;
+  text-decoration: none;
+}
+.wp-admin .form-field input[type=url]{
+  width: 50%;
+}
+
+/**
+ * Product Extra Content - Admin Styles
+ * Styles for Meta Box and buttons
+ */
+
+/* Meta Box Container */
+.somnia-extra-content-box {
+  padding: 12px;
+  a{
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Status Message */
+.somnia-extra-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 15px 0;
+  padding: 10px;
+  background: #f0f0f1;
+  border-left: 3px solid #2271b1;
+  font-weight: 500;
+}
+
+.somnia-extra-status .dashicons {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.somnia-extra-status .dashicons-yes-alt {
+  color: #00a32a;
+}
+
+.somnia-extra-status .dashicons-info {
+  color: #2271b1;
+}
+
+/* Buttons */
+.somnia-create-extra-content,
+.somnia-edit-extra-content {
+  width: 100%;
+  height: auto;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.somnia-create-extra-content .dashicons,
+.somnia-edit-extra-content .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.somnia-delete-extra-content {
+  width: 100%;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #b32d2e;
+  border: 1px solid #b32d2e;
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.somnia-delete-extra-content:hover {
+  background: #b32d2e;
+  color: #fff;
+  border-color: #8a2424;
+}
+
+.somnia-delete-extra-content .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.somnia-delete-extra-content:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.somnia-extra-loading {
+  text-align: center;
+  padding: 20px;
+  background: #f0f0f1;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.somnia-extra-loading .spinner {
+  float: none;
+  margin: 0 auto 10px;
+}
+
+.somnia-extra-loading p {
+  margin: 0;
+  color: #646970;
+  font-size: 13px;
+}
+
+/* Product List Table Column */
+.column-extra_content {
+  width: 100px;
+}
+
+.column-extra_content .button-small {
+  padding: 4px 8px;
+  height: auto;
+  line-height: 1.4;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.column-extra_content .dashicons {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  line-height: 1;
+}
+
+/* Hidden Field */
+#somnia_extra_content_post_id {
+  display: none;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+  .somnia-extra-content-box {
+      padding: 8px;
+  }
+  
+  .somnia-create-extra-content,
+  .somnia-edit-extra-content {
+      padding: 8px 12px;
+      font-size: 13px;
+  }
+  
+  .somnia-delete-extra-content {
+      padding: 6px 10px;
+      font-size: 12px;
+  }
+}
+
+/* Extra Content Post Type Editor */
+.post-type-extra_content_prod #post-body-content {
+  margin-bottom: 20px;
+}
+
+.post-type-extra_content_prod .notice-info {
+  margin: 15px 0;
+}
+
+/* Notice in posts list */
+.extra_content_prod-info-notice {
+  background: #e7f7fe;
+  border-left: 4px solid #2271b1;
+  padding: 12px;
+  margin: 15px 0;
+}
+
+.extra_content_prod-info-notice p {
+  margin: 0.5em 0;
+  font-size: 13px;
+}
+
+.extra_content_prod-info-notice strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #1d2327;
+}
+
+/* Extra Content Meta Box - Normal Context (Full Width) */
+#somnia_extra_content_box {
+  .inside {
+    margin: 0;
+    padding: 0;
+  }
+
+  .somnia-extra-content-box {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    background: #f9f9f9;
+    border-radius: 4px;
+
+    @media (max-width: 782px) {
+      padding: 15px;
+      gap: 15px;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    a{
+      display: flex;
+    }
+  }
+
+  .somnia-extra-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 12px 20px;
+    background: #fff;
+    border-left: 4px solid #2271b1;
+    border-radius: 4px;
+    font-weight: 500;
+    flex: 0 0 auto;
+
+    .dashicons {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .dashicons-yes-alt {
+      color: #00a32a;
+    }
+
+    .dashicons-info {
+      color: #2271b1;
+    }
+  }
+
+  .somnia-create-extra-content,
+  .somnia-edit-extra-content {
+    margin: 0;
+    padding: 12px 24px;
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+
+    .dashicons {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    @media (max-width: 782px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .somnia-delete-extra-content {
+    margin: 0;
+    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #b32d2e;
+    border: 1px solid #b32d2e;
+    background: transparent;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #b32d2e;
+      color: #fff;
+      border-color: #8a2424;
+    }
+
+    .dashicons {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 782px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .somnia-extra-loading {
+    text-align: center;
+    padding: 20px;
+    background: #fff;
+    border-radius: 4px;
+    margin: 0;
+    flex: 1 1 100%;
+
+    .spinner {
+      float: none;
+      margin: 0 auto 10px;
+    }
+
+    p {
+      margin: 0;
+      color: #646970;
+      font-size: 13px;
+    }
+  }
+
+  #somnia_extra_content_post_id {
+    display: none;
+  }
+}
+
