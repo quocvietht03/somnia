@@ -4044,6 +4044,70 @@
 		}
 	};
 
+	// Accordion hotspot
+	const AccordionHotspotHandler = function ($scope) {
+		const $accordionHotspot = $scope.find('.bt-elwg-accordion-hotspot');
+		if ($accordionHotspot.length > 0) {
+
+			// Handle hotspot point clicks
+			const $hotspotPoints = $accordionHotspot.find('.bt-hotspot-point');
+			const $accordionItems = $accordionHotspot.find('.bt-accordion-hotspot__item');
+			const $accordionTitle = $accordionItems.find('.bt-accordion-hotspot__item--title');
+			const $accordionDesc = $accordionItems.find('.bt-accordion-hotspot__item--desc');
+
+			$accordionTitle.on('click', function (e) {
+				e.preventDefault();
+				const $titleCurent = $(this);
+				const $descCurent = $titleCurent.next();
+				const $itemCurrent = $titleCurent.parent();
+				const itemIndex = $itemCurrent.data('index');
+
+				if ($itemCurrent.hasClass('__is_active')) {
+					$descCurent.slideUp();
+					$itemCurrent.removeClass('__is_active');
+					$hotspotPoints.removeClass('__is_active');
+				} else {
+					$accordionItems.removeClass('__is_active');
+					$accordionDesc.slideUp();
+					$hotspotPoints.removeClass('__is_active');
+
+					$descCurent.slideDown();
+					$itemCurrent.addClass('__is_active');
+
+					$hotspotPoints.filter(`[data-index="${itemIndex}"]`).addClass('__is_active');
+				}
+			});
+
+			$hotspotPoints.on('click', function (e) {
+				e.preventDefault();
+				const $pointCurrent = $(this);
+				const itemIndex = $pointCurrent.data('index');
+
+				if ($pointCurrent.hasClass('__is_active')) {
+					$hotspotPoints.removeClass('__is_active');
+					$accordionItems.removeClass('__is_active');
+					$accordionDesc.slideUp();
+				} else {
+					$hotspotPoints.removeClass('__is_active');
+					$accordionItems.removeClass('__is_active');
+					$accordionDesc.slideUp();
+
+					$pointCurrent.addClass('__is_active');
+
+					$accordionItems.filter(`[data-index="${itemIndex}"]`).addClass('__is_active');
+					$accordionItems.filter(`[data-index="${itemIndex}"]`).find('.bt-accordion-hotspot__item--desc').slideDown();
+				}
+
+				if ($(window).width() <= 767) {
+					const $accordionList = $accordionHotspot.find('.bt-accordion-hotspot__list');
+					$('html, body').animate({
+						scrollTop: $accordionList.offset().top - 100
+					}, 500);
+				}
+			});
+		}
+	}
+
 	// Make sure you run this code under Elementor.
 	$(window).on('elementor/frontend/init', function () {
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-mobile-menu.default', SubmenuToggleHandler);
@@ -4087,6 +4151,9 @@
 		elementorFrontend.hooks.addAction('frontend/element_ready/list-text-image-hover.default', ImageListWidgetHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/flicker-collage.default', FlickerCollageHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-popup-hotspot.default', ProductPopupHotspotHandler);
+
+
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-hotspot.default', AccordionHotspotHandler);
 	});
 
 })(jQuery);

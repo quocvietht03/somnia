@@ -161,8 +161,8 @@ class Widget_InstagramPosts extends Widget_Base
 			'css_prefix' => '',
 			'slides_to_show_custom_settings' => [
 				'default' => '5',
-				'tablet_default' => '3',
-				'mobile_default' => '2',
+				'tablet_default' => '5',
+				'mobile_default' => '3',
 				'selectors' => [
 					'{{WRAPPER}}' => '--swiper-slides-to-display: {{VALUE}}',
 				],
@@ -198,7 +198,7 @@ class Widget_InstagramPosts extends Widget_Base
 					],
 				],
 				'default' => [
-					'size' => 10,
+					'size' => 12,
 				],
 
 				'render_type' => 'template',
@@ -343,7 +343,7 @@ class Widget_InstagramPosts extends Widget_Base
 			[
 				'label' => __('Columns', 'somnia'),
 				'type' => Controls_Manager::SELECT,
-				'default' => '6',
+				'default' => '5',
 				'options' => [
 					'2' => '2',
 					'3' => '3',
@@ -351,9 +351,9 @@ class Widget_InstagramPosts extends Widget_Base
 					'5' => '5',
 					'6' => '6',
 				],
-				'desktop_default' => '3',
-				'tablet_default' => '2',
-				'mobile_default' => '1',
+				'desktop_default' => '5',
+				'tablet_default' => '5',
+				'mobile_default' => '3',
 				'selectors' => [
 					'{{WRAPPER}} .bt-ins-posts--grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
 				],
@@ -366,7 +366,7 @@ class Widget_InstagramPosts extends Widget_Base
 				'label' => __('Gap', 'somnia'),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
-					'size' => 16,
+					'size' => 12,
 				],
 				'range' => [
 					'px' => [

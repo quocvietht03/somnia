@@ -112,7 +112,11 @@ class ElementorWidgets
 			'order-tracking',
 			'list-text-image-hover',
 			'flicker-collage',
-			'product-banner-scroll-hotspot'
+			'product-banner-scroll-hotspot',
+
+			'accordion-hotspot',
+			'product-testimonial-item'
+
 		);
 
 		return $this->widgets;
@@ -377,6 +381,12 @@ class ElementorWidgets
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\FlickerCollage\Widget_FlickerCollage());
 
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductBannerScrollHotspot\Widget_ProductBannerScrollHotspot());
+
+
+		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\AccordionHotspot\Widget_AccordionHotspot());
+		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductTestimonialItem\Widget_ProductTestimonialItem());
+
+
 		// Register widgets that require Elementor Pro
 		$this->register_widget_with_pro_check(
 			'SomniaElementorWidgets\Widgets\InstagramPosts\Widget_InstagramPosts',
