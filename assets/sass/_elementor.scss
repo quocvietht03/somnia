@@ -15965,6 +15965,7 @@
     }
     @media(max-width: $break-xs) {
       flex-direction: column-reverse;
+      justify-content: start;
       &--image {
         width: 100%;
       }
