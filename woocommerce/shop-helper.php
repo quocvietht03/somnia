@@ -67,113 +67,7 @@ if (!function_exists('somnia_woocommerce_loop_add_to_cart_link')) {
         return $link;
     }
 }
-/**
- * Get the color taxonomy dynamically by checking which attribute has color_tax_attributes field
- * 
- * @return string|false The color taxonomy name or false if not found
- */
-if (!function_exists('somnia_get_color_taxonomy')) {
-    function somnia_get_color_taxonomy()
-    {
-        static $color_taxonomy = null;
 
-        // Return cached result if available
-        if ($color_taxonomy !== null) {
-            return $color_taxonomy;
-        }
-
-        // Auto-detect color taxonomy from ACF field group location rules
-        $color_taxonomy = 'pa_color';
-
-        // Get all ACF field groups
-        $field_groups = acf_get_field_groups();
-        if (!empty($field_groups)) {
-            foreach ($field_groups as $group) {
-                // Get fields in this group
-                $fields = acf_get_fields($group['key']);
-
-                // Check if this group has the color_tax_attributes field
-                $has_color_field = false;
-                if (!empty($fields)) {
-                    foreach ($fields as $field) {
-                        if ($field['name'] === 'color_tax_attributes') {
-                            $has_color_field = true;
-                            break;
-                        }
-                    }
-                }
-
-                // If found, get the taxonomy from location rules
-                if ($has_color_field && !empty($group['location'])) {
-                    foreach ($group['location'] as $location_group) {
-                        foreach ($location_group as $rule) {
-                            if ($rule['param'] === 'taxonomy' && $rule['operator'] === '==') {
-                                $color_taxonomy = $rule['value'];
-                                break 3; // Exit all loops once we find it
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $color_taxonomy;
-    }
-}
-
-/**
- * Get the image taxonomy dynamically by checking which attribute has image_tax_attributes field
- * 
- * @return string|false The image taxonomy name or false if not found
- */
-if (!function_exists('somnia_get_image_taxonomy')) {
-    function somnia_get_image_taxonomy()
-    {
-        static $image_taxonomy = null;
-
-        // Return cached result if available
-        if ($image_taxonomy !== null) {
-            return $image_taxonomy;
-        }
-
-        // Auto-detect image taxonomy from ACF field group location rules
-        $image_taxonomy = false;
-
-        // Get all ACF field groups
-        $field_groups = acf_get_field_groups();
-        if (!empty($field_groups)) {
-            foreach ($field_groups as $group) {
-                // Get fields in this group
-                $fields = acf_get_fields($group['key']);
-
-                // Check if this group has the image_tax_attributes field
-                $has_image_field = false;
-                if (!empty($fields)) {
-                    foreach ($fields as $field) {
-                        if ($field['name'] === 'image_tax_attributes') {
-                            $has_image_field = true;
-                            break;
-                        }
-                    }
-                }
-
-                // If found, get the taxonomy from location rules
-                if ($has_image_field && !empty($group['location'])) {
-                    foreach ($group['location'] as $location_group) {
-                        foreach ($location_group as $rule) {
-                            if ($rule['param'] === 'taxonomy' && $rule['operator'] === '==') {
-                                $image_taxonomy = $rule['value'];
-                                break 3; // Exit all loops once we find it
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $image_taxonomy;
-    }
-}
 
 remove_action('woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15);
 
@@ -1290,7 +1184,8 @@ function somnia_product_field_multiple_color_html($slug = '', $field_title = '',
                     }
 
                     $term_id = $term->term_id;
-                    $color = get_field('color_tax_attributes', $slug . '_' . $term_id);
+                    // Get color from metafield
+                    $color = get_term_meta($term_id, 'somnia_term_color', true);
                     if (!$color) {
                         $color = $term->slug;
                     }
@@ -1984,7 +1879,8 @@ function somnia_products_compare()
                                                 $count = 0;
                                                 foreach ($colors as $color_id) {
                                                     if ($count >= 6) break; // Only show max 6 colors
-                                                    $color_value = get_field('color_tax_attributes', $color_taxonomy . '_' . $color_id);
+                                                    // Get color from metafield
+                                                    $color_value = get_term_meta($color_id, 'somnia_term_color', true);
                                                     $color = get_term($color_id, $color_taxonomy);
                                                     if (!$color_value) {
                                                         $color_value = $color->slug;
