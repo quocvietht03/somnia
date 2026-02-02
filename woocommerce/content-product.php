@@ -38,15 +38,7 @@ if (empty($product) || ! $product->is_visible()) {
 		}
 		?>
 
-		<div class="bt-add-to-cart">
-			<?php
-			if (!$product->is_type('variable')) {
-				do_action('somnia_woocommerce_template_loop_add_to_cart');
-			} else {
-				do_action('somnia_woocommerce_template_loop_add_to_cart_variable');
-			}
-			?>
-		</div>
+	
 
 		<?php
 		do_action('somnia_woocommerce_template_loop_list_cta_button');
