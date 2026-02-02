@@ -60,6 +60,7 @@ class Widget_ProductTestimonialItem extends Widget_Base
             [
                 'label' => __('Testimonial Title', 'somnia'),
                 'type' => Controls_Manager::TEXT,
+                'label_block' => true,
                 'default' => __('What Our Customers Say', 'somnia'),
                 'placeholder' => __('Type your testimonial title', 'somnia'),
             ]
