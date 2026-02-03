@@ -13,8 +13,10 @@ global $product;
 	if ($ajax_add_to_cart_enabled && $product && ($product->is_type('simple') || $product->is_type('variable'))) {
 		$bt_product_inner_class .= ' bt-add-cart-ajax';
 	}
+	$parent_image_id = $product->get_image_id();
+	$parent_image_src = $parent_image_id ? wp_get_attachment_url($parent_image_id) : '';
 	?>
-	<div class="<?php echo esc_attr($bt_product_inner_class); ?>">
+	<div class="<?php echo esc_attr($bt_product_inner_class); ?>" data-parent-image-src="<?php echo esc_url($parent_image_src); ?>">
 		<?php
 		/**
 		 * Hook: woocommerce_before_single_product_summary.

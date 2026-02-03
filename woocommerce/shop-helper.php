@@ -2185,6 +2185,7 @@ function somnia_products_quick_view()
 
     $product_id = intval($_POST['productid']);
     $product = wc_get_product($product_id);
+    $source = isset($_POST['source']) ? sanitize_text_field($_POST['source']) : 'quickview';
 
     if (!$product) {
         wp_send_json_error('Product not found');
@@ -2192,9 +2193,11 @@ function somnia_products_quick_view()
     }
 
     ob_start();
+    
     ?>
     <div class="bt-quickview-title">
-        <h2><?php esc_html_e('Quick View', 'somnia') ?></h2>
+        <h2><?php echo ($source === 'add-to-cart') ? esc_html__('Select options', 'somnia') : esc_html__('Quick View', 'somnia'); ?></h2>
+        <div class="bt-quick-view-close"></div>
     </div>
     <div class="bt-quickview-wrap woocommerce">
         <?php
@@ -4511,7 +4514,26 @@ function somnia_load_product_gallery()
         $gallery_images = $product ? $product->get_gallery_image_ids() : array();
     }
 
-    if ($gallery_layout == 'gallery-slider') {
+    if ($gallery_layout == 'quickview-slider') {
+        ob_start();
+        echo '<div class="bt-gallery-slider-product">';
+        echo '<div class="swiper-wrapper">';
+        if ($main_image_id) {
+            $html = somnia_get_gallery_image_html($main_image_id, true, true);
+
+            if (!empty($gallery_images)) {
+                foreach ($gallery_images as $key => $attachment_id) {
+                    $html .= somnia_get_gallery_image_html($attachment_id, true, true);
+                }
+            }
+            echo apply_filters('woocommerce_single_product_image_thumbnail_html', $html, $main_image_id); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
+        }
+        echo '</div>';
+        echo '</div>';
+        echo '<div class="bt-swiper-pagination swiper-pagination"></div>';
+
+        $output['gallery-slider'] = ob_get_clean();
+    } else if ($gallery_layout == 'gallery-slider') {
         ob_start();
         echo '<div class="bt-gallery-slider-product bt-gallery-lightbox bt-gallery-zoomable">';
         echo '<div class="swiper-wrapper">';

@@ -356,11 +356,16 @@
 				attributesItem.find('.bt-js-item').removeClass('active'); // Remove active class only from items in the same attribute group
 				$(this).addClass('active'); // Add active class to clicked item
 				var colorTaxonomy = AJ_Options.color_taxonomy;
-				var nameItem = (attributeName == colorTaxonomy) ? $(this).find('label').text() : $(this).text();
-				attributesItem.find('.bt-result').text(nameItem);
+				var nameItem = (attributeName == colorTaxonomy) ? $(this).find('label').html() : $(this).html();
+				attributesItem.find('.bt-result').html(nameItem);
 				$(this).closest('.variations_form').find('select#' + attributeName).val(valueItem).trigger('change');
 				var gallerylayout = '';
-				if ($('.bt-gallery-slider-container').length > 0 || $('.bt-gallery-slider-fullwidth').length > 0) {
+				var $productContainer = $(this).closest('.bt-product-inner, .bt-quickview-product');
+				
+				// Check if we're in quick view
+				if ($productContainer.closest('.bt-popup-quick-view').length > 0 || $productContainer.hasClass('bt-quickview-product')) {
+					gallerylayout = 'quickview-slider';
+				} else if ($('.bt-gallery-slider-container').length > 0 || $('.bt-gallery-slider-fullwidth').length > 0) {
 					gallerylayout = 'gallery-slider';
 				} else if ($('.bt-gallery-one-column').length > 0 || $('.bt-gallery-two-columns').length > 0 || $('.bt-gallery-three-columns').length > 0 ||
 					$('.bt-gallery-four-columns').length > 0 || $('.bt-gallery-grid-fullwidth').length > 0 || $('.bt-gallery-stacked').length > 0) {
@@ -375,8 +380,6 @@
 				var $productLoop = $(this).closest('.woocommerce-loop-product');
 				var isInProductLoop = $productLoop.length > 0;
 				var showVariationTriggered = false;
-
-				var $productContainer = $(this).closest('.bt-product-inner, .bt-quickview-product');
 				$(this).closest('.variations_form').off('show_variation.somnia').on('show_variation.somnia', function (event, variation) {
 					showVariationTriggered = true;
 					var variationId = variation.variation_id;
@@ -398,6 +401,31 @@
 								$addToCartBtn.attr('data-product-quantity', newQuantity);
 							});
 						}
+						
+					// Check if variation has custom image before loading gallery
+					var hasCustomImage = false;
+					if (variation.image && variation.image.src) {
+						// Get parent product image source from data attribute (more reliable than selector)
+						var parentImageSrc = $productContainer.data('parent-image-src');
+						var variationImageSrc = variation.image.src;
+						
+						if (parentImageSrc) {
+							// Compare image sources (remove query strings and size suffixes for comparison)
+							// WordPress adds size suffixes like -300x300, -150x150, etc.
+							var cleanParentSrc = parentImageSrc.split('?')[0].replace(/-\d+x\d+\.(jpg|jpeg|png|gif|webp)$/i, '.$1');
+							var cleanVariationSrc = variationImageSrc.split('?')[0].replace(/-\d+x\d+\.(jpg|jpeg|png|gif|webp)$/i, '.$1');
+							// Check if images are different and variation image is not placeholder
+							hasCustomImage = cleanVariationSrc !== cleanParentSrc && 
+											 variationImageSrc.indexOf('woocommerce-placeholder') === -1 &&
+											 variationImageSrc.indexOf('placeholder.png') === -1;
+						}
+					}
+
+						// Only load gallery if variation has custom image
+						if (!hasCustomImage) {
+							return;
+						}
+						
 						// Load gallery
 						var param_ajax = {
 							action: 'somnia_load_product_gallery',
@@ -413,7 +441,7 @@
 							beforeSend: function () {
 								// Show loading skeleton
 								let skeletonHtml = '';
-								if (gallerylayout == 'gallery-slider') {
+								if (gallerylayout == 'quickview-slider' || gallerylayout == 'gallery-slider') {
 									skeletonHtml = `
 									<div class="bt-skeleton-gallery">
 										<div class="bt-skeleton-main-image">
@@ -475,7 +503,50 @@
 							success: function (response) {
 								if (response.success) {
 									if ($productContainer.length > 0) {
-										if (gallerylayout == 'gallery-slider') {
+										if (gallerylayout == 'quickview-slider') {
+											// Destroy existing swiper if any
+											var existingSwiper = $('.bt-popup-quick-view .bt-gallery-slider-product')[0]?.swiper;
+											if (existingSwiper) {
+												existingSwiper.destroy(true, true);
+											}
+											
+											$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
+											
+											// Re-init quickview slider
+											setTimeout(function() {
+												if ($('.bt-popup-quick-view .bt-gallery-slider-product').length > 0) {
+													var $quickviewSlider = $('.bt-popup-quick-view .bt-gallery-slider-product');
+													var $wrapper = $quickviewSlider.find('.swiper-wrapper');
+													var $slides = $wrapper.find('.swiper-slide');
+													var slideCount = $slides.length;
+													
+													// Duplicate slides to ensure minimum 3 slides
+													if (slideCount > 0 && slideCount < 3) {
+														var slidesToAdd = 3 - slideCount;
+														for (var i = 0; i < slidesToAdd; i++) {
+															var $clonedSlide = $slides.eq(i % slideCount).clone();
+															$wrapper.append($clonedSlide);
+														}
+													}
+													
+													var quickviewSlider = new Swiper('.bt-popup-quick-view .bt-gallery-slider-product', {
+														spaceBetween: 30,
+														loop: true,
+														loopedSlides: 3,
+														pagination: {
+															el: '.bt-popup-quick-view .swiper-pagination',
+															type: 'progressbar',
+														},
+														slidesPerView: 1,
+														allowTouchMove: true,
+														centeredSlides: false,
+													});
+												}
+												
+												$productContainer.find('.bt-skeleton-gallery').remove();
+												$productContainer.find('.bt-gallery-slider-products').removeClass('loading');
+											}, 100);
+										} else if (gallerylayout == 'gallery-slider') {
 											$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
 											SomniaImageZoomable();
 											SomniaGalleryLightbox();
@@ -521,13 +592,19 @@
 												$productContainer.find('.woocommerce-product-gallery').removeClass('loading');
 												$productContainer.find('.bt-skeleton-gallery').remove();
 											}, 200);
-										}
 									}
-									$productContainer.find('.bt-attributes-wrap .bt-js-item').removeClass('disable');
-
+									
+									// Update parent image src for next comparison
+									// Store the full variation image URL (not cleaned) for accurate comparison
+									if (variation.image && variation.image.src) {
+										$productContainer.data('parent-image-src', variation.image.src);
+									}
 								}
-							},
-							error: function (xhr, status, error) {
+								$productContainer.find('.bt-attributes-wrap .bt-js-item').removeClass('disable');
+
+							}
+						},
+						error: function (xhr, status, error) {
 								console.log('Error loading gallery:', error);
 								$productContainer.find('.woocommerce-product-gallery').removeClass('loading');
 								$productContainer.find('.bt-attributes-wrap .bt-js-item').removeClass('disable');
@@ -623,9 +700,36 @@
 	/* load Shop Quick View */
 	function SomniaLoadShopQuickView() {
 		if ($('.bt-quickview-product').length > 0) {
-			SomniaImageZoomable();
-			SomniaGalleryLightbox();
 			SomniaSliderThumbs('.bt-quickview-product');
+			// Init gallery slider for quickview (no zoom, no lightbox)
+			if ($('.bt-popup-quick-view .bt-gallery-slider-product').length > 0) {
+				var $quickviewSlider = $('.bt-popup-quick-view .bt-gallery-slider-product');
+				var $wrapper = $quickviewSlider.find('.swiper-wrapper');
+				var $slides = $wrapper.find('.swiper-slide');
+				var slideCount = $slides.length;
+				
+				// Duplicate slides to ensure minimum 3 slides
+				if (slideCount > 0 && slideCount < 3) {
+					var slidesToAdd = 3 - slideCount;
+					for (var i = 0; i < slidesToAdd; i++) {
+						var $clonedSlide = $slides.eq(i % slideCount).clone();
+						$wrapper.append($clonedSlide);
+					}
+				}
+				
+				var quickviewSlider = new Swiper('.bt-popup-quick-view .bt-gallery-slider-product', {
+					spaceBetween: 30,
+					loop: true,
+					loopedSlides: 3,
+					pagination: {
+						el: '.bt-popup-quick-view .swiper-pagination',
+						type: 'progressbar',
+					},
+					slidesPerView: 1,
+					allowTouchMove: true,
+					centeredSlides: false,
+				});
+			}
 		}
 		// check button add to cart 
 		if ($('.bt-quickview-product .grouped_form').length > 0) {
@@ -1162,7 +1266,7 @@
 		var hasQuickViewTrigger = $('.bt-product-quick-view-btn').length > 0 || $('.bt-loop-add-to-cart-btn').length > 0;
 		if (hasQuickViewTrigger) {
 			if ($('.bt-popup-quick-view').length === 0) {
-				$('body').append('<div class="bt-popup-quick-view"><div class="bt-quick-view-overlay"></div><div class="bt-quick-view-close"></div><div class="bt-quick-view-body"><div class="bt-quick-view-load"></div></div></div>');
+				$('body').append('<div class="bt-popup-quick-view"><div class="bt-quick-view-overlay"></div><div class="bt-quick-view-body"><div class="bt-quick-view-load"></div></div></div>');
 			}
 			function showQuickViewPopup() {
 				$('.bt-popup-quick-view').addClass('active');
@@ -1182,13 +1286,14 @@
 					'padding-right': '0' // Reset padding-right
 				});
 			}
-			function openQuickViewByProductId($btn, productid) {
+			function openQuickViewByProductId($btn, productid, source) {
 				if (!productid) return;
 				$btn.find('.tooltip').remove();
 				$btn.addClass('loading');
 				var param_ajax = {
 					action: 'somnia_products_quick_view',
 					productid: productid,
+					source: source || 'quickview'
 				};
 				$.ajax({
 					type: 'POST',
@@ -1220,7 +1325,7 @@
 			$(document).on('click', '.bt-product-quick-view-btn', function (e) {
 				e.preventDefault();
 				var productid = $(this).data('id');
-				openQuickViewByProductId($(this), productid);
+				openQuickViewByProductId($(this), productid, 'quickview');
 			});
 			/* .bt-loop-add-to-cart-btn: open quick view when not inside popup (e.g. product loop) */
 			$(document).on('click', '.bt-loop-add-to-cart-btn', function (e) {
@@ -1228,7 +1333,7 @@
 				var productid = $(this).data('product_id') || $(this).data('productId') || $(this).data('id');
 				if (!productid) return;
 				e.preventDefault();
-				openQuickViewByProductId($(this), productid);
+				openQuickViewByProductId($(this), productid, 'add-to-cart');
 			});
 			$(document).on('click', '.bt-popup-quick-view .bt-quick-view-overlay', function () {
 				removeQuickViewPopup();
@@ -3657,8 +3762,8 @@
 						var $attrItem = $item.closest('.bt-attributes--item');
 						var attrName = $attrItem.data('attribute-name');
 						var colorTaxonomy = AJ_Options.color_taxonomy;
-						var name = (attrName == colorTaxonomy) ? $item.find('label').text() : $item.text();
-						$attrItem.find('.bt-result').text(name);
+						var name = (attrName == colorTaxonomy) ? $item.find('label').html() : $item.html();
+						$attrItem.find('.bt-result').html(name);
 					});
 				});
 

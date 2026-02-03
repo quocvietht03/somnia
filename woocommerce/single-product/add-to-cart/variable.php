@@ -271,6 +271,7 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 								foreach ($ordered_options as $option) :
 									$term = get_term_by('slug', $option, $attribute_name);
 									$display_name = $term ? $term->name : $option;
+									$display_desc = $term ? $term->description : '';
 									$is_selected = ($selected_value === $option);
 									
 									// Check if option is available based on selected attributes
@@ -282,6 +283,7 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 										<?php disabled(!$is_available, true); ?>
 									>
 										<?php echo esc_html($display_name); ?>
+										<?php if(!empty($display_desc)) echo '<span class="bt-item-desc">' . esc_html($display_desc) . '</span>'; ?>
 									</option>
 								<?php endforeach; ?>
 							</select>
@@ -303,7 +305,7 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 								<span class="bt-js-item bt-item-value<?php echo esc_attr($class_active . $class_disabled); ?>" data-value="<?php echo esc_attr($option); ?>">
 									<?php 
 										echo esc_html($display_name); 
-										if(!empty($display_desc)) echo '<br>' . esc_html($display_desc);
+										if(!empty($display_desc)) echo '<span class="bt-item-desc">' . esc_html($display_desc) . '</span>';
 									?>
 								</span>
 							<?php endforeach; ?>

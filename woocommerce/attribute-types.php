@@ -59,7 +59,7 @@ function somnia_edit_attribute_type_field()
 	</tr>
 	<?php
 }
-add_action('woocommerce_before_edit_attribute_fields', 'somnia_edit_attribute_type_field');
+add_action('woocommerce_after_edit_attribute_fields', 'somnia_edit_attribute_type_field');
 
 /**
  * Save attribute type when adding new attribute

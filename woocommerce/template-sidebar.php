@@ -4,7 +4,7 @@
  * Template Name: Shop Sidebar
  */
 global $wp_query;
-$rows = intval(get_option('woocommerce_catalog_rows', 2));
+$rows = intval(get_option('woocommerce_catalog_rows', 3));
 $columns = intval(get_option('woocommerce_catalog_columns', 4));
 
 $rows = $rows > 0 ? $rows : 1;
