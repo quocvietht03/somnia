@@ -225,7 +225,9 @@ require_once get_template_directory() . '/framework/cron-helper.php';
 
 /* Woocommerce Functions */
 if (class_exists('Woocommerce')) {
+	require_once get_template_directory() . '/woocommerce/attribute-types.php';
 	require_once get_template_directory() . '/woocommerce/shop-helper.php';
+	
 }
 
 /* Product Extra Content */

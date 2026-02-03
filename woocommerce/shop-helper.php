@@ -67,113 +67,7 @@ if (!function_exists('somnia_woocommerce_loop_add_to_cart_link')) {
         return $link;
     }
 }
-/**
- * Get the color taxonomy dynamically by checking which attribute has color_tax_attributes field
- * 
- * @return string|false The color taxonomy name or false if not found
- */
-if (!function_exists('somnia_get_color_taxonomy')) {
-    function somnia_get_color_taxonomy()
-    {
-        static $color_taxonomy = null;
 
-        // Return cached result if available
-        if ($color_taxonomy !== null) {
-            return $color_taxonomy;
-        }
-
-        // Auto-detect color taxonomy from ACF field group location rules
-        $color_taxonomy = 'pa_color';
-
-        // Get all ACF field groups
-        $field_groups = acf_get_field_groups();
-        if (!empty($field_groups)) {
-            foreach ($field_groups as $group) {
-                // Get fields in this group
-                $fields = acf_get_fields($group['key']);
-
-                // Check if this group has the color_tax_attributes field
-                $has_color_field = false;
-                if (!empty($fields)) {
-                    foreach ($fields as $field) {
-                        if ($field['name'] === 'color_tax_attributes') {
-                            $has_color_field = true;
-                            break;
-                        }
-                    }
-                }
-
-                // If found, get the taxonomy from location rules
-                if ($has_color_field && !empty($group['location'])) {
-                    foreach ($group['location'] as $location_group) {
-                        foreach ($location_group as $rule) {
-                            if ($rule['param'] === 'taxonomy' && $rule['operator'] === '==') {
-                                $color_taxonomy = $rule['value'];
-                                break 3; // Exit all loops once we find it
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $color_taxonomy;
-    }
-}
-
-/**
- * Get the image taxonomy dynamically by checking which attribute has image_tax_attributes field
- * 
- * @return string|false The image taxonomy name or false if not found
- */
-if (!function_exists('somnia_get_image_taxonomy')) {
-    function somnia_get_image_taxonomy()
-    {
-        static $image_taxonomy = null;
-
-        // Return cached result if available
-        if ($image_taxonomy !== null) {
-            return $image_taxonomy;
-        }
-
-        // Auto-detect image taxonomy from ACF field group location rules
-        $image_taxonomy = false;
-
-        // Get all ACF field groups
-        $field_groups = acf_get_field_groups();
-        if (!empty($field_groups)) {
-            foreach ($field_groups as $group) {
-                // Get fields in this group
-                $fields = acf_get_fields($group['key']);
-
-                // Check if this group has the image_tax_attributes field
-                $has_image_field = false;
-                if (!empty($fields)) {
-                    foreach ($fields as $field) {
-                        if ($field['name'] === 'image_tax_attributes') {
-                            $has_image_field = true;
-                            break;
-                        }
-                    }
-                }
-
-                // If found, get the taxonomy from location rules
-                if ($has_image_field && !empty($group['location'])) {
-                    foreach ($group['location'] as $location_group) {
-                        foreach ($location_group as $rule) {
-                            if ($rule['param'] === 'taxonomy' && $rule['operator'] === '==') {
-                                $image_taxonomy = $rule['value'];
-                                break 3; // Exit all loops once we find it
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $image_taxonomy;
-    }
-}
 
 remove_action('woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15);
 
@@ -1318,7 +1212,8 @@ function somnia_product_field_multiple_color_html($slug = '', $field_title = '',
                     }
 
                     $term_id = $term->term_id;
-                    $color = get_field('color_tax_attributes', $slug . '_' . $term_id);
+                    // Get color from metafield
+                    $color = get_term_meta($term_id, 'somnia_term_color', true);
                     if (!$color) {
                         $color = $term->slug;
                     }
@@ -2012,7 +1907,8 @@ function somnia_products_compare()
                                                 $count = 0;
                                                 foreach ($colors as $color_id) {
                                                     if ($count >= 6) break; // Only show max 6 colors
-                                                    $color_value = get_field('color_tax_attributes', $color_taxonomy . '_' . $color_id);
+                                                    // Get color from metafield
+                                                    $color_value = get_term_meta($color_id, 'somnia_term_color', true);
                                                     $color = get_term($color_id, $color_taxonomy);
                                                     if (!$color_value) {
                                                         $color_value = $color->slug;
@@ -2427,13 +2323,16 @@ function somnia_display_button_wishlist($enable_status, $product_id)
     }
 
     ob_start();
-    ?>
+?>
     <a class="bt-icon-btn bt-product-wishlist-btn" href="#" data-id="<?php echo esc_attr($product_id); ?>">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16.6875 3C14.7516 3 13.0566 3.8325 12 5.23969C10.9434 3.8325 9.24844 3 7.3125 3C5.77146 3.00174 4.29404 3.61468 3.20436 4.70436C2.11468 5.79404 1.50174 7.27146 1.5 8.8125C1.5 15.375 11.2303 20.6869 11.6447 20.9062C11.7539 20.965 11.876 20.9958 12 20.9958C12.124 20.9958 12.2461 20.965 12.3553 20.9062C12.7697 20.6869 22.5 15.375 22.5 8.8125C22.4983 7.27146 21.8853 5.79404 20.7956 4.70436C19.706 3.61468 18.2285 3.00174 16.6875 3ZM12 19.3875C10.2881 18.39 3 13.8459 3 8.8125C3.00149 7.66921 3.45632 6.57317 4.26475 5.76475C5.07317 4.95632 6.16921 4.50149 7.3125 4.5C9.13594 4.5 10.6669 5.47125 11.3062 7.03125C11.3628 7.16881 11.4589 7.28646 11.5824 7.36926C11.7059 7.45207 11.8513 7.49627 12 7.49627C12.1487 7.49627 12.2941 7.45207 12.4176 7.36926C12.5411 7.28646 12.6372 7.16881 12.6937 7.03125C13.3331 5.46844 14.8641 4.5 16.6875 4.5C17.8308 4.50149 18.9268 4.95632 19.7353 5.76475C20.5437 6.57317 20.9985 7.66921 21 8.8125C21 13.8384 13.71 18.3891 12 19.3875Z" />
+        <svg class="bt-icon-added" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="currentColor">
+            <path d="M26.25 11.1562C26.25 18.8125 14.898 25.0097 14.4145 25.2656C14.2871 25.3342 14.1447 25.37 14 25.37C13.8553 25.37 13.7129 25.3342 13.5855 25.2656C13.102 25.0097 1.75 18.8125 1.75 11.1562C1.75203 9.35837 2.46713 7.63471 3.73842 6.36342C5.00971 5.09213 6.73337 4.37703 8.53125 4.375C10.7898 4.375 12.7673 5.34625 14 6.98797C15.2327 5.34625 17.2102 4.375 19.4688 4.375C21.2666 4.37703 22.9903 5.09213 24.2616 6.36342C25.5329 7.63471 26.248 9.35837 26.25 11.1562Z" />
+        </svg>
+        <svg class="bt-icon-not-added" xmlns="http://www.w3.org/2000/svg" width="21" height="18" viewBox="0 0 21 18" fill="currentColor">
+            <path d="M15.1875 0C13.2516 0 11.5566 0.8325 10.5 2.23969C9.44344 0.8325 7.74844 0 5.8125 0C4.27146 0.00173694 2.79404 0.614681 1.70436 1.70436C0.614681 2.79404 0.00173694 4.27146 0 5.8125C0 12.375 9.73031 17.6869 10.1447 17.9062C10.2539 17.965 10.376 17.9958 10.5 17.9958C10.624 17.9958 10.7461 17.965 10.8553 17.9062C11.2697 17.6869 21 12.375 21 5.8125C20.9983 4.27146 20.3853 2.79404 19.2956 1.70436C18.206 0.614681 16.7285 0.00173694 15.1875 0ZM10.5 16.3875C8.78813 15.39 1.5 10.8459 1.5 5.8125C1.50149 4.66921 1.95632 3.57317 2.76475 2.76475C3.57317 1.95632 4.66921 1.50149 5.8125 1.5C7.63594 1.5 9.16687 2.47125 9.80625 4.03125C9.86275 4.16881 9.95888 4.28646 10.0824 4.36926C10.2059 4.45207 10.3513 4.49627 10.5 4.49627C10.6487 4.49627 10.7941 4.45207 10.9176 4.36926C11.0411 4.28646 11.1372 4.16881 11.1937 4.03125C11.8331 2.46844 13.3641 1.5 15.1875 1.5C16.3308 1.50149 17.4268 1.95632 18.2353 2.76475C19.0437 3.57317 19.4985 4.66921 19.5 5.8125C19.5 10.8384 12.21 15.3891 10.5 16.3875Z"  />
         </svg>
     </a>
-    <?php
+<?php
     return ob_get_clean();
 }
 
@@ -2445,13 +2344,13 @@ function somnia_display_button_compare($enable_status, $product_id)
     }
 
     ob_start();
-    ?>
+?>
     <a class="bt-icon-btn bt-product-compare-btn" href="#" data-id="<?php echo esc_attr($product_id); ?>">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10.5 14.2504C10.3011 14.2504 10.1103 14.3295 9.96968 14.4701C9.82903 14.6108 9.75001 14.8015 9.75001 15.0004V17.6901L7.09876 15.0379C6.7493 14.6907 6.47224 14.2776 6.28364 13.8224C6.09503 13.3673 5.99862 12.8793 6.00001 12.3867V8.90669C6.707 8.72415 7.32315 8.29002 7.73296 7.68568C8.14277 7.08135 8.3181 6.3483 8.2261 5.62394C8.13409 4.89958 7.78106 4.23364 7.23318 3.75095C6.6853 3.26826 5.98019 3.00195 5.25001 3.00195C4.51983 3.00195 3.81471 3.26826 3.26683 3.75095C2.71895 4.23364 2.36592 4.89958 2.27392 5.62394C2.18191 6.3483 2.35725 7.08135 2.76706 7.68568C3.17687 8.29002 3.79301 8.72415 4.50001 8.90669V12.3876C4.49826 13.0773 4.63324 13.7606 4.89715 14.3978C5.16105 15.035 5.54864 15.6136 6.03751 16.1001L8.6897 18.7504H6.00001C5.8011 18.7504 5.61033 18.8295 5.46968 18.9701C5.32903 19.1108 5.25001 19.3015 5.25001 19.5004C5.25001 19.6994 5.32903 19.8901 5.46968 20.0308C5.61033 20.1714 5.8011 20.2504 6.00001 20.2504H10.5C10.6989 20.2504 10.8897 20.1714 11.0303 20.0308C11.171 19.8901 11.25 19.6994 11.25 19.5004V15.0004C11.25 14.8015 11.171 14.6108 11.0303 14.4701C10.8897 14.3295 10.6989 14.2504 10.5 14.2504ZM3.75001 6.00044C3.75001 5.70377 3.83798 5.41376 4.0028 5.16709C4.16763 4.92041 4.40189 4.72815 4.67598 4.61462C4.95007 4.50109 5.25167 4.47138 5.54264 4.52926C5.83361 4.58714 6.10089 4.73 6.31067 4.93978C6.52045 5.14956 6.66331 5.41683 6.72119 5.70781C6.77906 5.99878 6.74936 6.30038 6.63583 6.57447C6.5223 6.84855 6.33004 7.08282 6.08336 7.24764C5.83669 7.41247 5.54668 7.50044 5.25001 7.50044C4.85218 7.50044 4.47065 7.3424 4.18935 7.0611C3.90804 6.7798 3.75001 6.39827 3.75001 6.00044ZM19.5 15.0942V11.6142C19.5018 10.9245 19.3668 10.2413 19.1029 9.60404C18.839 8.96681 18.4514 8.38822 17.9625 7.90169L15.3103 5.25044H18C18.1989 5.25044 18.3897 5.17142 18.5303 5.03077C18.671 4.89012 18.75 4.69935 18.75 4.50044C18.75 4.30153 18.671 4.11076 18.5303 3.97011C18.3897 3.82946 18.1989 3.75044 18 3.75044H13.5C13.3011 3.75044 13.1103 3.82946 12.9697 3.97011C12.829 4.11076 12.75 4.30153 12.75 4.50044V9.00044C12.75 9.19935 12.829 9.39012 12.9697 9.53077C13.1103 9.67142 13.3011 9.75044 13.5 9.75044C13.6989 9.75044 13.8897 9.67142 14.0303 9.53077C14.171 9.39012 14.25 9.19935 14.25 9.00044V6.31075L16.9013 8.96294C17.2507 9.31018 17.5278 9.72333 17.7164 10.1784C17.905 10.6335 18.0014 11.1216 18 11.6142V15.0942C17.293 15.2767 16.6769 15.7109 16.2671 16.3152C15.8572 16.9195 15.6819 17.6526 15.7739 18.3769C15.8659 19.1013 16.219 19.7672 16.7668 20.2499C17.3147 20.7326 18.0198 20.9989 18.75 20.9989C19.4802 20.9989 20.1853 20.7326 20.7332 20.2499C21.2811 19.7672 21.6341 19.1013 21.7261 18.3769C21.8181 17.6526 21.6428 16.9195 21.233 16.3152C20.8232 15.7109 20.207 15.2767 19.5 15.0942ZM18.75 19.5004C18.4533 19.5004 18.1633 19.4125 17.9167 19.2476C17.67 19.0828 17.4777 18.8486 17.3642 18.5745C17.2507 18.3004 17.221 17.9988 17.2788 17.7078C17.3367 17.4168 17.4796 17.1496 17.6893 16.9398C17.8991 16.73 18.1664 16.5871 18.4574 16.5293C18.7483 16.4714 19.0499 16.5011 19.324 16.6146C19.5981 16.7282 19.8324 16.9204 19.9972 17.1671C20.162 17.4138 20.25 17.7038 20.25 18.0004C20.25 18.3983 20.092 18.7798 19.8107 19.0611C19.5294 19.3424 19.1478 19.5004 18.75 19.5004Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="currentColor">
+            <path d="M12.25 16.6232C12.0179 16.6232 11.7954 16.7154 11.6313 16.8795C11.4672 17.0436 11.375 17.2662 11.375 17.4982V20.6362L8.28188 17.542C7.87419 17.1369 7.55095 16.6549 7.33091 16.1239C7.11086 15.593 6.99839 15.0236 7.00001 14.4489V10.3889C7.82483 10.1759 8.54367 9.66941 9.02178 8.96435C9.4999 8.2593 9.70445 7.40407 9.59711 6.55899C9.48977 5.7139 9.0779 4.93697 8.43871 4.37383C7.79952 3.81069 6.97688 3.5 6.12501 3.5C5.27313 3.5 4.4505 3.81069 3.8113 4.37383C3.17211 4.93697 2.76024 5.7139 2.6529 6.55899C2.54556 7.40407 2.75012 8.2593 3.22823 8.96435C3.70634 9.66941 4.42518 10.1759 5.25001 10.3889V14.45C5.24797 15.2546 5.40545 16.0517 5.71334 16.7951C6.02122 17.5386 6.47341 18.2136 7.04376 18.7812L10.138 21.8732H7.00001C6.76794 21.8732 6.54538 21.9654 6.38129 22.1295C6.2172 22.2936 6.12501 22.5162 6.12501 22.7482C6.12501 22.9803 6.2172 23.2029 6.38129 23.367C6.54538 23.531 6.76794 23.6232 7.00001 23.6232H12.25C12.4821 23.6232 12.7046 23.531 12.8687 23.367C13.0328 23.2029 13.125 22.9803 13.125 22.7482V17.4982C13.125 17.2662 13.0328 17.0436 12.8687 16.8795C12.7046 16.7154 12.4821 16.6232 12.25 16.6232ZM4.37501 6.99824C4.37501 6.65212 4.47764 6.31377 4.66994 6.02599C4.86223 5.7382 5.13554 5.5139 5.45531 5.38145C5.77508 5.24899 6.12695 5.21434 6.46642 5.28186C6.80588 5.34939 7.1177 5.51606 7.36244 5.7608C7.60719 6.00554 7.77386 6.31736 7.84138 6.65683C7.90891 6.99629 7.87425 7.34816 7.7418 7.66793C7.60934 7.9877 7.38504 8.26101 7.09726 8.45331C6.80947 8.6456 6.47113 8.74824 6.12501 8.74824C5.66088 8.74824 5.21576 8.56386 4.88757 8.23567C4.55938 7.90748 4.37501 7.46236 4.37501 6.99824ZM22.75 17.6076V13.5476C22.752 12.7429 22.5946 11.9459 22.2867 11.2024C21.9788 10.459 21.5266 9.78397 20.9563 9.21636L17.862 6.12324H21C21.2321 6.12324 21.4546 6.03105 21.6187 5.86695C21.7828 5.70286 21.875 5.4803 21.875 5.24824C21.875 5.01617 21.7828 4.79361 21.6187 4.62952C21.4546 4.46542 21.2321 4.37324 21 4.37324H15.75C15.5179 4.37324 15.2954 4.46542 15.1313 4.62952C14.9672 4.79361 14.875 5.01617 14.875 5.24824V10.4982C14.875 10.7303 14.9672 10.9529 15.1313 11.117C15.2954 11.281 15.5179 11.3732 15.75 11.3732C15.9821 11.3732 16.2046 11.281 16.3687 11.117C16.5328 10.9529 16.625 10.7303 16.625 10.4982V7.36027L19.7181 10.4545C20.1258 10.8596 20.4491 11.3416 20.6691 11.8726C20.8892 12.4035 21.0016 12.9729 21 13.5476V17.6076C20.1752 17.8206 19.4563 18.3271 18.9782 19.0321C18.5001 19.7372 18.2956 20.5924 18.4029 21.4375C18.5102 22.2826 18.9221 23.0595 19.5613 23.6226C20.2005 24.1858 21.0231 24.4965 21.875 24.4965C22.7269 24.4965 23.5495 24.1858 24.1887 23.6226C24.8279 23.0595 25.2398 22.2826 25.3471 21.4375C25.4545 20.5924 25.2499 19.7372 24.7718 19.0321C24.2937 18.3271 23.5748 17.8206 22.75 17.6076ZM21.875 22.7482C21.5289 22.7482 21.1905 22.6456 20.9028 22.4533C20.615 22.261 20.3907 21.9877 20.2582 21.6679C20.1258 21.3482 20.0911 20.9963 20.1586 20.6568C20.2262 20.3174 20.3928 20.0055 20.6376 19.7608C20.8823 19.5161 21.1941 19.3494 21.5336 19.2819C21.8731 19.2143 22.2249 19.249 22.5447 19.3814C22.8645 19.5139 23.1378 19.7382 23.3301 20.026C23.5224 20.3138 23.625 20.6521 23.625 20.9982C23.625 21.4624 23.4406 21.9075 23.1124 22.2357C22.7843 22.5639 22.3391 22.7482 21.875 22.7482Z" />
         </svg>
     </a>
-    <?php
+<?php
     return ob_get_clean();
 }
 
@@ -2463,19 +2362,19 @@ function somnia_display_button_quick_view($enable_status, $product_id)
     }
 
     ob_start();
-    ?>
+?>
     <a class="bt-icon-btn bt-product-quick-view-btn" href="#" data-id="<?php echo esc_attr($product_id); ?>">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M23.1853 11.6962C23.1525 11.6222 22.3584 9.86062 20.5931 8.09531C18.2409 5.74312 15.27 4.5 12 4.5C8.72999 4.5 5.75905 5.74312 3.40687 8.09531C1.64155 9.86062 0.843741 11.625 0.814679 11.6962C0.772035 11.7922 0.75 11.896 0.75 12.0009C0.75 12.1059 0.772035 12.2097 0.814679 12.3056C0.847491 12.3797 1.64155 14.1403 3.40687 15.9056C5.75905 18.2569 8.72999 19.5 12 19.5C15.27 19.5 18.2409 18.2569 20.5931 15.9056C22.3584 14.1403 23.1525 12.3797 23.1853 12.3056C23.2279 12.2097 23.25 12.1059 23.25 12.0009C23.25 11.896 23.2279 11.7922 23.1853 11.6962ZM12 18C9.11437 18 6.59343 16.9509 4.50655 14.8828C3.65028 14.0313 2.92179 13.0603 2.34374 12C2.92164 10.9396 3.65014 9.9686 4.50655 9.11719C6.59343 7.04906 9.11437 6 12 6C14.8856 6 17.4066 7.04906 19.4934 9.11719C20.3514 9.9684 21.0814 10.9394 21.6609 12C20.985 13.2619 18.0403 18 12 18ZM12 7.5C11.11 7.5 10.2399 7.76392 9.49992 8.25839C8.7599 8.75285 8.18313 9.45566 7.84253 10.2779C7.50194 11.1002 7.41282 12.005 7.58646 12.8779C7.76009 13.7508 8.18867 14.5526 8.81801 15.182C9.44735 15.8113 10.2492 16.2399 11.1221 16.4135C11.995 16.5872 12.8998 16.4981 13.7221 16.1575C14.5443 15.8169 15.2471 15.2401 15.7416 14.5001C16.2361 13.76 16.5 12.89 16.5 12C16.4987 10.8069 16.0242 9.66303 15.1806 8.81939C14.337 7.97575 13.1931 7.50124 12 7.5ZM12 15C11.4066 15 10.8266 14.8241 10.3333 14.4944C9.83993 14.1648 9.45541 13.6962 9.22835 13.1481C9.00129 12.5999 8.94188 11.9967 9.05763 11.4147C9.17339 10.8328 9.45911 10.2982 9.87867 9.87868C10.2982 9.45912 10.8328 9.1734 11.4147 9.05764C11.9967 8.94189 12.5999 9.0013 13.148 9.22836C13.6962 9.45542 14.1648 9.83994 14.4944 10.3333C14.824 10.8266 15 11.4067 15 12C15 12.7956 14.6839 13.5587 14.1213 14.1213C13.5587 14.6839 12.7956 15 12 15Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="currentColor">
+            <path d="M27.0495 13.6456C27.0113 13.5592 26.0848 11.5041 24.0253 9.44453C21.2811 6.70031 17.815 5.25 14 5.25C10.185 5.25 6.71891 6.70031 3.97469 9.44453C1.91516 11.5041 0.984376 13.5625 0.95047 13.6456C0.900719 13.7575 0.875011 13.8786 0.875011 14.0011C0.875011 14.1236 0.900719 14.2447 0.95047 14.3566C0.988751 14.443 1.91516 16.497 3.97469 18.5566C6.71891 21.2997 10.185 22.75 14 22.75C17.815 22.75 21.2811 21.2997 24.0253 18.5566C26.0848 16.497 27.0113 14.443 27.0495 14.3566C27.0993 14.2447 27.125 14.1236 27.125 14.0011C27.125 13.8786 27.0993 13.7575 27.0495 13.6456ZM14 21C10.6334 21 7.69235 19.7761 5.25766 17.3633C4.25868 16.3698 3.40877 15.237 2.73438 14C3.40859 12.7629 4.25851 11.63 5.25766 10.6367C7.69235 8.22391 10.6334 7 14 7C17.3666 7 20.3077 8.22391 22.7423 10.6367C23.7433 11.6298 24.595 12.7627 25.2711 14C24.4825 15.4722 21.047 21 14 21ZM14 8.75C12.9616 8.75 11.9466 9.05791 11.0833 9.63478C10.2199 10.2117 9.54699 11.0316 9.14963 11.9909C8.75227 12.9502 8.64831 14.0058 8.85088 15.0242C9.05345 16.0426 9.55346 16.9781 10.2877 17.7123C11.0219 18.4465 11.9574 18.9466 12.9758 19.1491C13.9942 19.3517 15.0498 19.2477 16.0091 18.8504C16.9684 18.453 17.7883 17.7801 18.3652 16.9167C18.9421 16.0534 19.25 15.0384 19.25 14C19.2486 12.6081 18.695 11.2735 17.7107 10.2893C16.7265 9.30504 15.3919 8.75145 14 8.75ZM14 17.5C13.3078 17.5 12.6311 17.2947 12.0555 16.9101C11.4799 16.5256 11.0313 15.9789 10.7664 15.3394C10.5015 14.6999 10.4322 13.9961 10.5673 13.3172C10.7023 12.6383 11.0356 12.0146 11.5251 11.5251C12.0146 11.0356 12.6383 10.7023 13.3172 10.5673C13.9961 10.4322 14.6999 10.5015 15.3394 10.7664C15.9789 11.0313 16.5256 11.4799 16.9101 12.0555C17.2947 12.6311 17.5 13.3078 17.5 14C17.5 14.9283 17.1313 15.8185 16.4749 16.4749C15.8185 17.1313 14.9283 17.5 14 17.5Z" />
         </svg>
     </a>
-    <?php
+<?php
     return ob_get_clean();
 }
 
 /* add button wishlist, compare and quick view */
 function somnia_display_button_wishlist_compare_quick_view()
-{   
+{
     global $product;
 
     $archive_shop = function_exists('get_field') ? get_field('archive_shop', 'options') : array();
@@ -2483,18 +2382,20 @@ function somnia_display_button_wishlist_compare_quick_view()
     $show_compare = isset($archive_shop['show_compare']) ? $archive_shop['show_compare'] : true;
     $show_quickview = isset($archive_shop['show_quickview']) ? $archive_shop['show_quickview'] : true;
 
-    if (!$show_wishlist && !$show_compare && !$show_quickview) {
-        return;
-    }
-    ?>
+?>
     <div class="bt-product-icon-btn">
         <?php
-            echo somnia_display_button_wishlist($show_wishlist, get_the_ID());
-            echo somnia_display_button_compare($show_compare, get_the_ID());
-            echo somnia_display_button_quick_view($show_quickview, get_the_ID());
+        if (!$product->is_type('variable')) {
+            do_action('somnia_woocommerce_template_loop_add_to_cart');
+        } else {
+            do_action('somnia_woocommerce_template_loop_add_to_cart_variable');
+        }
+        echo somnia_display_button_wishlist($show_wishlist, get_the_ID());
+        echo somnia_display_button_compare($show_compare, get_the_ID());
+        echo somnia_display_button_quick_view($show_quickview, get_the_ID());
         ?>
     </div>
-    <?php
+<?php
 }
 
 add_action('somnia_woocommerce_template_loop_list_cta_button', 'somnia_display_button_wishlist_compare_quick_view');
@@ -2511,11 +2412,11 @@ function somnia_display_button_wishlist_compare()
     if (!$show_wishlist && !$show_compare) {
         return;
     }
-    ?>
+?>
     <div class="bt-product-icon-btn">
         <?php
-            echo somnia_display_button_compare($show_compare, $product->get_id());
-            echo somnia_display_button_wishlist($show_wishlist, $product->get_id());
+        echo somnia_display_button_compare($show_compare, $product->get_id());
+        echo somnia_display_button_wishlist($show_wishlist, $product->get_id());
         ?>
     </div>
 <?php
@@ -4548,7 +4449,7 @@ function somnia_get_gallery_image_html($attachment_id, $main_image = false, $swi
     global $product;
 
     $flexslider        = (bool) apply_filters('woocommerce_single_product_flexslider_enabled', get_theme_support('wc-product-gallery-slider'));
-    if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
+    if (\Elementor\Plugin::$instance->editor->is_edit_mode()) {
         $gallery_thumbnail = wc_get_image_size('woocommerce_thumbnail');
     } else {
         $gallery_thumbnail = is_product() ? wc_get_image_size('gallery_thumbnail') : wc_get_image_size('woocommerce_thumbnail');
@@ -4868,155 +4769,10 @@ function somnia_woocommerce_template_loop_add_to_cart_variable()
 {
     global $product;
     if ($product->is_type('variable')) {
-        // Get all available variations
-        $available_variations = $product->get_available_variations();
-        $variations_data = array();
-
-        // Get the color and image taxonomies dynamically
-        $color_taxonomy = somnia_get_color_taxonomy();
-        $image_taxonomy = somnia_get_image_taxonomy();
-
-        // Get product attributes to check what this specific product has
-        $product_attributes = $product->get_variation_attributes();
-        $product_attribute_names = array_keys($product_attributes);
-
-        // Check if this product has image attribute
-        $has_image_attr = false;
-        if ($image_taxonomy) {
-            foreach ($product_attribute_names as $attr_name) {
-                $attr_name_clean = str_replace('attribute_', '', strtolower($attr_name));
-                $image_taxonomy_clean = str_replace('pa_', '', strtolower($image_taxonomy));
-                if ($attr_name_clean === $image_taxonomy_clean || $attr_name_clean === strtolower($image_taxonomy)) {
-                    $has_image_attr = true;
-                    break;
-                }
-            }
-        }
-
-        // Check if this product has color attribute
-        $has_color_attr = false;
-        if ($color_taxonomy) {
-            foreach ($product_attribute_names as $attr_name) {
-                $attr_name_clean = str_replace('attribute_', '', strtolower($attr_name));
-                $color_taxonomy_clean = str_replace('pa_', '', strtolower($color_taxonomy));
-                if ($attr_name_clean === $color_taxonomy_clean || $attr_name_clean === strtolower($color_taxonomy)) {
-                    $has_color_attr = true;
-                    break;
-                }
-            }
-        }
-
-        // Determine which attribute to use (prioritize image over color)
-        $primary_taxonomy = null;
-        $is_image_attribute = false;
-
-        if ($has_image_attr) {
-            // If product has image attribute, use it
-            $primary_taxonomy = $image_taxonomy;
-            $is_image_attribute = true;
-        } elseif ($has_color_attr) {
-            // If product only has color attribute, use color
-            $primary_taxonomy = $color_taxonomy;
-            $is_image_attribute = false;
-        }
-
-        $primary_attribute_key = $primary_taxonomy ? str_replace('pa_', '', $primary_taxonomy) : '';
-
-        foreach ($available_variations as $variation_data) {
-            $variation_id = $variation_data['variation_id'];
-            $variation = wc_get_product($variation_id);
-
-            // Get variation attributes
-            $attributes = $variation->get_attributes();
-
-            // Check if this variation has the primary attribute (image or color)
-            $attr_value = '';
-            if ($primary_taxonomy && isset($attributes[$primary_taxonomy])) {
-                $attr_value = $attributes[$primary_taxonomy];
-            } elseif ($primary_attribute_key && isset($attributes[$primary_attribute_key])) {
-                $attr_value = $attributes[$primary_attribute_key];
-            }
-
-            // Only process if attribute is found and not already processed
-            if (!empty($attr_value) && !isset($variations_data[$attr_value])) {
-                $post_thumbnail_id = $variation->get_image_id();
-
-                if ($post_thumbnail_id) {
-                    // Always show main image
-                    $html = somnia_get_gallery_image_html($post_thumbnail_id, false, false);
-
-                    // If there are gallery images, show the first one
-                    $variation_gallery = get_post_meta($variation_id, '_variation_gallery', true);
-                    $attachment_ids = $variation_gallery ? explode(',', $variation_gallery) : array();
-
-                    if (!empty($attachment_ids)  && isset($attachment_ids[0])) {
-                        $html .= somnia_get_gallery_image_html($attachment_ids[0], false, false);
-                    } else {
-                        // If no gallery images, show main image again
-                        $html .= somnia_get_gallery_image_html($post_thumbnail_id, false, false);
-                    }
-
-                    $variable_image_html = apply_filters('woocommerce_loop_product_image_thumbnail_html', $html, $post_thumbnail_id); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
-                } else {
-                    $wrapper_classname = $product->is_type('variable') && ! empty($product->get_available_variations('image')) ?
-                        'woocommerce-product-gallery__image woocommerce-product-gallery__image--placeholder' :
-                        'woocommerce-product-gallery__image--placeholder';
-                    $html = sprintf('<div class="%s">', esc_attr($wrapper_classname));
-                    $html .= sprintf('<img src="%s" alt="%s" class="wp-post-image" />', esc_url(wc_placeholder_img_src('woocommerce_thumbnail')), esc_html__('Awaiting product image', 'somnia'));
-                    $html .= '</div>';
-
-                    $variable_image_html = apply_filters('woocommerce_loop_product_image_thumbnail_html', $html, $post_thumbnail_id); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
-                }
-
-                // Get term info for display
-                $term = $primary_taxonomy ? get_term_by('slug', $attr_value, $primary_taxonomy) : null;
-                $attr_name = $term ? $term->name : $attr_value;
-
-                // Get attribute display value from ACF if available
-                $attr_display = '';
-                if ($term && $primary_taxonomy) {
-                    if ($is_image_attribute) {
-                        // Get image ID from ACF field
-                        $image_data = get_field('image_tax_attributes', $primary_taxonomy . '_' . $term->term_id);
-                        $image_id = 0;
-                        if ($image_data) {
-                            if (is_array($image_data) && isset($image_data['ID'])) {
-                                $image_id = $image_data['ID'];
-                            } elseif (is_numeric($image_data)) {
-                                $image_id = $image_data;
-                            }
-                        }
-                        // Get image URL
-                        $attr_display = $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '';
-                    } else {
-                        // Get color hex from ACF
-                        $attr_display = get_field('color_tax_attributes', $primary_taxonomy . '_' . $term->term_id);
-                    }
-                }
-                if (empty($attr_display)) {
-                    $attr_display = $attr_value; // fallback to slug
-                }
-
-                // Store variation data
-                $variations_data[$attr_value] = array(
-                    'variation_id' => $variation_id,
-                    'attr_name' => $attr_name,
-                    'attr_display' => $attr_display,
-                    'attr_type' => $is_image_attribute ? 'image' : 'color',
-                    'variable_image_html' => $variable_image_html,
-                    'has_gallery' => !empty($variable_image_html)
-                );
-            }
-        }
-
-        // Convert variations data to JSON for JavaScript
-        $variations_json = !empty($variations_data) ? json_encode($variations_data) : '{}';
-
-        echo '<div class="bt-product-add-to-cart-variable" data-attribute-variations="' . esc_attr($variations_json) . '" data-product-id="' . esc_attr($product->get_id()) . '">';
-
-        do_action('somnia_woocommerce_template_single_add_to_cart');
-
-        echo '</div>';
+        $product_id = $product->get_id();
+        echo '<a class="button add_to_cart_button product_type_variable bt-loop-add-to-cart-btn" href="#" data-id="' . esc_attr($product_id) . '">';
+        echo esc_html__('Choose Options', 'somnia');
+        echo '</a>';
     }
 }
 // hook button add to cart variable after add to cart

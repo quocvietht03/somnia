@@ -297,7 +297,8 @@ class Widget_ProductCompare extends Widget_Base
 													foreach ($colors as $color_id) {
 														if ($count >= 6) break; // Only show max 6 colors
 
-														$color_value = get_field('color_tax_attributes', $color_taxonomy . '_' . $color_id);
+														// Get color from metafield
+														$color_value = get_term_meta($color_id, 'somnia_term_color', true);
 														$color = get_term($color_id, $color_taxonomy);
 														if (!$color_value) {
 															$color_value = $color->slug;

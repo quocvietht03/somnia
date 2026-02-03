@@ -1159,8 +1159,11 @@
 	}
 	/* Product Quick View */
 	function SomniaProductQuickView() {
-		if ($('.bt-product-quick-view-btn').length > 0) {
-			$('body').append('<div class="bt-popup-quick-view"><div class="bt-quick-view-overlay"></div><div class="bt-quick-view-close"></div><div class="bt-quick-view-body"><div class="bt-quick-view-load"></div></div></div>');
+		var hasQuickViewTrigger = $('.bt-product-quick-view-btn').length > 0 || $('.bt-loop-add-to-cart-btn').length > 0;
+		if (hasQuickViewTrigger) {
+			if ($('.bt-popup-quick-view').length === 0) {
+				$('body').append('<div class="bt-popup-quick-view"><div class="bt-quick-view-overlay"></div><div class="bt-quick-view-close"></div><div class="bt-quick-view-body"><div class="bt-quick-view-load"></div></div></div>');
+			}
 			function showQuickViewPopup() {
 				$('.bt-popup-quick-view').addClass('active');
 				$('.bt-quick-view-body').addClass('show');
@@ -1179,11 +1182,10 @@
 					'padding-right': '0' // Reset padding-right
 				});
 			}
-			$(document).on('click', '.bt-product-quick-view-btn', function (e) {
-				e.preventDefault();
-				var productid = $(this).data('id');
-				$(this).find('.tooltip').remove();
-				$(this).addClass('loading');
+			function openQuickViewByProductId($btn, productid) {
+				if (!productid) return;
+				$btn.find('.tooltip').remove();
+				$btn.addClass('loading');
 				var param_ajax = {
 					action: 'somnia_products_quick_view',
 					productid: productid,
@@ -1193,12 +1195,9 @@
 					dataType: 'json',
 					url: AJ_Options.ajax_url,
 					data: param_ajax,
-					beforeSend: function () {
-
-					},
 					success: function (response) {
+						$('.bt-product-quick-view-btn, .bt-loop-add-to-cart-btn').removeClass('loading');
 						if (response.success) {
-							$('.bt-product-quick-view-btn').removeClass('loading');
 							showQuickViewPopup();
 							$('.bt-popup-quick-view .bt-quick-view-load').html(response.data['product']).fadeIn('slow');
 							SomniaLoadShopQuickView();
@@ -1207,15 +1206,29 @@
 							if (typeof $.fn.wc_variation_form !== 'undefined') {
 								$('.bt-quickview-product .variations_form').wc_variation_form();
 							}
+							SomniaProductVariationHandler();
 						} else {
 							console.log('error');
 						}
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
+						$('.bt-product-quick-view-btn, .bt-loop-add-to-cart-btn').removeClass('loading');
 						console.log('The following error occured: ' + textStatus, errorThrown);
 					}
 				});
-
+			}
+			$(document).on('click', '.bt-product-quick-view-btn', function (e) {
+				e.preventDefault();
+				var productid = $(this).data('id');
+				openQuickViewByProductId($(this), productid);
+			});
+			/* .bt-loop-add-to-cart-btn: open quick view when not inside popup (e.g. product loop) */
+			$(document).on('click', '.bt-loop-add-to-cart-btn', function (e) {
+				if ($(this).closest('.bt-popup-quick-view, .bt-quickview-product').length > 0) return; // inside quick view: keep add-to-cart
+				var productid = $(this).data('product_id') || $(this).data('productId') || $(this).data('id');
+				if (!productid) return;
+				e.preventDefault();
+				openQuickViewByProductId($(this), productid);
 			});
 			$(document).on('click', '.bt-popup-quick-view .bt-quick-view-overlay', function () {
 				removeQuickViewPopup();
@@ -2732,6 +2745,9 @@
 		SomniaAttachTooltip('.bt-product-compare-btn.no-added', 'Add to Compare');
 		SomniaAttachTooltip('.bt-product-compare-btn.added', 'View Compare');
 		SomniaAttachTooltip('.bt-product-quick-view-btn', 'Quick View');
+		SomniaAttachTooltip('.bt-product-icon-btn .bt-loop-add-to-cart-btn', 'Choose options');
+		SomniaAttachTooltip('.bt-product-icon-btn .product_type_simple', 'Add to Cart');
+		SomniaAttachTooltip('.bt-product-icon-btn .wc-forward', 'View Cart');
 	}
 	function SomniaUpdateMiniCart() {
 		var timeout;

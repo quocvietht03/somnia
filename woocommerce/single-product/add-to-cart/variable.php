@@ -68,6 +68,11 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 			<?php
 			// Helper function to check if an option is available based on selected attributes
 			$check_option_availability = function ($option_value, $current_attribute_name, $all_attributes, $selected_attributes, $available_variations) {
+				// Check if available_variations is valid array
+				if (!is_array($available_variations) || empty($available_variations)) {
+					return true; // If no variations data, assume all options are available
+				}
+
 				// Build test attributes array - exclude current attribute and add the test option
 				$test_attributes = $selected_attributes;
 				unset($test_attributes[$current_attribute_name]); // Remove current attribute from test
@@ -140,12 +145,13 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 				// Check if this is color or image attribute and add dynamic class
 				$color_taxonomy = function_exists('somnia_get_color_taxonomy') ? somnia_get_color_taxonomy() : false;
 				$image_taxonomy = function_exists('somnia_get_image_taxonomy') ? somnia_get_image_taxonomy() : false;
+				$is_select_attr = function_exists('somnia_is_select_attribute') ? somnia_is_select_attribute($attribute_name) : false;
 
-				// Prioritize image over color
+				// Prioritize image over color, check select type
 				$is_image_attr = $image_taxonomy && ($attribute_name === $image_taxonomy);
 				$is_color_attr = !$is_image_attr && $color_taxonomy && ($attribute_name === $color_taxonomy);
 
-				$attr_class = $is_image_attr ? ' bt-is-image-attribute' : ($is_color_attr ? ' bt-is-color-attribute' : '');
+				$attr_class = $is_image_attr ? ' bt-is-image-attribute' : ($is_color_attr ? ' bt-is-color-attribute' : ($is_select_attr ? ' bt-is-select-attribute' : ''));
 			?>
 				<div class="bt-attributes--item<?php echo esc_attr($attr_class); ?>" data-attribute-name="<?php echo esc_attr($data_attribute_slug); ?>">
 					<div class="bt-attributes--name">
@@ -194,17 +200,9 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 							foreach ($ordered_options as $option) :
 								$term = get_term_by('slug', $option, $attribute_name);
 								$term_id = $term ? $term->term_id : '';
-								$image_data = $term_id ? get_field('image_tax_attributes', $attribute_name . '_' . $term_id) : '';
-
-								// Get image ID from ACF field
-								$image_id = 0;
-								if ($image_data) {
-									if (is_array($image_data) && isset($image_data['ID'])) {
-										$image_id = $image_data['ID'];
-									} elseif (is_numeric($image_data)) {
-										$image_id = $image_data;
-									}
-								}
+								// Get image ID from metafield
+								$image_id = $term_id ? get_term_meta($term_id, 'somnia_term_image', true) : 0;
+								$image_id = absint($image_id);
 
 								// Get image URL
 								$image_url = $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '';
@@ -241,7 +239,8 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 							foreach ($ordered_options as $option) :
 								$term = get_term_by('slug', $option, $attribute_name);
 								$term_id = $term ? $term->term_id : '';
-								$color = $term_id ? get_field('color_tax_attributes', $attribute_name . '_' . $term_id) : '';
+								// Get color from metafield
+								$color = $term_id ? get_term_meta($term_id, 'somnia_term_color', true) : '';
 								if (!$color) {
 									$color = $option;
 								}
@@ -263,6 +262,29 @@ do_action('woocommerce_before_add_to_cart_form'); ?>
 									<label><?php echo esc_html($term ? $term->name : $option); ?></label>
 								</div>
 							<?php endforeach; ?>
+						</div>
+					<?php } elseif ($is_select_attr) { ?>
+						<div class="bt-attributes--value bt-value-select">
+							<select class="bt-js-select" data-attribute="<?php echo esc_attr($data_attribute_slug); ?>">
+								<option value=""><?php echo esc_html__('Choose an option', 'somnia'); ?></option>
+								<?php
+								foreach ($ordered_options as $option) :
+									$term = get_term_by('slug', $option, $attribute_name);
+									$display_name = $term ? $term->name : $option;
+									$is_selected = ($selected_value === $option);
+									
+									// Check if option is available based on selected attributes
+									$is_available = $check_option_availability($option, $attribute_name, $attributes, $selected_attributes, $available_variations);
+								?>
+									<option 
+										value="<?php echo esc_attr($option); ?>" 
+										<?php selected($is_selected, true); ?>
+										<?php disabled(!$is_available, true); ?>
+									>
+										<?php echo esc_html($display_name); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
 						</div>
 					<?php } else { ?>
 						<div class="bt-attributes--value">
