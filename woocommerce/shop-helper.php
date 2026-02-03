@@ -339,6 +339,34 @@ function somnia_should_show_products()
     return true; // Default to showing products
 }
 
+function somnia_register_product_taxonomy()
+{   
+    $labels = [
+        'name'              => __( 'Comfort Scale', 'somnia' ),
+        'singular_name'     => __( 'Comfort Scale', 'somnia' ),
+        'search_items'      => __( 'Search Comfort Scales', 'somnia' ),
+        'all_items'         => __( 'All Comfort Scales', 'somnia' ),
+        'edit_item'         => __( 'Edit Comfort Scale', 'somnia' ),
+        'update_item'       => __( 'Update Comfort Scale', 'somnia' ),
+        'add_new_item'      => __( 'Add New Comfort Scale', 'somnia' ),
+        'new_item_name'     => __( 'New Comfort Scale', 'somnia' ),
+        'menu_name'         => __( 'Comfort Scale', 'somnia' ),
+    ];
+
+    $args = array(
+        'hierarchical' => true,
+        'labels' => $labels,
+        'show_ui' => true,
+        'show_admin_column' => false,
+        'query_var' => true,
+        'show_in_rest' => true,
+        'publicly_queryable' => false,
+    );
+
+    register_taxonomy('comfort_scale', array('product'), $args);
+}
+
+add_action('init', 'somnia_register_product_taxonomy');
 
 function somnia_woocommerce_single_product_meta()
 {
