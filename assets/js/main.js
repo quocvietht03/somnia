@@ -1692,14 +1692,9 @@
 			e.preventDefault();
 
 			var view_type = $(this).data('view');
-
-			if ('grid-3' == view_type) {
-				$('.bt-product-filter-form .bt-product-view-type').val('');
-				$('.bt-product-layout').attr('data-view', '');
-			} else {
-				$('.bt-product-filter-form .bt-product-view-type').val(view_type);
-				$('.bt-product-layout').attr('data-view', view_type);
-			}
+			console.log(view_type);
+			$('.bt-product-filter-form .bt-product-view-type').val(view_type);
+			$('.bt-product-layout').attr('data-view', view_type);
 
 			$('.bt-view-type').removeClass('active');
 			$(this).addClass('active');

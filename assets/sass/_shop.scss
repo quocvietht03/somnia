@@ -87,11 +87,11 @@
         &:has(> input:checked):not(:has(.bt-children-categories > .item-radio > input:checked)) {
           > label {
             font-weight: 500;
-            color: $color-accent;
+            color: $color-primary;
           }
           > span {
             font-weight: 500;
-            color: $color-accent;
+            color: $color-primary;
           }
         }
 
@@ -382,14 +382,14 @@
         line-height: 26px;
         color: $color-text;
         &.checked {
-          color: $color-accent;
+          color: $color-primary;
           font-weight: 500;
           svg {
             opacity: 1;
           }
           span {
-            background: $color-accent;
-            border-color: $color-accent;
+            background: $color-primary;
+            border-color: $color-primary;
           }
         }
         span {
@@ -470,7 +470,7 @@
         cursor: pointer;
         margin-left: 1px;
         .noUi-connect {
-          background: $color-accent;
+          background: $color-primary;
         }
         .noUi-handle {
           cursor: pointer;
@@ -481,7 +481,7 @@
           &.noUi-handle-lower {
             width: 16px;
             height: 16px;
-            border: 3px solid $color-accent;
+            border: 3px solid $color-primary;
             box-shadow: none;
             border-radius: 50%;
             right: -15px;
@@ -489,7 +489,7 @@
           &.noUi-handle-upper {
             width: 16px;
             height: 16px;
-            border: 3px solid $color-accent;
+            border: 3px solid $color-primary;
             box-shadow: none;
             border-radius: 50%;
             right: -15px;
@@ -522,7 +522,7 @@
           box-sizing: border-box;
           font-size: 16px;
           font-style: normal;
-          font-weight: 400;
+          font-weight: 500;
           line-height: 26px;
           color: $color-primary;
           border-width: 1px;
@@ -716,7 +716,10 @@
     .bt-main-product-row {
       display: flex;
       justify-content: space-between;
-      gap: 20px;
+      gap: 60px;
+      @media (max-width: $break-lg) {
+        gap: 40px;
+      }
       .bt-products-sidebar {
         width: 270px;
         .bt-product-sidebar {
@@ -2713,10 +2716,12 @@
       margin: 0;
       display: block;
       text-align: left;
-      @media (min-width: $break-sm) {
-        &:hover {
-          color: $color-accent;
-        }
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: transparent;
+      transition: color .3s ease, text-decoration-color .3s ease;
+      &:hover {
+        text-decoration-color: $color-primary;
       }
     }
     span.price {
@@ -3737,9 +3742,12 @@
     padding-bottom: 0;
   }
   .bt-main-products-ss {
-    padding: 80px 0;
+    padding: 80px 25px;
+    @media (max-width: $break-tl) {
+      padding: 60px 15px;
+    }
     @media (max-width: $break-sm) {
-      padding: 60px 0;
+      padding: 60px 5px;
     }
   }
 
@@ -3949,6 +3957,7 @@
       align-items: center;
       gap: 6px;
       svg {
+        color: $color-primary;
         position: relative;
         top: -1px;
         @media (max-width: 360px) {
@@ -3957,11 +3966,11 @@
         }
       }
       .bt-results-count {
-        font-size: 14px;
+        font-size: 16px;
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
-        color: $color-text;
+        color: $color-primary;
         @media (max-width: $break-xs) {
           font-size: 14px;
           line-height: 18px;
@@ -3981,7 +3990,7 @@
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
-        color: $color-text;
+        color: $color-primary;
         @media (max-width: 767px) {
           display: none;
         }
@@ -4022,7 +4031,7 @@
           }
         }
         .select2-selection--single {
-          border: 1px solid #e4e4e4;
+          border: 1px solid $color-line;
           border-radius: 4px;
           padding: 9px 12px;
           height: 40px;
@@ -4221,12 +4230,6 @@
       .product {
         width: calc(33.33% - 20px);
       }
-      @media (max-width: $break-lg) {
-        gap: 20px;
-        .product {
-          width: calc(33.33% - 14px);
-        }
-      }
       @media (max-width: $break-sm) {
         .product {
           width: calc(50% - 10px);
@@ -4243,15 +4246,139 @@
         .product {
           width: calc(50% - 15px);
         }
-        @media (max-width: $break-tl) {
-          gap: 20px;
+        @media (max-width: $break-lg) {
           .product {
-            width: calc(50% - 10px);
+            .bt-product-icon-btn {
+              gap: 12px;
+              .button,
+              .added_to_cart {
+                width: 38px;
+                height: 38px;
+                &:before {
+                  background-size: 26px;
+                }
+                &:after {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+              .bt-icon-btn {
+                width: 38px;
+                height: 38px;
+                svg {
+                  width: 22px;
+                  height: 22px;
+                }
+                &:after {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+            }
+          }
+        }
+        @media (max-width: $break-tl) {
+          gap: 30px;
+          .product {
+            width: calc(50% - 15px);
+            .bt-product-icon-btn {
+              gap: 12px;
+              .button,
+              .added_to_cart {
+                width: 38px;
+                height: 38px;
+                &:before {
+                  background-size: 26px;
+                }
+                &:after {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+              .bt-icon-btn {
+                width: 38px;
+                height: 38px;
+                svg {
+                  width: 22px;
+                  height: 22px;
+                }
+                &:after {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+            }
           }
         }
         @media (max-width: $break-xs) {
           .product {
             width: 100%;
+          }
+        }
+      }
+    }
+    &[data-view="grid-3"] {
+      .woocommerce-loop-products {
+        @media (max-width: 1320px) {
+          .product {
+            .bt-product-icon-btn {
+              gap: 12px;
+              .button,
+              .added_to_cart {
+                width: 38px;
+                height: 38px;
+                &:before {
+                  background-size: 26px;
+                }
+                &:after {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+              .bt-icon-btn {
+                width: 38px;
+                height: 38px;
+                svg {
+                  width: 22px;
+                  height: 22px;
+                }
+                &:after {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+            }
+          }
+        }
+        @media (max-width: $break-lg) {
+          .product {
+            .bt-product-icon-btn {
+              gap: 12px;
+              .button,
+              .added_to_cart {
+                width: 32px;
+                height: 32px;
+                &:before {
+                  background-size: 24px;
+                }
+                &:after {
+                  width: 16px;
+                  height: 16px;
+                }
+              }
+              .bt-icon-btn {
+                width: 32px;
+                height: 32px;
+                svg {
+                  width: 20px;
+                  height: 20px;
+                }
+                &:after {
+                  width: 16px;
+                  height: 16px;
+                }
+              }
+            }
           }
         }
       }
@@ -4264,12 +4391,27 @@
             gap: 8px;
             .button,
             .added_to_cart {
-              width: 44px;
-              height: 44px;
+              width: 32px;
+              height: 32px;
+              &:before {
+                background-size: 24px;
+              }
+              &:after {
+                width: 16px;
+                height: 16px;
+              }
             }
             .bt-icon-btn {
-              width: 44px;
-              height: 44px;
+              width: 32px;
+              height: 32px;
+              svg {
+                width: 20px;
+                height: 20px;
+              }
+              &:after {
+                width: 16px;
+                height: 16px;
+              }
             }
           }
         }
@@ -4305,6 +4447,9 @@
           align-items: center;
           &__thumbnail {
             width: 300px;
+            @media (max-width: $break-lg) {
+              width: 260px;
+            }
             .bt-product-icon-btn {
               display: none;
             }
@@ -4315,6 +4460,10 @@
           &__infor {
             width: calc(100% - 300px);
             padding: 0 0 0 40px;
+            @media (max-width: $break-lg) {
+              width: calc(100% - 260px);
+              padding: 0 0 0 30px;
+            }
             .bt-product-short-description {
               display: block;
               font-size: 16px;
@@ -4327,8 +4476,11 @@
             .bt-product-icon-btn {
               display: flex;
               flex-wrap: wrap;
-              gap: 12px;
+              gap: 16px;
               margin: 28px 0 0 0;
+              @media (max-width: $break-lg) {
+                gap: 12px;
+              }
               .tooltip {
                 position: absolute;
                 bottom: 100%;
@@ -4359,7 +4511,7 @@
               }
               .button,
               .added_to_cart {
-                color: #fff;
+                color: $color-primary;
                 text-align: center;
                 font-family: $accent-font;
                 font-size: 16px;
@@ -4369,16 +4521,22 @@
                 text-transform: uppercase;
                 width: auto;
                 max-width: 100%;
-                padding: 7px 28px;
-                border-radius: 4px;
+                padding: 7px 24px;
+                border-radius: 7px;
                 min-width: 276px;
                 border: 1px solid $color-accent;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 background: $color-accent;
-                @media (max-width: 1250px) {
-                  min-width: auto;
+                @media (max-width: 1280px) {
+                  min-width: 200px;
+                }
+                @media (max-width: $break-lg) {
+                  font-size: 14px;
+                  line-height: 24px;
+                  padding: 5px 20px;
+                  min-width: 140px;
                 }
 
                 &.added {
@@ -4421,6 +4579,10 @@
                   animation-iteration-count: infinite;
                   animation-timing-function: linear;
                   opacity: 0;
+                  @media (min-width: $break-lg) {
+                    width: 16px;
+                    height: 16px;
+                  }
                 }
 
                 &.loading {
@@ -4496,7 +4658,6 @@
                   }
                   .bt-icon-not-added {
                     display: block;
-                    width: 24px;
                   }
                   &.added {
                     .bt-icon-added {
@@ -4507,32 +4668,21 @@
                     }
                   }
                 }
-              }
-              .bt-add-to-cart {
-                a {
-                  color: #fff;
-                  text-align: center;
-                  font-family: $accent-font;
-                  font-size: 14px;
-                  font-style: normal;
-                  font-weight: 500;
-                  line-height: 26px;
-                  text-transform: uppercase;
-                  width: auto;
-                  max-width: 100%;
-                  padding: 7px 28px;
-                  border-radius: 4px;
-                  min-width: 276px;
-                  border: 1px solid $color-accent;
-                  background: $color-accent;
-                  @media (max-width: 1250px) {
-                    min-width: auto;
+
+                @media (max-width: $break-lg) {
+                  width: 36px;
+                  height: 36px;
+                  &::after {
+                    width: 16px;
+                    height: 16px;
                   }
-                  &.added {
-                    display: none;
+                  svg {
+                    width: 20px;
+                    height: 20px;
                   }
                 }
               }
+              
             }
           }
           @media (max-width: $break-sm) {
