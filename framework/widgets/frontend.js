@@ -2378,6 +2378,20 @@
 				});
 			}
 		}
+		const $progressBar = $layoutWidget.find('.bt-progress-bar-sold');
+		if (!$progressBar.hasClass('bt-progress-initialized')) {
+			$progressBar.addClass('bt-progress-initialized');
+			let progressWidth = $progressBar.data("width");
+			let currentWidth = 0;
+			var interval = setInterval(function () {
+				if (currentWidth >= progressWidth) {
+					clearInterval(interval);
+				} else {
+					currentWidth++;
+					$progressBar.css("width", currentWidth + "%");
+				}
+			}, 30);
+		}
 	}
 	function SomniaProductHotspotAddSetCart($container) {
 		const $variationForm = $container.find('.variations_form');

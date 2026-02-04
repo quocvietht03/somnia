@@ -361,7 +361,7 @@
 				$(this).closest('.variations_form').find('select#' + attributeName).val(valueItem).trigger('change');
 				var gallerylayout = '';
 				var $productContainer = $(this).closest('.bt-product-inner, .bt-quickview-product');
-				
+
 				// Check if we're in quick view
 				if ($productContainer.closest('.bt-popup-quick-view').length > 0 || $productContainer.hasClass('bt-quickview-product')) {
 					gallerylayout = 'quickview-slider';
@@ -401,31 +401,47 @@
 								$addToCartBtn.attr('data-product-quantity', newQuantity);
 							});
 						}
-						
-					// Check if variation has custom image before loading gallery
-					var hasCustomImage = false;
-					if (variation.image && variation.image.src) {
-						// Get parent product image source from data attribute (more reliable than selector)
-						var parentImageSrc = $productContainer.data('parent-image-src');
-						var variationImageSrc = variation.image.src;
-						
-						if (parentImageSrc) {
-							// Compare image sources (remove query strings and size suffixes for comparison)
-							// WordPress adds size suffixes like -300x300, -150x150, etc.
-							var cleanParentSrc = parentImageSrc.split('?')[0].replace(/-\d+x\d+\.(jpg|jpeg|png|gif|webp)$/i, '.$1');
-							var cleanVariationSrc = variationImageSrc.split('?')[0].replace(/-\d+x\d+\.(jpg|jpeg|png|gif|webp)$/i, '.$1');
-							// Check if images are different and variation image is not placeholder
-							hasCustomImage = cleanVariationSrc !== cleanParentSrc && 
-											 variationImageSrc.indexOf('woocommerce-placeholder') === -1 &&
-											 variationImageSrc.indexOf('placeholder.png') === -1;
+						//Get variation price from data-product_variations
+						var $form = $(this).closest('.variations_form');
+						var variations = $form.data('product_variations');
+						if (variations) {
+							// Find matching variation by ID
+							var variation = variations.find(function (v) {
+								return v.variation_id === variationId;
+							});
+							if (variation && variation.price_html) {
+								// Format price with currency symbol
+								var formattedPrice = '<span class="bt-price-add-cart"> - ' +
+									variation.price_html + '</span>';
+								// Update add to cart button text
+								$form.find(".single_add_to_cart_button")
+									.html("Add to cart" + formattedPrice);
+							}
 						}
-					}
+						// Check if variation has custom image before loading gallery
+						var hasCustomImage = false;
+						if (variation.image && variation.image.src) {
+							// Get parent product image source from data attribute (more reliable than selector)
+							var parentImageSrc = $productContainer.data('parent-image-src');
+							var variationImageSrc = variation.image.src;
+
+							if (parentImageSrc) {
+								// Compare image sources (remove query strings and size suffixes for comparison)
+								// WordPress adds size suffixes like -300x300, -150x150, etc.
+								var cleanParentSrc = parentImageSrc.split('?')[0].replace(/-\d+x\d+\.(jpg|jpeg|png|gif|webp)$/i, '.$1');
+								var cleanVariationSrc = variationImageSrc.split('?')[0].replace(/-\d+x\d+\.(jpg|jpeg|png|gif|webp)$/i, '.$1');
+								// Check if images are different and variation image is not placeholder
+								hasCustomImage = cleanVariationSrc !== cleanParentSrc &&
+									variationImageSrc.indexOf('woocommerce-placeholder') === -1 &&
+									variationImageSrc.indexOf('placeholder.png') === -1;
+							}
+						}
 
 						// Only load gallery if variation has custom image
 						if (!hasCustomImage) {
 							return;
 						}
-						
+
 						// Load gallery
 						var param_ajax = {
 							action: 'somnia_load_product_gallery',
@@ -509,17 +525,17 @@
 											if (existingSwiper) {
 												existingSwiper.destroy(true, true);
 											}
-											
+
 											$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
-											
+
 											// Re-init quickview slider
-											setTimeout(function() {
+											setTimeout(function () {
 												if ($('.bt-popup-quick-view .bt-gallery-slider-product').length > 0) {
 													var $quickviewSlider = $('.bt-popup-quick-view .bt-gallery-slider-product');
 													var $wrapper = $quickviewSlider.find('.swiper-wrapper');
 													var $slides = $wrapper.find('.swiper-slide');
 													var slideCount = $slides.length;
-													
+
 													// Duplicate slides to ensure minimum 3 slides
 													if (slideCount > 0 && slideCount < 3) {
 														var slidesToAdd = 3 - slideCount;
@@ -528,7 +544,7 @@
 															$wrapper.append($clonedSlide);
 														}
 													}
-													
+
 													var quickviewSlider = new Swiper('.bt-popup-quick-view .bt-gallery-slider-product', {
 														spaceBetween: 30,
 														loop: true,
@@ -542,7 +558,7 @@
 														centeredSlides: false,
 													});
 												}
-												
+
 												$productContainer.find('.bt-skeleton-gallery').remove();
 												$productContainer.find('.bt-gallery-slider-products').removeClass('loading');
 											}, 100);
@@ -592,41 +608,25 @@
 												$productContainer.find('.woocommerce-product-gallery').removeClass('loading');
 												$productContainer.find('.bt-skeleton-gallery').remove();
 											}, 200);
-									}
-									
-									// Update parent image src for next comparison
-									// Store the full variation image URL (not cleaned) for accurate comparison
-									if (variation.image && variation.image.src) {
-										$productContainer.data('parent-image-src', variation.image.src);
-									}
-								}
-								$productContainer.find('.bt-attributes-wrap .bt-js-item').removeClass('disable');
+										}
 
-							}
-						},
-						error: function (xhr, status, error) {
+										// Update parent image src for next comparison
+										// Store the full variation image URL (not cleaned) for accurate comparison
+										if (variation.image && variation.image.src) {
+											$productContainer.data('parent-image-src', variation.image.src);
+										}
+									}
+									$productContainer.find('.bt-attributes-wrap .bt-js-item').removeClass('disable');
+
+								}
+							},
+							error: function (xhr, status, error) {
 								console.log('Error loading gallery:', error);
 								$productContainer.find('.woocommerce-product-gallery').removeClass('loading');
 								$productContainer.find('.bt-attributes-wrap .bt-js-item').removeClass('disable');
 							}
 						});
-						//Get variation price from data-product_variations
-						var $form = $(this).closest('.variations_form');
-						var variations = $form.data('product_variations');
-						if (variations) {
-							// Find matching variation by ID
-							var variation = variations.find(function (v) {
-								return v.variation_id === variationId;
-							});
-							if (variation && variation.price_html) {
-								// Format price with currency symbol
-								var formattedPrice = '<span class="bt-price-add-cart"> - ' +
-									variation.price_html + '</span>';
-								// Update add to cart button text
-								$form.find(".single_add_to_cart_button")
-									.html("Add to cart" + formattedPrice);
-							}
-						}
+
 					} else {
 						$(this).closest('.variations_form').find('.bt-button-buy-now a').addClass('disabled').removeAttr('data-variation');
 						if ($('.bt-product-add-to-cart-variable').length > 0) {
@@ -707,7 +707,7 @@
 				var $wrapper = $quickviewSlider.find('.swiper-wrapper');
 				var $slides = $wrapper.find('.swiper-slide');
 				var slideCount = $slides.length;
-				
+
 				// Duplicate slides to ensure minimum 3 slides
 				if (slideCount > 0 && slideCount < 3) {
 					var slidesToAdd = 3 - slideCount;
@@ -716,7 +716,7 @@
 						$wrapper.append($clonedSlide);
 					}
 				}
-				
+
 				var quickviewSlider = new Swiper('.bt-popup-quick-view .bt-gallery-slider-product', {
 					spaceBetween: 30,
 					loop: true,
@@ -1312,6 +1312,7 @@
 								$('.bt-quickview-product .variations_form').wc_variation_form();
 							}
 							SomniaProductVariationHandler();
+							SomniaFrequentlyBoughtTogether();
 						} else {
 							console.log('error');
 						}
@@ -3584,6 +3585,7 @@
 			var product_id = $button.data('product-id').toString();
 			var variation_id = $form.find('input.variation_id').val();
 			var quantity = $form.find('.quantity .qty').val() || 1;
+			var fbt_product_id = $form.find('input[name="fbt_product_id"]').val();
 
 			var param_ajax = {
 				action: 'somnia_products_add_to_cart_variable',
@@ -3595,6 +3597,11 @@
 			if (variation_id) {
 				param_ajax.variation_id = variation_id;
 			}
+
+			// Add fbt_product_id to AJAX data if it exists
+			if (fbt_product_id) {
+				param_ajax.fbt_product_id = fbt_product_id;
+			}
 			$.ajax({
 				type: 'POST',
 				dataType: 'json',
@@ -3603,11 +3610,12 @@
 				beforeSend: function () {
 
 				},
-				success: function (response) {
-					if (response.success) {
-						$('.bt-js-add-to-cart-variable').removeClass('loading');
-						var productId = variation_id || product_id;
-				
+			success: function (response) {
+				if (response.success) {
+					$('.bt-js-add-to-cart-variable').removeClass('loading');
+					var productId = variation_id || product_id;
+					var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
+
 					// Update mini cart after successful add to cart
 					$.ajax({
 						url: wc_cart_fragments_params.wc_ajax_url.toString().replace('%%endpoint%%', 'get_refreshed_fragments'),
@@ -3625,10 +3633,16 @@
 								}
 								// Trigger fragments refreshed event to update note button class
 								$(document.body).trigger('wc_fragments_refreshed');
-								
+
 								// Open mini cart after fragments are loaded
 								if (productId) {
 									SomniaHandleCartAction(productId);
+								}
+								// Show notification for FBT product if it exists
+								if (fbtProductId) {
+									setTimeout(function() {
+										SomniaHandleCartAction(fbtProductId);
+									}, 500);
 								}
 								// Free shipping message
 								SomniaFreeShippingMessage();
@@ -3638,10 +3652,10 @@
 							console.error('Failed to update mini cart.');
 						}
 					});
-					} else {
-						console.log('error');
-					}
-				},
+				} else {
+					console.log('error');
+				}
+			},
 				error: function (jqXHR, textStatus, errorThrown) {
 					console.log('The following error occured: ' + textStatus, errorThrown);
 				}
@@ -3665,12 +3679,18 @@
 			// Get the latest values from the form
 			var product_id = $button.data('product-id').toString();
 			var quantity = $form.find('.quantity .qty').val() || 1;
+			var fbt_product_id = $form.find('input[name="fbt_product_id"]').val();
 
 			var param_ajax = {
 				action: 'somnia_products_add_to_cart_simple',
 				product_id: product_id,
 				quantity: quantity
 			};
+
+			// Add fbt_product_id to AJAX data if it exists
+			if (fbt_product_id) {
+				param_ajax.fbt_product_id = fbt_product_id;
+			}
 
 			$.ajax({
 				type: 'POST',
@@ -3680,10 +3700,10 @@
 				beforeSend: function () {
 
 				},
-				success: function (response) {
-					if (response.success) {
-						$('.bt-js-add-to-cart-simple').removeClass('loading');
-						
+			success: function (response) {
+				if (response.success) {
+					$('.bt-js-add-to-cart-simple').removeClass('loading');
+					var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
 
 					// Update mini cart after successful add to cart
 					$.ajax({
@@ -3702,10 +3722,16 @@
 								}
 								// Trigger fragments refreshed event to update note button class
 								$(document.body).trigger('wc_fragments_refreshed');
-								
+
 								// Open mini cart after fragments are loaded
 								if (product_id) {
 									SomniaHandleCartAction(product_id);
+								}
+								// Show notification for FBT product if it exists
+								if (fbtProductId) {
+									setTimeout(function() {
+										SomniaHandleCartAction(fbtProductId);
+									}, 500);
 								}
 								// Free shipping message
 								SomniaFreeShippingMessage();
@@ -3715,10 +3741,10 @@
 							console.error('Failed to update mini cart.');
 						}
 					});
-					} else {
-						console.log('error');
-					}
-				},
+				} else {
+					console.log('error');
+				}
+			},
 				error: function (jqXHR, textStatus, errorThrown) {
 					console.log('The following error occured: ' + textStatus, errorThrown);
 				}
@@ -3742,12 +3768,19 @@
 				} else {
 					$form.removeClass('out-of-stock');
 				}
+				$form.find('.bt-attributes-wrap .bt-js-item.active').each(function () {
+					var $item = $(this);
+					var $attrItem = $item.closest('.bt-attributes--item');
+					var attrName = $attrItem.data('attribute-name');
+					var colorTaxonomy = AJ_Options.color_taxonomy;
+					var name = (attrName == colorTaxonomy) ? $item.find('label').html() : $item.html();
+					$attrItem.find('.bt-result').html(name);
+				});
 			});
 		}
 
 		// Handle other variation forms (full logic)
 		if ($variationForms.length > 0) {
-
 			$variationForms.each(function () {
 				var $form = $(this);
 				$form.off('show_variation.somniasetdefault').on('show_variation.somniasetdefault', function (event, variation) {
@@ -3757,14 +3790,6 @@
 					} else {
 						$form.removeClass('out-of-stock');
 					}
-					$form.find('.bt-attributes-wrap .bt-js-item.active').each(function () {
-						var $item = $(this);
-						var $attrItem = $item.closest('.bt-attributes--item');
-						var attrName = $attrItem.data('attribute-name');
-						var colorTaxonomy = AJ_Options.color_taxonomy;
-						var name = (attrName == colorTaxonomy) ? $item.find('label').html() : $item.html();
-						$attrItem.find('.bt-result').html(name);
-					});
 				});
 
 				var $activeItems = $form.find('.bt-attributes-wrap .bt-js-item.active');
@@ -3825,203 +3850,37 @@
 		const $fbtSection = $('.somnia-frequently-bought-together');
 		if ($fbtSection.length === 0) return;
 
-		const $productsList = $fbtSection.find('.fbt-products-list');
-		const $totalAmount = $fbtSection.find('.fbt-total-amount');
-		const $addToCartBtn = $fbtSection.find('.fbt-add-to-cart-btn');
-		const $currentProduct = $productsList.find('.fbt-current-product');
-		const isVariable = $currentProduct.data('is-variable') === 1;
+		const $fbtSelect = $fbtSection.find('.fbt-products-select');
+		if ($fbtSelect.length === 0) return;
 
-		// Get currency settings
-		const currencySymbol = $productsList.data('currency') || '$';
-		const decimalSeparator = $productsList.data('decimal-separator') || '.';
-		const thousandSeparator = $productsList.data('thousand-separator') || ',';
-
-		let currentVariationId = null;
-		let currentVariationSelected = !isVariable; // If not variable, consider as selected
-
-		// Function to parse price from HTML
-		function parsePrice(priceText) {
-			return parseFloat(
-				priceText
-					.replace(new RegExp('[^0-9' + thousandSeparator + decimalSeparator + ']+', 'g'), '')
-					.replace(new RegExp('\\' + thousandSeparator, 'g'), '')
-					.replace(new RegExp('\\' + decimalSeparator, 'g'), '.')
-			) || 0;
-		}
-
-		// Function to format price
-		function formatPrice(price) {
-			const parts = price.toFixed(2).split('.');
-			parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
-			return currencySymbol + parts.join(decimalSeparator);
-		}
-
-		// Function to calculate total
-		function calculateTotal() {
-			let totalPrice = 0;
-			let regularTotalPrice = 0;
-			let checkedCount = 0;
-
-			$productsList.find('.fbt-product-item').each(function () {
-				const $item = $(this);
-				const $checkbox = $item.find('input[type="checkbox"]');
-
-				if ($checkbox.is(':checked')) {
-					const price = parseFloat($item.data('price')) || 0;
-					const regularPrice = parseFloat($item.data('regular-price')) || price;
-
-					totalPrice += price;
-					regularTotalPrice += regularPrice;
-
-					// Count only non-disabled checkboxes
-					if (!$checkbox.is(':disabled')) {
-						checkedCount++;
-					}
-				}
-			});
-
-			// Update total display
-			if (regularTotalPrice > totalPrice) {
-				$totalAmount.html('<del>' + formatPrice(regularTotalPrice) + '</del> ' + formatPrice(totalPrice));
-			} else {
-				$totalAmount.text(formatPrice(totalPrice));
-			}
-
-			// Enable/disable button
-			// Disabled if: variable product without selection OR no other products checked
-			if (!currentVariationSelected || checkedCount === 0) {
-				$addToCartBtn.prop('disabled', true).addClass('disabled');
-			} else {
-				$addToCartBtn.prop('disabled', false).removeClass('disabled');
-			}
-		}
-
-		// Handle checkbox change
-		$productsList.on('change', 'input[type="checkbox"]:not(:disabled)', function () {
-			calculateTotal();
+		// Initialize select2
+		$('.fbt-products-select').select2({
+			dropdownParent: $('.fbt-products-select-wrapper'),
+			minimumResultsForSearch: Infinity
 		});
 
-		// Listen to WooCommerce variation changes
-		if (isVariable) {
-			$('.variations_form').on('found_variation', function (event, variation) {
-				currentVariationId = variation.variation_id;
-				currentVariationSelected = true;
-
-				// Update current product data
-				$currentProduct.data('product-id', variation.variation_id);
-				$currentProduct.attr('data-product-id', variation.variation_id);
-				$currentProduct.data('price', variation.display_price);
-				$currentProduct.data('regular-price', variation.display_regular_price || variation.display_price);
-
-				// Update checkbox value
-				$currentProduct.find('input[type="checkbox"]').val(variation.variation_id);
-
-				// Update price display
-				const $priceDiv = $currentProduct.find('.fbt-product-price');
-				if (variation.price_html) {
-					$priceDiv.html(variation.price_html);
-				}
-
-				// Update variation text
-				let variationText = '';
-				if (variation.attributes) {
-					const attrValues = [];
-					for (let key in variation.attributes) {
-						if (variation.attributes.hasOwnProperty(key)) {
-							let value = variation.attributes[key];
-							// Capitalize first letter
-							value = value.charAt(0).toUpperCase() + value.slice(1);
-							attrValues.push(value);
-						}
-					}
-					if (attrValues.length > 0) {
-						variationText = ' - ' + attrValues.join('/');
-					}
-				}
-				$currentProduct.find('.fbt-variation-text').text(variationText);
-
-				// Recalculate total
-				calculateTotal();
-			});
-
-			$('.variations_form').on('reset_data', function () {
-				currentVariationId = null;
-				currentVariationSelected = false;
-
-				// Reset variation text
-				$currentProduct.find('.fbt-variation-text').text('');
-
-				// Disable button
-				calculateTotal();
-			});
+		// Add hidden input to form when select changes
+		const $addToCartForm = $('form.cart');
+		const $buttonAddToCart = $addToCartForm.find('button[type="submit"]');
+		
+		// Create hidden input if not exists
+		if ($addToCartForm.find('input[name="fbt_product_id"]').length === 0) {
+			$buttonAddToCart.before('<input type="hidden" name="fbt_product_id" value="">');
 		}
 
-		// Handle add to cart button click
-		$addToCartBtn.on('click', function (e) {
-			e.preventDefault();
+		const $hiddenInput = $addToCartForm.find('input[name="fbt_product_id"]');
 
-			if ($(this).prop('disabled')) {
-				return;
-			}
-			if ($(this).hasClass('bt-view-cart')) {
-				window.location.href = AJ_Options.cart;
-				return;
-			}
-			const productIds = [];
-			$productsList.find('.fbt-product-item input[type="checkbox"]:checked').each(function () {
-				const productId = $(this).val();
-				// For current product, use variation ID if selected
-				if ($(this).closest('.fbt-current-product').length && currentVariationId) {
-					productIds.push(currentVariationId);
-				} else {
-					productIds.push(productId);
-				}
-			});
-
-			if (productIds.length === 0) {
-				return;
-			}
-
-			// Disable button and show loading
-
-			$addToCartBtn.prop('disabled', true).addClass('loading');
-
-			$.ajax({
-				url: AJ_Options.ajax_url,
-				type: 'POST',
-				data: {
-					action: 'somnia_add_fbt_to_cart',
-					product_ids: productIds
-				},
-				success: function (response) {
-					if (response.success) {
-						// Handle cart action for each added product with sequential delay
-						if (response.data.added && response.data.added.length > 0) {
-							response.data.added.forEach((productId, idx) => {
-								setTimeout(() => {
-									SomniaHandleCartAction(productId);
-								}, idx * 300);
-							});
-						}
-
-						// Trigger WooCommerce added_to_cart event
-						$(document.body).trigger('wc_fragment_refresh');
-						$addToCartBtn.text('View Cart').prop('disabled', false).addClass('bt-view-cart');
-					}
-
-					// Reset button
-					$addToCartBtn.prop('disabled', false).removeClass('loading');
-					calculateTotal(); // Recheck state
-				},
-				error: function () {
-					$addToCartBtn.prop('disabled', false).removeClass('loading');
-					calculateTotal(); // Recheck state
-				}
-			});
+		// Update hidden input when select changes
+		$fbtSelect.on('change', function() {
+			const fbtProductId = $(this).val();
+			$hiddenInput.val(fbtProductId);
 		});
 
-		// Calculate initial total on page load
-		calculateTotal();
+		// Set initial value if already selected
+		const initialValue = $fbtSelect.val();
+		if (initialValue) {
+			$hiddenInput.val(initialValue);
+		}
 	}
 
 	/* Elementor Slider Control - Button click to trigger slider arrows */
@@ -4223,16 +4082,16 @@
 			if ($button && $button.data('product_id')) {
 				productId = $button.data('product_id');
 			}
-			
+
 			// Apply fragments if available
 			if (fragments) {
 				$.each(fragments, function (key, value) {
 					$(key).replaceWith(value);
 				});
 			}
-			
+
 			// Wait a bit to ensure DOM is updated before opening mini cart
-			setTimeout(function() {
+			setTimeout(function () {
 				SomniaFreeShippingMessage();
 				if (productId) {
 					SomniaHandleCartAction(productId);

@@ -72,7 +72,7 @@ if (!function_exists('somnia_woocommerce_loop_add_to_cart_link')) {
 remove_action('woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15);
 
 add_action('somnia_woocommerce_template_upsell_products', 'woocommerce_upsell_display', 20);
-add_action('somnia_woocommerce_template_frequently_bought_together', 'somnia_display_frequently_bought_together', 20);
+add_action('woocommerce_before_add_to_cart_quantity', 'somnia_display_frequently_bought_together', 10);
 
 //Remove categories from product loop
 add_filter('woocommerce_product_loop_start', function ($html) {
@@ -308,6 +308,16 @@ function somnia_size_guide_button_before_quantity()
     }
 
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
 
     // Check if size guide is enabled for this product
     $enable_size_guide = get_post_meta($product->get_id(), '_enable_size_guide', true);
@@ -379,6 +389,17 @@ add_action('somnia_woocommerce_template_loop_product_thumbnail', 'somnia_woocomm
 function somnia_woocommerce_template_loop_product_thumbnail()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     $post_thumbnail_id = $product->get_image_id();
     echo '<div class="bt-product-images-wrapper">';
     if ($post_thumbnail_id) {
@@ -709,6 +730,17 @@ add_action('somnia_woocommerce_shop_loop_item_sold', 'somnia_woocommerce_item_so
 function somnia_display_sold_after_rating()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     somnia_woocommerce_item_sold($product->get_id());
 }
 
@@ -1326,7 +1358,8 @@ function somnia_product_field_rating($slug = '', $field_title = '', $field_value
 <?php
 }
 
-function somnia_highest_and_lowest_product_price() {
+function somnia_highest_and_lowest_product_price()
+{
 
     global $wpdb;
 
@@ -1341,7 +1374,7 @@ function somnia_highest_and_lowest_product_price() {
         "
     );
 
-    if ( ! $prices ) {
+    if (! $prices) {
         return [
             'highest_price' => 0,
             'lowest_price'  => 0,
@@ -1349,8 +1382,8 @@ function somnia_highest_and_lowest_product_price() {
     }
 
     return [
-        'highest_price' => ceil( (float) $prices->max_price ),
-        'lowest_price'  => floor( (float) $prices->min_price ),
+        'highest_price' => ceil((float) $prices->max_price),
+        'lowest_price'  => floor((float) $prices->min_price),
     ];
 }
 
@@ -2208,7 +2241,7 @@ function somnia_products_quick_view()
     }
 
     ob_start();
-    
+
     ?>
     <div class="bt-quickview-title">
         <h2><?php echo ($source === 'add-to-cart') ? esc_html__('Select options', 'somnia') : esc_html__('Quick View', 'somnia'); ?></h2>
@@ -2319,7 +2352,7 @@ function somnia_display_button_wishlist($enable_status, $product_id)
             <path d="M26.25 11.1562C26.25 18.8125 14.898 25.0097 14.4145 25.2656C14.2871 25.3342 14.1447 25.37 14 25.37C13.8553 25.37 13.7129 25.3342 13.5855 25.2656C13.102 25.0097 1.75 18.8125 1.75 11.1562C1.75203 9.35837 2.46713 7.63471 3.73842 6.36342C5.00971 5.09213 6.73337 4.37703 8.53125 4.375C10.7898 4.375 12.7673 5.34625 14 6.98797C15.2327 5.34625 17.2102 4.375 19.4688 4.375C21.2666 4.37703 22.9903 5.09213 24.2616 6.36342C25.5329 7.63471 26.248 9.35837 26.25 11.1562Z" />
         </svg>
         <svg class="bt-icon-not-added" xmlns="http://www.w3.org/2000/svg" width="21" height="18" viewBox="0 0 21 18" fill="currentColor">
-            <path d="M15.1875 0C13.2516 0 11.5566 0.8325 10.5 2.23969C9.44344 0.8325 7.74844 0 5.8125 0C4.27146 0.00173694 2.79404 0.614681 1.70436 1.70436C0.614681 2.79404 0.00173694 4.27146 0 5.8125C0 12.375 9.73031 17.6869 10.1447 17.9062C10.2539 17.965 10.376 17.9958 10.5 17.9958C10.624 17.9958 10.7461 17.965 10.8553 17.9062C11.2697 17.6869 21 12.375 21 5.8125C20.9983 4.27146 20.3853 2.79404 19.2956 1.70436C18.206 0.614681 16.7285 0.00173694 15.1875 0ZM10.5 16.3875C8.78813 15.39 1.5 10.8459 1.5 5.8125C1.50149 4.66921 1.95632 3.57317 2.76475 2.76475C3.57317 1.95632 4.66921 1.50149 5.8125 1.5C7.63594 1.5 9.16687 2.47125 9.80625 4.03125C9.86275 4.16881 9.95888 4.28646 10.0824 4.36926C10.2059 4.45207 10.3513 4.49627 10.5 4.49627C10.6487 4.49627 10.7941 4.45207 10.9176 4.36926C11.0411 4.28646 11.1372 4.16881 11.1937 4.03125C11.8331 2.46844 13.3641 1.5 15.1875 1.5C16.3308 1.50149 17.4268 1.95632 18.2353 2.76475C19.0437 3.57317 19.4985 4.66921 19.5 5.8125C19.5 10.8384 12.21 15.3891 10.5 16.3875Z"  />
+            <path d="M15.1875 0C13.2516 0 11.5566 0.8325 10.5 2.23969C9.44344 0.8325 7.74844 0 5.8125 0C4.27146 0.00173694 2.79404 0.614681 1.70436 1.70436C0.614681 2.79404 0.00173694 4.27146 0 5.8125C0 12.375 9.73031 17.6869 10.1447 17.9062C10.2539 17.965 10.376 17.9958 10.5 17.9958C10.624 17.9958 10.7461 17.965 10.8553 17.9062C11.2697 17.6869 21 12.375 21 5.8125C20.9983 4.27146 20.3853 2.79404 19.2956 1.70436C18.206 0.614681 16.7285 0.00173694 15.1875 0ZM10.5 16.3875C8.78813 15.39 1.5 10.8459 1.5 5.8125C1.50149 4.66921 1.95632 3.57317 2.76475 2.76475C3.57317 1.95632 4.66921 1.50149 5.8125 1.5C7.63594 1.5 9.16687 2.47125 9.80625 4.03125C9.86275 4.16881 9.95888 4.28646 10.0824 4.36926C10.2059 4.45207 10.3513 4.49627 10.5 4.49627C10.6487 4.49627 10.7941 4.45207 10.9176 4.36926C11.0411 4.28646 11.1372 4.16881 11.1937 4.03125C11.8331 2.46844 13.3641 1.5 15.1875 1.5C16.3308 1.50149 17.4268 1.95632 18.2353 2.76475C19.0437 3.57317 19.4985 4.66921 19.5 5.8125C19.5 10.8384 12.21 15.3891 10.5 16.3875Z" />
         </svg>
     </a>
 <?php
@@ -2395,6 +2428,17 @@ add_action('somnia_woocommerce_template_loop_list_cta_button', 'somnia_display_b
 function somnia_display_button_wishlist_compare()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     $archive_shop = function_exists('get_field') ? get_field('archive_shop', 'options') : array();
     $show_wishlist = isset($archive_shop['show_wishlist']) ? $archive_shop['show_wishlist'] : true;
     $show_compare = isset($archive_shop['show_compare']) ? $archive_shop['show_compare'] : true;
@@ -2697,7 +2741,16 @@ add_action('woocommerce_product_options_related', 'somnia_add_frequently_bought_
 function somnia_add_frequently_bought_together_field()
 {
     global $post;
+
+    $fbt_title = get_post_meta($post->ID, '_frequently_bought_together_title', true);
 ?>
+    <p class="form-field">
+        <label for="frequently_bought_together_title">
+            <?php _e('Title (FBT)', 'somnia'); ?>
+        </label>
+        <input type="text" class="short" name="frequently_bought_together_title" id="frequently_bought_together_title" value="<?php echo esc_attr($fbt_title); ?>" placeholder="<?php esc_attr_e('Title for Frequently Bought Together', 'somnia'); ?>" />
+        <?php echo wc_help_tip(__('Custom title for the frequently bought together section.', 'somnia')); ?>
+    </p>
     <p class="form-field">
         <label for="frequently_bought_together_ids">
             <?php _e('Frequently Bought Together', 'somnia'); ?>
@@ -2797,6 +2850,14 @@ add_action('woocommerce_process_product_meta', 'somnia_woocommerce_custom_field_
 
 function somnia_woocommerce_custom_field_save($post_id)
 {
+    // Save Frequently Bought Together title
+    if (isset($_POST['frequently_bought_together_title'])) {
+        $title = sanitize_text_field($_POST['frequently_bought_together_title']);
+        update_post_meta($post_id, '_frequently_bought_together_title', $title);
+    } else {
+        delete_post_meta($post_id, '_frequently_bought_together_title');
+    }
+
     // Save Frequently Bought Together products
     if (isset($_POST['frequently_bought_together_ids'])) {
         $product_ids = array_map('intval', (array) $_POST['frequently_bought_together_ids']);
@@ -2910,6 +2971,17 @@ add_action('somnia_woocommerce_shop_loop_item_label', 'somnia_woocommerce_produc
 function somnia_woocommerce_product_label()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     $label = get_post_meta($product->get_id(), '_label', true);
     $label_text = str_replace('-', ' ', $label);
 
@@ -2922,6 +2994,17 @@ add_action('woocommerce_after_add_to_cart_button', 'somnia_display_button_buy_no
 function somnia_display_button_buy_now()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     if ($product->is_type('simple')) {
         if ($product->is_in_stock() && $product->is_purchasable()) {
             echo '<div class="bt-button-buy-now">';
@@ -3019,6 +3102,7 @@ function somnia_products_add_to_cart_variable()
     $product_id = intval($_POST['product_id']);
     $variation_id = intval($_POST['variation_id']);
     $quantity = intval($_POST['quantity']);
+    $fbt_product_id = isset($_POST['fbt_product_id']) ? intval($_POST['fbt_product_id']) : 0;
     $variation = $variation_id > 0 ? array() : null;
 
     $product = wc_get_product($product_id);
@@ -3033,9 +3117,16 @@ function somnia_products_add_to_cart_variable()
             }
         }
 
+        // Add to cart - hook 'woocommerce_add_to_cart' will handle fbt_product_id automatically
         WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);
 
-        wp_send_json_success(array('success' => true));
+        // Return fbt_product_id in response if it exists
+        $response = array('success' => true);
+        if ($fbt_product_id > 0) {
+            $response['fbt_product_id'] = $fbt_product_id;
+        }
+
+        wp_send_json_success($response);
         wp_die();
     }
 }
@@ -3048,12 +3139,20 @@ function somnia_products_add_to_cart_simple()
 {
     $product_id = intval($_POST['product_id']);
     $quantity = intval($_POST['quantity']);
+    $fbt_product_id = isset($_POST['fbt_product_id']) ? intval($_POST['fbt_product_id']) : 0;
 
     $product = wc_get_product($product_id);
     if ($product && $product->is_type('simple')) {
+        // Add to cart - hook 'woocommerce_add_to_cart' will handle fbt_product_id automatically
         WC()->cart->add_to_cart($product_id, $quantity);
 
-        wp_send_json_success(array('success' => true));
+        // Return fbt_product_id in response if it exists
+        $response = array('success' => true);
+        if ($fbt_product_id > 0) {
+            $response['fbt_product_id'] = $fbt_product_id;
+        }
+
+        wp_send_json_success($response);
         wp_die();
     }
 }
@@ -3733,6 +3832,12 @@ function somnia_after_checkout_product($order_id)
     foreach ($items as $item) {
         $item_product_id = $item->get_product_id();
         $product = wc_get_product($item_product_id);
+        
+        // Skip if product is invalid
+        if (!$product || !is_a($product, 'WC_Product')) {
+            continue;
+        }
+        
         $sale_date_start = get_post_meta($item_product_id, '_product_start_datetime', true);
         $sale_date = get_post_meta($item_product_id, '_product_datetime', true);
         $sale_date_start = new DateTime($sale_date_start, new DateTimeZone(wp_timezone_string()));
@@ -3790,6 +3895,17 @@ function somnia_after_checkout_product($order_id)
 function somnia_check_sale_date_countdown()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     // Get sale end date from product meta
     $sale_date = get_post_meta($product->get_id(), '_product_datetime', true);
     $disable_sale = get_post_meta($product->get_id(), '_disable_sale_price', true);
@@ -4092,6 +4208,17 @@ add_action('somnia_woocommerce_template_single_out_of_stock', 'somnia_woocommerc
 function somnia_woocommerce_single_product_out_of_stock()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     // Check if ACF function exists
     if (!function_exists('get_field')) {
         return;
@@ -4777,6 +4904,17 @@ add_action('somnia_woocommerce_template_loop_add_to_cart_variable', 'somnia_wooc
 function somnia_woocommerce_template_loop_add_to_cart_variable()
 {
     global $product;
+    
+    // Get product if global is not set
+    if (!$product) {
+        $product = wc_get_product();
+    }
+    
+    // Check if product is valid
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     if ($product->is_type('variable')) {
         $product_id = $product->get_id();
         echo '<a class="button add_to_cart_button product_type_variable bt-loop-add-to-cart-btn" href="#" data-id="' . esc_attr($product_id) . '">';
@@ -4789,6 +4927,12 @@ add_action('woocommerce_after_add_to_cart_button', 'somnia_woocommerce_after_add
 function somnia_woocommerce_after_add_to_cart_button()
 {
     global $product;
+    
+    // Check if product exists
+    if (empty($product) || ! is_a($product, 'WC_Product')) {
+        return;
+    }
+    
     $variation_id = 0;
     if (isset($_REQUEST['variation_id'])) {
         $variation_id = intval($_REQUEST['variation_id']);
@@ -5072,202 +5216,111 @@ function somnia_display_frequently_bought_together($product_id = null)
     $thousand_separator = wc_get_price_thousand_separator();
 
 ?>
-    <section class="somnia-frequently-bought-together">
+    <div class="somnia-frequently-bought-together">
         <?php
-        // Get heading from theme options
-        $fbt_options = get_field('frequently_bought_together', 'option');
-        $custom_heading = '';
-        if ($fbt_options && isset($fbt_options['enable_frequently_bought_together']) && $fbt_options['enable_frequently_bought_together']) {
-            if (!empty($fbt_options['heading'])) {
-                $custom_heading = $fbt_options['heading'];
-            }
-        }
+        // Get heading from product meta
+        $custom_heading = get_post_meta($product_id, '_frequently_bought_together_title', true);
 
         // Use custom heading if available, otherwise use default
-        $default_heading = __('Frequently Bought Together', 'somnia');
+        $default_heading = __('Adjustable Base and Box Spring:', 'somnia');
         $heading = !empty($custom_heading) ? $custom_heading : $default_heading;
 
         // Allow filtering
-        $heading = apply_filters('somnia_product_frequently_bought_together_heading', $heading);
+        $heading = apply_filters('somnia_product_frequently_bought_together_heading', $heading, $product_id);
 
         if ($heading) :
         ?>
             <h2 class="fbt-heading"><?php echo esc_html($heading); ?></h2>
         <?php endif; ?>
 
-        <div class="fbt-products-list"
-            data-currency="<?php echo esc_attr($currency_symbol); ?>"
-            data-decimal-separator="<?php echo esc_attr($decimal_separator); ?>"
-            data-thousand-separator="<?php echo esc_attr($thousand_separator); ?>">
+        <div class="fbt-products-select-wrapper">
+            <select class="fbt-products-select"
+                id="fbt-products-select"
+                name="fbt_product_id"
+                data-main-product-id="<?php echo esc_attr($product_id); ?>"
+                data-currency="<?php echo esc_attr($currency_symbol); ?>"
+                data-decimal-separator="<?php echo esc_attr($decimal_separator); ?>"
+                data-thousand-separator="<?php echo esc_attr($thousand_separator); ?>">
+                <option value=""><?php esc_html_e('No Thanks', 'somnia'); ?></option>
+                <?php
+                // Display frequently bought together products only
+                foreach ($fbt_products as $fbt_product) :
+                    if (empty($fbt_product) || !$fbt_product->is_visible()) {
+                        continue;
+                    }
 
-            <?php
-            // Display current product first (always checked, disabled)
-            $current_price = $product->get_price();
-            $current_regular_price = $product->get_regular_price() ? $product->get_regular_price() : $current_price;
-            $is_variable = $product->is_type('variable');
-            $data_variable = $is_variable ? '1' : '0';
-            $current_name = $product->get_name();
+                    $fbt_price = $fbt_product->get_price();
+                    $fbt_regular_price = $fbt_product->get_regular_price() ? $fbt_product->get_regular_price() : $fbt_price;
+                    $is_variation = $fbt_product->is_type('variation');
+                    $product_name = $fbt_product->get_name();
 
-            // If it's a variable product, we'll need to get the selected variation via JS
-            $current_product_id = $product->get_id();
-            ?>
+                    if ($is_variation) {
+                        $parent_id = $fbt_product->get_parent_id();
+                        $parent = wc_get_product($parent_id);
+                        $attributes = $fbt_product->get_attributes();
+                        $attr_labels = [];
 
-            <div class="fbt-product-item fbt-current-product"
-                data-product-id="<?php echo esc_attr($current_product_id); ?>"
-                data-is-variable="<?php echo esc_attr($data_variable); ?>"
-                data-price="<?php echo esc_attr($current_price); ?>"
-                data-regular-price="<?php echo esc_attr($current_regular_price); ?>">
-                <div class="fbt-product-checkbox">
-                    <input type="checkbox"
-                        id="fbt-product-current"
-                        value="<?php echo esc_attr($current_product_id); ?>"
-                        checked
-                        disabled>
-                    <label for="fbt-product-current"></label>
-                </div>
-                <div class="fbt-product-image">
-                    <?php echo '<a href="' . esc_url($product->get_permalink()) . '">' . $product->get_image('woocommerce_gallery_thumbnail') . '</a>'; ?>
-                </div>
-                <div class="fbt-product-details">
-                    <h3 class="fbt-product-name">
-                        <a href="<?php echo esc_url($product->get_permalink()); ?>">
-                            <?php echo esc_html($current_name); ?>
-                            <?php if ($is_variable) : ?>
-                                <span class="fbt-variation-text"></span>
-                            <?php endif; ?>
-                        </a>
-
-                    </h3>
-                    <div class="fbt-product-price">
-                        <?php
-                        $price_html  = $product->get_price_html();
-                        echo wp_kses_post($price_html);
-                        ?>
-                    </div>
-                </div>
-            </div>
-
-            <?php
-            // Display frequently bought together products
-            foreach ($fbt_products as $fbt_product) :
-                if (empty($fbt_product) || !$fbt_product->is_visible()) {
-                    continue;
-                }
-
-                $fbt_price = $fbt_product->get_price();
-                $fbt_regular_price = $fbt_product->get_regular_price() ? $fbt_product->get_regular_price() : $fbt_price;
-                $is_variation = $fbt_product->is_type('variation');
-                $product_name = $fbt_product->get_name();
-
-                if ($is_variation) {
-                    $parent_id = $fbt_product->get_parent_id();
-                    $parent = wc_get_product($parent_id);
-                    $attributes = $fbt_product->get_attributes();
-                    $attr_labels = [];
-
-                    foreach ($attributes as $attr_name => $attr_value) {
-                        if (taxonomy_exists($attr_name)) {
-                            $term = get_term_by('slug', $attr_value, $attr_name);
-                            $attr_value = $term ? $term->name : $attr_value;
+                        foreach ($attributes as $attr_name => $attr_value) {
+                            if (taxonomy_exists($attr_name)) {
+                                $term = get_term_by('slug', $attr_value, $attr_name);
+                                $attr_value = $term ? $term->name : $attr_value;
+                            }
+                            $attr_labels[] = ucfirst($attr_value);
                         }
-                        $attr_labels[] = ucfirst($attr_value);
+
+                        if (!empty($attr_labels)) {
+                            $product_name = $parent->get_name() . ' - ' . implode('/', $attr_labels);
+                        }
                     }
 
-                    if (!empty($attr_labels)) {
-                        $product_name = $parent->get_name() . ' - ' . implode('/', $attr_labels);
-                    }
-                }
-            ?>
-
-                <div class="fbt-product-item"
-                    data-product-id="<?php echo esc_attr($fbt_product->get_id()); ?>"
-                    data-price="<?php echo esc_attr($fbt_price); ?>"
-                    data-regular-price="<?php echo esc_attr($fbt_regular_price); ?>">
-                    <div class="fbt-product-checkbox">
-                        <input type="checkbox"
-                            id="fbt-product-<?php echo esc_attr($fbt_product->get_id()); ?>"
-                            value="<?php echo esc_attr($fbt_product->get_id()); ?>"
-                            checked>
-                        <label for="fbt-product-<?php echo esc_attr($fbt_product->get_id()); ?>"></label>
-                    </div>
-                    <div class="fbt-product-image">
-                        <?php echo '<a href="' . esc_url($fbt_product->get_permalink()) . '">' . $fbt_product->get_image('woocommerce_gallery_thumbnail') . '</a>'; ?>
-                    </div>
-                    <div class="fbt-product-details">
-                        <h3 class="fbt-product-name">
-                            <a href="<?php echo esc_url($fbt_product->get_permalink()); ?>">
-                                <?php echo esc_html($product_name); ?>
-                            </a>
-                        </h3>
-                        <div class="fbt-product-price"><?php echo wp_kses_post($fbt_product->get_price_html()); ?></div>
-                    </div>
-                </div>
-
-            <?php endforeach; ?>
+                    // Format: Product Name - $Price
+                    $formatted_price = wc_price($fbt_price);
+                    $formatted_price = strip_tags($formatted_price); // Remove HTML tags from price
+                    $option_text = $product_name . ' - ' . $formatted_price;
+                ?>
+                    <option value="<?php echo esc_attr($fbt_product->get_id()); ?>"
+                        data-product-id="<?php echo esc_attr($fbt_product->get_id()); ?>"
+                        data-price="<?php echo esc_attr($fbt_price); ?>"
+                        data-regular-price="<?php echo esc_attr($fbt_regular_price); ?>">
+                        <?php echo esc_html($option_text); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
-
-        <div class="fbt-summary">
-            <div class="fbt-total-price">
-                <span class="fbt-total-label"><?php _e('Total Price:', 'somnia'); ?></span>
-                <span class="fbt-total-amount"></span>
-            </div>
-            <button type="button" class="fbt-add-to-cart-btn" disabled>
-                <?php _e('Add Selected to Cart', 'somnia'); ?>
-            </button>
-        </div>
-    </section>
+    </div>
 
     <?php
-    wp_reset_postdata();
 }
 
-// AJAX handler for adding Frequently Bought Together products to cart
-add_action('wp_ajax_somnia_add_fbt_to_cart', 'somnia_add_fbt_to_cart');
-add_action('wp_ajax_nopriv_somnia_add_fbt_to_cart', 'somnia_add_fbt_to_cart');
+// Hook to automatically add FBT product when main product is added to cart
+add_action('woocommerce_add_to_cart', 'somnia_auto_add_fbt_product', 10, 6);
 
-function somnia_add_fbt_to_cart()
+function somnia_auto_add_fbt_product($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data)
 {
-    if (!isset($_POST['product_ids']) || empty($_POST['product_ids'])) {
-        wp_send_json_error(array('message' => __('No products selected', 'somnia')));
-        return;
-    }
-
-    $product_ids = array_map('intval', $_POST['product_ids']);
-    $added_products = array();
-    $failed_products = array();
-
-    foreach ($product_ids as $product_id) {
-        $product = wc_get_product($product_id);
-
-        if (!$product) {
-            $failed_products[] = $product_id;
-            continue;
+    // Check if FBT product ID is provided from form submission
+    if (isset($_REQUEST['fbt_product_id']) && !empty($_REQUEST['fbt_product_id'])) {
+        $fbt_product_id = intval($_REQUEST['fbt_product_id']);
+        
+        // Verify it's a valid product
+        $fbt_product = wc_get_product($fbt_product_id);
+        
+        if ($fbt_product && $fbt_product->is_purchasable() && $fbt_product->is_in_stock()) {
+            // Check if FBT product is not already in cart to avoid duplicates
+            $cart = WC()->cart->get_cart();
+            $already_in_cart = false;
+            
+            foreach ($cart as $item_key => $item) {
+                if ($item['product_id'] == $fbt_product_id || $item['variation_id'] == $fbt_product_id) {
+                    $already_in_cart = true;
+                    break;
+                }
+            }
+            
+            // Add FBT product to cart if not already there
+            if (!$already_in_cart) {
+                WC()->cart->add_to_cart($fbt_product_id, 1);
+            }
         }
-
-        // Check if product can be added to cart
-        if (!$product->is_purchasable() || !$product->is_in_stock()) {
-            $failed_products[] = $product_id;
-            continue;
-        }
-
-        // Add product to cart
-        $cart_item_key = WC()->cart->add_to_cart($product_id, 1);
-
-        if ($cart_item_key) {
-            $added_products[] = $product_id;
-        } else {
-            $failed_products[] = $product_id;
-        }
-    }
-
-    if (!empty($added_products)) {
-        wp_send_json_success(array(
-            'message' => sprintf(__('%d product(s) added to cart', 'somnia'), count($added_products)),
-            'added' => $added_products,
-            'failed' => $failed_products
-        ));
-    } else {
-        wp_send_json_error(array('message' => __('Failed to add products to cart', 'somnia')));
     }
 }
 

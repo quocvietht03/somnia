@@ -228,7 +228,7 @@ class Widget_SiteNotification extends Widget_Base
         } else {
             $site_infor = '';
         }
-        if (!empty($site_infor) && isset($site_infor)) { 
+        if (!empty($site_infor) && isset($site_infor) && isset($site_infor['site_notification']) && is_array($site_infor['site_notification'])) { 
             $is_enable = $settings['slider_navigation'] == 'yes' ? 'bt-navigation-enabled' : '';
             ?>
             <div class="bt-elwg-site-notification--default " data-slider-settings='<?php echo json_encode($slider_settings); ?>'>
