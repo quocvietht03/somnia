@@ -526,7 +526,7 @@
 												existingSwiper.destroy(true, true);
 											}
 
-										//	$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
+											$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
 
 											// Re-init quickview slider
 											setTimeout(function () {
@@ -564,8 +564,8 @@
 													});
 												}
 
-											//	$productContainer.find('.bt-skeleton-gallery').remove();
-											//	$productContainer.find('.bt-gallery-slider-products').removeClass('loading');
+												$productContainer.find('.bt-skeleton-gallery').remove();
+												$productContainer.find('.bt-gallery-slider-products').removeClass('loading');
 											}, 100);
 										} else if (gallerylayout == 'gallery-slider') {
 											$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
