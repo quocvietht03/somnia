@@ -1590,11 +1590,11 @@
                             "choices": {
                                 "search_form": "Search Form",
                                 "categories": "Product Categories",
-                                "brand": "Brand",
                                 "price": "Price",
-                                "colors": "Colors",
                                 "customer_rating": "Customer Rating",
-                                "text_editor": "Text Editor"
+                                "text_editor": "Text Editor",
+                                "pa_size": "Size",
+                                "pa_color": "Color"
                             },
                             "default_value": false,
                             "return_format": "value",
@@ -2734,6 +2734,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "display_title": "",
-    "modified": 1769400220
+    "modified": 1770277002
 }

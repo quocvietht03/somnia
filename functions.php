@@ -186,12 +186,31 @@ if (!function_exists('somnia_enqueue_scripts')) {
 if (!function_exists('somnia_enqueue_admin_scripts')) {
 	function somnia_enqueue_admin_scripts($hook)
 	{
-		wp_enqueue_style('somnia-fonts', get_template_directory_uri() . '/assets/css/fonts.css',  array(), false);
-		wp_enqueue_script('somnia-admin-main', get_template_directory_uri() . '/assets/js/admin-main.js', array('jquery'), '', true);
+		$screen = get_current_screen();
+		wp_enqueue_style('somnia-fonts', get_template_directory_uri() . '/assets/css/fonts.css', array(), false);
 		wp_enqueue_style('somnia-admin-main', get_template_directory_uri() . '/assets/css/admin-main.css', array(), false);
 
+		// Dependencies for admin-main.js
+		$admin_main_deps = array('jquery');
+
+		// On WooCommerce attribute term pages, add media + color picker (used by attribute types in admin-main.js)
+		$is_attribute_term_page = ($hook === 'edit-tags.php' || $hook === 'term.php')
+			&& $screen && isset($screen->taxonomy) && strpos($screen->taxonomy, 'pa_') === 0;
+		if ($is_attribute_term_page) {
+			wp_enqueue_media();
+			wp_enqueue_style('wp-color-picker');
+			wp_enqueue_script('wp-color-picker');
+			$admin_main_deps[] = 'wp-color-picker';
+		}
+
+		wp_enqueue_script(
+			'somnia-admin-main',
+			get_template_directory_uri() . '/assets/js/admin-main.js',
+			$admin_main_deps,
+			'',
+			true
+		);
 		// Localize script for Product Extra Content (in admin-main.js)
-		$screen = get_current_screen();
 		if ($screen && ($screen->post_type === 'product' || $screen->post_type === 'extra_content_prod')) {
 			wp_localize_script('somnia-admin-main', 'somniaExtraContent', array(
 				'nonce' => wp_create_nonce('somnia-extra-content-nonce'),
