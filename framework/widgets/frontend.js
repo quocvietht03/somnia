@@ -2337,7 +2337,7 @@
 				// Initialize thumbnail slider
 				var galleryThumbs = new Swiper($layoutWidget.find('.woocommerce-product-gallery__slider-thumbs')[0], {
 					direction: thumbDirection,
-					spaceBetween: 10,
+					spaceBetween: 12,
 					autoHeight: true,
 					loop: false,
 					freeMode: true,
@@ -2346,18 +2346,15 @@
 					watchSlidesProgress: true,
 					breakpoints: {
 						0: {
-							slidesPerView: 'vertical' == thumbDirection ? 'auto' : 3,
+							slidesPerView: 'vertical' == thumbDirection ? 'auto' : 4,
 						},
 						480: {
-							slidesPerView: 'vertical' == thumbDirection ? 'auto' : 4,
-						},
-						768: {
 							slidesPerView: 'vertical' == thumbDirection ? 'auto' : 5,
 						},
-						992: {
+						768: {
 							slidesPerView: 'vertical' == thumbDirection ? 'auto' : 4,
 						},
-						1200: {
+						1024: {
 							slidesPerView: 'vertical' == thumbDirection ? 'auto' : 5,
 						}
 					}
