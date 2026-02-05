@@ -92,7 +92,7 @@ class Widget_ProductShowcaseStyle2 extends Widget_Base
 			'image_ratio',
 			[
 				'label' => __('Image Ratio', 'somnia'),
-				'type' => Controls_Manager::SLIDER,
+				'type' => Controls_Manager::SLIDER, 
 				'default' => [
 					'size' => 1,
 				],
@@ -766,7 +766,8 @@ class Widget_ProductShowcaseStyle2 extends Widget_Base
 								do_action('somnia_woocommerce_template_single_excerpt');
 								do_action('somnia_woocommerce_template_single_countdown');
 								do_action('somnia_woocommerce_template_single_add_to_cart');
-									?>
+								?>
+							</div>
 						</div>
 					</div>
 			<?php
