@@ -112,7 +112,7 @@
   font-size: 15px;
   line-height: 150%;
   min-height: 56px;
-
+  width: 100% !important;
   &.select2-container--open {
     .select2-selection--single {
       .select2-selection {
@@ -1624,19 +1624,20 @@
     width: var(--swiper-navigation-size);
     height: var(--swiper-navigation-size);
     color: $color-primary;
-    background-color: #ffffff;
-    box-shadow: 0 10px 25px 0 rgba(43, 52, 74, 0.12);
+    background-color: rgba($color-white, 0.16);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    box-shadow: 0 0 5px 0 rgba($color-black, 0.16);;
     transition: all 0.3s ease;
     &::after {
       display: none;
     }
     svg {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
     }
     &:hover {
-      color: #ffffff;
-      background-color: $color-primary;
+      background-color: $color-secondary;
     }
   }
   .swiper-button-prev {
@@ -1935,6 +1936,7 @@
   display: flex;
   align-items: center;
   line-height: 1;
+  gap: 2px;
   .star {
     color: #cfc8d8;
     &.filled {
@@ -1943,6 +1945,10 @@
     svg {
       width: 20px;
       height: 20px;
+      @media (max-width: $break-sm) {
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 }

@@ -3099,7 +3099,7 @@ function somnia_display_button_buy_now()
     if ($product->is_type('simple')) {
         if ($product->is_in_stock() && $product->is_purchasable()) {
             echo '<div class="bt-button-buy-now">';
-            echo '<a class="button" data-id="' . get_the_ID() . '">' . esc_html__('Buy it now ', 'somnia') . '</a>';
+            echo '<a href="#" class="button" data-id="' . get_the_ID() . '">' . esc_html__('Buy it now ', 'somnia') . '</a>';
             echo '</div>';
         }
     } else if ($product->is_type('variable')) {
@@ -3123,7 +3123,7 @@ function somnia_display_button_buy_now()
                 }
 
                 echo '<div class="bt-button-buy-now">';
-                echo '<a class="' . esc_attr($button_class) . '" data-id="' . get_the_ID() . '"' . $data_variation . '>' . esc_html__('Buy it now ', 'somnia') . '</a>';
+                echo '<a href="#" class="' . esc_attr($button_class) . '" data-id="' . get_the_ID() . '"' . $data_variation . '>' . esc_html__('Buy it now ', 'somnia') . '</a>';
                 echo '</div>';
             }
         }
@@ -3132,7 +3132,7 @@ function somnia_display_button_buy_now()
             $children = $product->get_children();
             if (!empty($children)) {
                 echo '<div class="bt-button-buy-now">';
-                echo '<a class="button disabled" data-id="' . get_the_ID() . '">' . esc_html__('Buy it now ', 'somnia') . '</a>';
+                echo '<a href="#" class="button disabled" data-id="' . get_the_ID() . '">' . esc_html__('Buy it now ', 'somnia') . '</a>';
                 echo '</div>';
             }
         }

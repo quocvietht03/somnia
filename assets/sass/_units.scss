@@ -58,12 +58,15 @@ html :where(.editor-styles-wrapper) {
   font-family: $text-font;
   font-size: 18px;
   font-weight: 400;
-  line-height: 176%;
+  line-height: 163%;
   color: $color-text;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   @media (max-width: $break-lg) {
     font-size: 16px;
+  }
+  @media (max-width: $break-sm) {
+    font-size: 15px;
   }
 }
 
