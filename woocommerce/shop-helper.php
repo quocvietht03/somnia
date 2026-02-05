@@ -83,13 +83,21 @@ add_filter('woocommerce_product_loop_start', function ($html) {
 }, 20);
 
 /**
- * Prevent product_brand query param from being treated as taxonomy archive
+ * Prevent product_brand, comfort_scale, mattress_type query params from being treated as taxonomy archive
  * Remove from query vars when it's just a filter parameter
  */
 function somnia_remove_brand_from_query_vars($query_vars)
 {
-    if (!is_admin() && isset($_GET['product_brand']) && isset($query_vars['product_brand'])) {
-        unset($query_vars['product_brand']);
+    if (!is_admin()) {
+        if (isset($_GET['product_brand']) && isset($query_vars['product_brand'])) {
+            unset($query_vars['product_brand']);
+        }
+        if (isset($_GET['comfort_scale']) && isset($query_vars['comfort_scale'])) {
+            unset($query_vars['comfort_scale']);
+        }
+        if (isset($_GET['mattress_type']) && isset($query_vars['mattress_type'])) {
+            unset($query_vars['mattress_type']);
+        }
     }
     return $query_vars;
 }
@@ -258,6 +266,31 @@ function somnia_register_product_taxonomy()
     );
 
     register_taxonomy('comfort_scale', array('product'), $args);
+
+    // Mattress Type
+    $mattress_labels = [
+        'name' => __('Mattress Type', 'somnia'),
+        'singular_name' => __('Mattress Type', 'somnia'),
+        'search_items' => __('Search Mattress Types', 'somnia'),
+        'all_items' => __('All Mattress Types', 'somnia'),
+        'edit_item' => __('Edit Mattress Type', 'somnia'),
+        'update_item' => __('Update Mattress Type', 'somnia'),
+        'add_new_item' => __('Add New Mattress Type', 'somnia'),
+        'new_item_name' => __('New Mattress Type', 'somnia'),
+        'menu_name' => __('Mattress Type', 'somnia'),
+    ];
+
+    $mattress_args = array(
+        'hierarchical' => true,
+        'labels' => $mattress_labels,
+        'show_ui' => true,
+        'show_admin_column' => false,
+        'query_var' => true,
+        'show_in_rest' => true,
+        'publicly_queryable' => false,
+    );
+
+    register_taxonomy('mattress_type', array('product'), $mattress_args);
 }
 
 add_action('init', 'somnia_register_product_taxonomy');
@@ -1138,6 +1171,16 @@ function somnia_product_field_multiple_html($slug = '', $field_title = '', $fiel
         return;
     }
 
+    // Check if this is a product attribute taxonomy and if it's enabled in search
+    if (strpos($slug, 'pa_') === 0) {
+        if (!function_exists('somnia_is_attribute_enabled_in_search')) {
+            return;
+        }
+        if (!somnia_is_attribute_enabled_in_search($slug)) {
+            return;
+        }
+    }
+
     $terms = get_terms(array(
         'taxonomy' => $slug,
         'hide_empty' => true
@@ -1186,7 +1229,13 @@ function somnia_product_field_multiple_html($slug = '', $field_title = '', $fiel
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28.1489 8.44723C28.6566 8.98059 28.6358 9.82456 28.1025 10.3323L12.6951 24.9989C12.4319 25.2494 12.078 25.3817 11.7151 25.3652C11.3522 25.3486 11.0118 25.1848 10.7725 24.9114L4.8466 18.1422C4.36156 17.5882 4.41752 16.7458 4.97159 16.2607C5.52565 15.7757 6.36802 15.8317 6.85306 16.3857L11.8633 22.109L26.2639 8.4008C26.7972 7.89308 27.6412 7.91387 28.1489 8.44723Z" fill="white" />
                                 </svg>
                             </span>
-                            <?php echo esc_html($term->name); ?>
+                            <?php 
+                            echo esc_html($term->name);
+                            // If this is an attribute taxonomy, append description
+                            if (strpos($slug, 'pa_') === 0 && !empty($term->description)) {
+                                echo ' - ' . esc_html($term->description);
+                            }
+                            ?>
                             <div class="bt-count"><?php echo '(' . $term_count . ')'; ?></div>
                         </a>
                     </div>
@@ -1203,6 +1252,16 @@ function somnia_product_field_multiple_color_html($slug = '', $field_title = '',
 {
     if (empty($slug)) {
         return;
+    }
+
+    // Check if this is a product attribute taxonomy and if it's enabled in search
+    if (strpos($slug, 'pa_') === 0) {
+        if (!function_exists('somnia_is_attribute_enabled_in_search')) {
+            return;
+        }
+        if (!somnia_is_attribute_enabled_in_search($slug)) {
+            return;
+        }
     }
 
     $terms = get_terms(array(
@@ -1586,6 +1645,34 @@ function somnia_products_query_args($params = array(), $limit = 9)
             'terms' => explode(',', $params['product_brand'])
         );
     }
+    if (isset($params['comfort_scale']) && $params['comfort_scale'] != '') {
+        $query_tax[] = array(
+            'taxonomy' => 'comfort_scale',
+            'field' => 'slug',
+            'terms' => explode(',', $params['comfort_scale'])
+        );
+    }
+    if (isset($params['mattress_type']) && $params['mattress_type'] != '') {
+        $query_tax[] = array(
+            'taxonomy' => 'mattress_type',
+            'field' => 'slug',
+            'terms' => explode(',', $params['mattress_type'])
+        );
+    }
+    // Handle all enabled WooCommerce attributes (non-color) dynamically
+    $enabled_attributes = function_exists('somnia_get_all_enabled_search_attributes') ? somnia_get_all_enabled_search_attributes() : array();
+    if (!empty($enabled_attributes)) {
+        foreach ($enabled_attributes as $attr_data) {
+            $taxonomy = $attr_data['taxonomy'];
+            if (isset($params[$taxonomy]) && $params[$taxonomy] != '') {
+                $query_tax[] = array(
+                    'taxonomy' => $taxonomy,
+                    'field' => 'slug',
+                    'terms' => explode(',', $params[$taxonomy])
+                );
+            }
+        }
+    }
     if (isset($params['product_tag']) && $params['product_tag'] != '') {
         $query_tax[] = array(
             'taxonomy' => 'product_tag',
@@ -1593,14 +1680,18 @@ function somnia_products_query_args($params = array(), $limit = 9)
             'terms' => explode(',', $params['product_tag'])
         );
     }
-    // Handle color taxonomy dynamically
-    $color_taxonomy = somnia_get_color_taxonomy();
-    if ($color_taxonomy && isset($params[$color_taxonomy]) && $params[$color_taxonomy] != '') {
-        $query_tax[] = array(
-            'taxonomy' => $color_taxonomy,
-            'field' => 'slug',
-            'terms' => explode(',', $params[$color_taxonomy])
-        );
+    // Handle color taxonomies dynamically
+    $color_taxonomies = function_exists('somnia_get_all_color_taxonomies') ? somnia_get_all_color_taxonomies() : array();
+    if (!empty($color_taxonomies)) {
+        foreach ($color_taxonomies as $color_taxonomy) {
+            if (isset($params[$color_taxonomy]) && $params[$color_taxonomy] != '') {
+                $query_tax[] = array(
+                    'taxonomy' => $color_taxonomy,
+                    'field' => 'slug',
+                    'terms' => explode(',', $params[$color_taxonomy])
+                );
+            }
+        }
     }
     if (!empty($query_tax)) {
         $query_args['tax_query'] = $query_tax;

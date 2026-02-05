@@ -632,7 +632,7 @@
 							const skeletonCount = isMobile ? 4 : 4;
 
 							if (isMobile) {
-								// Mobile skeleton với bt-product-item structure
+								// Mobile skeleton bt-product-item structure
 								for (let i = 0; i < skeletonCount; i++) {
 									skeletonHtml += `
 							<div class="bt-product-item bt-product-skeleton">
@@ -650,7 +650,7 @@
 						`;
 								}
 							} else {
-								// Desktop skeleton với WooCommerce structure
+								// Desktop skeleton WooCommerce structure
 								for (let i = 0; i < skeletonCount; i++) {
 									skeletonHtml += `
 							<div class="bt-product-skeleton product">

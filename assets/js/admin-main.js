@@ -73,7 +73,6 @@
 						} else {
 							alert(response.data.message);
 						}
-
 						// Open Elementor editor in new tab
 						window.open(response.data.edit_link, '_blank');
 
@@ -320,8 +319,121 @@
 			$displayModeField.append('<span class="somnia-tab-note" style="color: #666; font-style: italic; font-size: 12px;">Note: Tab option is only available for Thumbnail layouts</span>');
 		}
 	}
+	// Attribute types: image uploader + color picker (term edit/add forms)
+	function somniaAttributeTypesHandlers() {
+		if (!$('.somnia-term-image-wrapper').length && !$('.somnia-color-picker').length) {
+			return;
+		}
+		// Image uploader
+		$(document).on('click', '.somnia-upload-image-button', function (e) {
+			e.preventDefault();
+			var button = $(this);
+			var wrapper = button.closest('.somnia-term-image-wrapper');
+			var input = wrapper.find('input[type="hidden"]');
+			var preview = wrapper.find('.somnia-term-image-preview');
+			var removeBtn = wrapper.find('.somnia-remove-image-button');
+
+			var frame = wp.media({
+				title: 'Select Image',
+				button: { text: 'Use this image' },
+				multiple: false
+			});
+
+			frame.on('select', function () {
+				var attachment = frame.state().get('selection').first().toJSON();
+				input.val(attachment.id);
+				preview.html('<img src="' + attachment.url + '" style="max-width: 150px; height: auto; display: block;" />');
+				removeBtn.show();
+			});
+
+			frame.open();
+		});
+
+		$(document).on('click', '.somnia-remove-image-button', function (e) {
+			e.preventDefault();
+			var button = $(this);
+			var wrapper = button.closest('.somnia-term-image-wrapper');
+			var input = wrapper.find('input[type="hidden"]');
+			var preview = wrapper.find('.somnia-term-image-preview');
+			input.val('');
+			preview.html('');
+			button.hide();
+		});
+
+		// Color picker init
+		function initColorPicker() {
+			if ($('.somnia-color-picker').length) {
+				$('.somnia-color-picker').each(function () {
+					if (!$(this).hasClass('wp-color-picker')) {
+						$(this).wpColorPicker({
+							change: function (event, ui) {
+								var $input = $(this);
+								$input.val(ui.color.toString());
+								// Show input wrap when color has value
+								$input.closest('.wp-picker-input-wrap').show();
+							},
+							clear: function () {
+								var $input = $(this);
+								if ($input.hasClass('wp-color-picker')) {
+									$input.wpColorPicker('color', '');
+								}
+								// Hide input wrap when cleared
+								$input.closest('.wp-picker-input-wrap').hide();
+							}
+						});
+					}
+				});
+				// Initial state: hide input wrap when empty
+				$('.somnia-color-picker').each(function () {
+					var $input = $(this);
+					var $wrap = $input.closest('.wp-picker-input-wrap');
+					if ($wrap.length) {
+						if ($.trim($input.val())) {
+							$wrap.show();
+						} else {
+							$wrap.hide();
+						}
+					}
+				});
+			}
+		}
+		initColorPicker();
+
+		function syncColorValues() {
+			$('.somnia-color-picker').each(function () {
+				if ($(this).hasClass('wp-color-picker')) {
+					var colorValue = $(this).wpColorPicker('color');
+					if (colorValue) {
+						$(this).val(colorValue);
+					}
+				}
+			});
+		}
+
+		$('#edittag, #addtag').on('submit', function () {
+			syncColorValues();
+		});
+
+		$(document).ajaxSend(function (event, jqxhr, settings) {
+			if (settings.data && (settings.data.indexOf('action=add-tag') !== -1 || settings.data.indexOf('action=inline-save-tax') !== -1)) {
+				syncColorValues();
+			}
+		});
+
+		$(document).ajaxComplete(function (event, xhr, settings) {
+			if (settings.data && settings.data.indexOf('action=add-tag') !== -1 && xhr.status === 200) {
+				setTimeout(function () {
+					$('#addtag .somnia-remove-image-button').trigger('click');
+					$('#addtag .wp-picker-clear').trigger('click');
+					initColorPicker();
+				}, 200);
+			}
+		});
+	}
+
 	jQuery(document).ready(function ($) {
 		somniaExtraContentHandlers();
+		somniaAttributeTypesHandlers();
 		if (!$('#woocommerce-product-data').length) {
 			return;
 		}

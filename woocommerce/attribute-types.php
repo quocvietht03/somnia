@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
 function somnia_add_attribute_type_field()
 {
 	$attribute_type = 'select'; // Default value
+	$enable_search = false; // Default value
 	?>
 	<div class="form-field">
 		<label for="somnia_attribute_type"><?php esc_html_e('Display Type', 'somnia'); ?></label>
@@ -26,6 +27,13 @@ function somnia_add_attribute_type_field()
 			<option value="color" <?php selected($attribute_type, 'color'); ?>><?php esc_html_e('Color', 'somnia'); ?></option>
 		</select>
 		<p class="description"><?php esc_html_e('Select how this attribute should be displayed on the frontend.', 'somnia'); ?></p>
+	</div>
+	<div class="form-field">
+		<label for="somnia_enable_search">
+			<input name="somnia_enable_search" id="somnia_enable_search" type="checkbox" value="1" <?php checked($enable_search, true); ?> />
+			<?php esc_html_e('Enable in Search', 'somnia'); ?>
+		</label>
+		<p class="description"><?php esc_html_e('Enable this attribute to be displayed in search/filter fields.', 'somnia'); ?></p>
 	</div>
 	<?php
 }
@@ -42,6 +50,7 @@ function somnia_edit_attribute_type_field()
 	}
 
 	$attribute_type = get_option('somnia_attribute_type_' . $edit, 'select');
+	$enable_search = get_option('somnia_enable_search_' . $edit, false);
 	?>
 	<tr class="form-field form-required">
 		<th scope="row" valign="top">
@@ -55,6 +64,18 @@ function somnia_edit_attribute_type_field()
 				<option value="color" <?php selected($attribute_type, 'color'); ?>><?php esc_html_e('Color', 'somnia'); ?></option>
 			</select>
 			<p class="description"><?php esc_html_e('Select how this attribute should be displayed on the frontend.', 'somnia'); ?></p>
+		</td>
+	</tr>
+	<tr class="form-field">
+		<th scope="row" valign="top">
+			<label for="somnia_enable_search"><?php esc_html_e('Enable in Search', 'somnia'); ?></label>
+		</th>
+		<td>
+			<label for="somnia_enable_search">
+				<input name="somnia_enable_search" id="somnia_enable_search" type="checkbox" value="1" <?php checked($enable_search, true); ?> />
+				<?php esc_html_e('Enable in Search', 'somnia'); ?>
+			</label>
+			<p class="description"><?php esc_html_e('Enable this attribute to be displayed in search/filter fields.', 'somnia'); ?></p>
 		</td>
 	</tr>
 	<?php
@@ -81,6 +102,20 @@ function somnia_save_attribute_type($attribute_id, $data = null)
 			}
 		}
 	}
+
+	// Save enable search option
+	$enable_search = isset($_POST['somnia_enable_search']) && $_POST['somnia_enable_search'] == '1' ? true : false;
+	update_option('somnia_enable_search_' . $attribute_id, $enable_search);
+	
+	// Clear static cache for color taxonomies and enabled attributes
+	if (function_exists('somnia_get_all_color_taxonomies')) {
+		// Force refresh by clearing static cache
+		$reflection = new ReflectionFunction('somnia_get_all_color_taxonomies');
+		$static_vars = $reflection->getStaticVariables();
+	}
+	
+	// Update ACF JSON file with enabled attributes
+	somnia_update_acf_filter_choices();
 }
 add_action('woocommerce_attribute_added', 'somnia_save_attribute_type', 10, 2);
 
@@ -104,6 +139,13 @@ function somnia_update_attribute_type($attribute_id, $data = null, $old_slug = n
 			}
 		}
 	}
+
+	// Save enable search option
+	$enable_search = isset($_POST['somnia_enable_search']) && $_POST['somnia_enable_search'] == '1' ? true : false;
+	update_option('somnia_enable_search_' . $attribute_id, $enable_search);
+	
+	// Update ACF JSON file with enabled attributes
+	somnia_update_acf_filter_choices();
 }
 add_action('woocommerce_attribute_updated', 'somnia_update_attribute_type', 10, 3);
 
@@ -383,133 +425,6 @@ function somnia_register_term_save_hooks()
 add_action('init', 'somnia_register_term_save_hooks', 100);
 
 /**
- * Enqueue admin scripts for image uploader and color picker
- */
-function somnia_enqueue_attribute_admin_scripts($hook)
-{
-	// Only load on attribute term pages
-	if ($hook !== 'edit-tags.php' && $hook !== 'term.php') {
-		return;
-	}
-
-	// Check if we're on a product attribute taxonomy page
-	$screen = get_current_screen();
-	if (!$screen || !isset($screen->taxonomy) || strpos($screen->taxonomy, 'pa_') !== 0) {
-		return;
-	}
-
-	// Enqueue WordPress media uploader
-	wp_enqueue_media();
-
-	// Enqueue color picker
-	wp_enqueue_style('wp-color-picker');
-	wp_enqueue_script('wp-color-picker');
-
-	// Add custom script
-	$script = "
-	jQuery(document).ready(function($) {
-		// Image uploader
-		$(document).on('click', '.somnia-upload-image-button', function(e) {
-			e.preventDefault();
-			var button = $(this);
-			var wrapper = button.closest('.somnia-term-image-wrapper');
-			var input = wrapper.find('input[type=\"hidden\"]');
-			var preview = wrapper.find('.somnia-term-image-preview');
-			var removeBtn = wrapper.find('.somnia-remove-image-button');
-
-			var frame = wp.media({
-				title: 'Select Image',
-				button: {
-					text: 'Use this image'
-				},
-				multiple: false
-			});
-
-		frame.on('select', function() {
-			var attachment = frame.state().get('selection').first().toJSON();
-			input.val(attachment.id);
-			preview.html('<img src=\"' + attachment.url + '\" style=\"max-width: 150px; height: auto; display: block;\" />');
-			removeBtn.show();
-		});
-
-			frame.open();
-		});
-
-		// Remove image
-		$(document).on('click', '.somnia-remove-image-button', function(e) {
-			e.preventDefault();
-			var button = $(this);
-			var wrapper = button.closest('.somnia-term-image-wrapper');
-			var input = wrapper.find('input[type=\"hidden\"]');
-			var preview = wrapper.find('.somnia-term-image-preview');
-			
-			input.val('');
-			preview.html('');
-			button.hide();
-		});
-
-		// Initialize color picker
-		function initColorPicker() {
-			if ($('.somnia-color-picker').length) {
-				$('.somnia-color-picker').each(function() {
-					if (!$(this).hasClass('wp-color-picker')) {
-						$(this).wpColorPicker({
-							change: function(event, ui) {
-								$(this).val(ui.color.toString());
-							},
-							clear: function() {
-								$(this).val('');
-							}
-						});
-					}
-				});
-			}
-		}
-		
-		initColorPicker();
-		
-		// Function to sync color values
-		function syncColorValues() {
-			$('.somnia-color-picker').each(function() {
-				if ($(this).hasClass('wp-color-picker')) {
-					var colorValue = $(this).wpColorPicker('color');
-					if (colorValue) {
-						$(this).val(colorValue);
-					}
-				}
-			});
-		}
-		
-		// Sync before regular form submit
-		$('#edittag, #addtag').on('submit', function(e) {
-			syncColorValues();
-		});
-		
-		// Hook into WordPress AJAX for term add/edit
-		$(document).ajaxSend(function(event, jqxhr, settings) {
-			if (settings.data && (settings.data.indexOf('action=add-tag') !== -1 || settings.data.indexOf('action=inline-save-tax') !== -1)) {
-				syncColorValues();
-			}
-		});
-		
-		// Reset fields after AJAX term add
-		$(document).ajaxComplete(function(event, xhr, settings) {
-			if (settings.data && settings.data.indexOf('action=add-tag') !== -1 && xhr.status === 200) {
-				setTimeout(function() {
-					$('#addtag .somnia-remove-image-button').trigger('click');
-					$('#addtag .wp-picker-clear').trigger('click');
-					initColorPicker();
-				}, 200);
-			}
-		});
-	});
-	";
-
-	wp_add_inline_script('wp-color-picker', $script);
-}
-add_action('admin_enqueue_scripts', 'somnia_enqueue_attribute_admin_scripts');
-
-/**
  * Get attribute type for a taxonomy
  */
 function somnia_get_attribute_type($taxonomy_name)
@@ -526,7 +441,38 @@ function somnia_get_attribute_type($taxonomy_name)
 }
 
 /**
+ * Get all color taxonomies dynamically by checking attribute type
+ * Only returns taxonomies if enabled in search
+ */
+if (!function_exists('somnia_get_all_color_taxonomies')) {
+	function somnia_get_all_color_taxonomies()
+	{
+		static $color_taxonomies = null;
+
+		if ($color_taxonomies !== null) {
+			return $color_taxonomies;
+		}
+
+		$color_taxonomies = array();
+		$attribute_taxonomies = wc_get_attribute_taxonomies();
+
+		if (!empty($attribute_taxonomies)) {
+			foreach ($attribute_taxonomies as $attribute) {
+				$attribute_type = get_option('somnia_attribute_type_' . $attribute->attribute_id, 'select');
+				$enable_search = get_option('somnia_enable_search_' . $attribute->attribute_id, false);
+				if ($attribute_type === 'color' && $enable_search) {
+					$color_taxonomies[] = wc_attribute_taxonomy_name($attribute->attribute_name);
+				}
+			}
+		}
+
+		return $color_taxonomies;
+	}
+}
+
+/**
  * Get color taxonomy dynamically by checking attribute type
+ * Only returns first taxonomy if enabled in search (for backward compatibility)
  */
 if (!function_exists('somnia_get_color_taxonomy')) {
 	function somnia_get_color_taxonomy()
@@ -537,20 +483,47 @@ if (!function_exists('somnia_get_color_taxonomy')) {
 			return $color_taxonomy;
 		}
 
-		$color_taxonomy = false;
+		$color_taxonomies = somnia_get_all_color_taxonomies();
+		$color_taxonomy = !empty($color_taxonomies) ? $color_taxonomies[0] : false;
+
+		return $color_taxonomy;
+	}
+}
+
+/**
+ * Get all enabled search attributes (excluding color)
+ * Returns array of taxonomy names with their attribute types
+ */
+if (!function_exists('somnia_get_all_enabled_search_attributes')) {
+	function somnia_get_all_enabled_search_attributes()
+	{
+		static $enabled_attributes = null;
+
+		if ($enabled_attributes !== null) {
+			return $enabled_attributes;
+		}
+
+		$enabled_attributes = array();
 		$attribute_taxonomies = wc_get_attribute_taxonomies();
 
 		if (!empty($attribute_taxonomies)) {
 			foreach ($attribute_taxonomies as $attribute) {
 				$attribute_type = get_option('somnia_attribute_type_' . $attribute->attribute_id, 'select');
-				if ($attribute_type === 'color') {
-					$color_taxonomy = wc_attribute_taxonomy_name($attribute->attribute_name);
-					break;
+				$enable_search = get_option('somnia_enable_search_' . $attribute->attribute_id, false);
+				
+				// Only include non-color attributes that are enabled in search
+				if ($attribute_type !== 'color' && $enable_search) {
+					$taxonomy_name = wc_attribute_taxonomy_name($attribute->attribute_name);
+					$enabled_attributes[] = array(
+						'taxonomy' => $taxonomy_name,
+						'type' => $attribute_type,
+						'attribute_id' => $attribute->attribute_id
+					);
 				}
 			}
 		}
 
-		return $color_taxonomy;
+		return $enabled_attributes;
 	}
 }
 
@@ -583,6 +556,7 @@ if (!function_exists('somnia_get_image_taxonomy')) {
 	}
 }
 
+
 /**
  * Check if attribute is select type
  */
@@ -599,5 +573,214 @@ if (!function_exists('somnia_is_select_attribute')) {
 		}
 
 		return false;
+	}
+}
+
+/**
+ * Check if attribute is enabled in search
+ */
+if (!function_exists('somnia_is_attribute_enabled_in_search')) {
+	function somnia_is_attribute_enabled_in_search($attribute_name_or_id)
+	{
+		$attribute_id = 0;
+		
+		// If it's a numeric ID, use it directly
+		if (is_numeric($attribute_name_or_id)) {
+			$attribute_id = absint($attribute_name_or_id);
+		} else {
+			// Otherwise, treat it as attribute name/slug
+			$attribute_slug = str_replace('pa_', '', $attribute_name_or_id);
+			$attribute_id = wc_attribute_taxonomy_id_by_name($attribute_slug);
+		}
+
+	if ($attribute_id) {
+		return (bool) get_option('somnia_enable_search_' . $attribute_id, false);
+	}
+
+	return false;
+	}
+}
+
+/**
+ * Update ACF JSON file with enabled search attributes
+ * Automatically adds/removes attributes from filter choices
+ */
+if (!function_exists('somnia_update_acf_filter_choices')) {
+	function somnia_update_acf_filter_choices()
+	{
+		$acf_json_path = get_template_directory() . '/framework/acf-options/group_6530e5259c0aa.json';
+		
+		if (!file_exists($acf_json_path)) {
+			return false;
+		}
+		
+		// Read JSON file
+		$json_content = file_get_contents($acf_json_path);
+		if ($json_content === false) {
+			return false;
+		}
+		
+		$acf_data = json_decode($json_content, true);
+		if (!$acf_data || !isset($acf_data['fields'])) {
+			return false;
+		}
+		
+		// Find the field with key "field_68f5e9b6ea2f3" (Item Filters)
+		$field_found = false;
+		somnia_find_and_update_field($acf_data['fields'], 'field_68f5e9b6ea2f3', $field_found);
+		
+		if (!$field_found) {
+			return false;
+		}
+		
+		// Save updated JSON
+		$updated_json = json_encode($acf_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		if ($updated_json === false) {
+			return false;
+		}
+		
+		// Write back to file
+		$result = file_put_contents($acf_json_path, $updated_json);
+		
+		return $result !== false;
+	}
+}
+
+/**
+ * Sync ACF JSON file on admin init to ensure all enabled attributes are included
+ */
+if (!function_exists('somnia_sync_acf_filter_choices_on_init')) {
+	function somnia_sync_acf_filter_choices_on_init()
+	{
+		// Only run in admin and when saving/updating attributes
+		if (!is_admin()) {
+			return;
+		}
+		
+		// Check if we're on the attributes page
+		$screen = get_current_screen();
+		if ($screen && $screen->id === 'product_page_product_attributes') {
+			// Sync when on attributes page
+			somnia_update_acf_filter_choices();
+		}
+	}
+	add_action('admin_init', 'somnia_sync_acf_filter_choices_on_init');
+}
+
+/**
+ * Recursively find and update field in ACF structure
+ */
+if (!function_exists('somnia_find_and_update_field')) {
+	function somnia_find_and_update_field(&$fields, $target_key, &$found)
+	{
+		if ($found) {
+			return;
+		}
+		
+		foreach ($fields as &$field) {
+			if (isset($field['key']) && $field['key'] === $target_key) {
+				// Found the field, update choices
+				$found = true;
+				
+				// Get base choices (static ones)
+				$base_choices = array(
+					'search_form' => 'Search Form',
+					'categories' => 'Product Categories',
+					'brand' => 'Brand',
+					'comfort_scale' => 'Comfort Scale',
+					'mattress_type' => 'Mattress Type',
+					'price' => 'Price',
+					'customer_rating' => 'Customer Rating',
+					'text_editor' => 'Text Editor'
+				);
+				
+				// Get all enabled WooCommerce attributes (including color)
+				// Force fresh data by getting directly from options
+				$enabled_attributes = array();
+				$color_taxonomies = array();
+				$attribute_taxonomies = wc_get_attribute_taxonomies();
+				
+				if (!empty($attribute_taxonomies)) {
+					foreach ($attribute_taxonomies as $attribute) {
+						$attribute_type = get_option('somnia_attribute_type_' . $attribute->attribute_id, 'select');
+						$enable_search = get_option('somnia_enable_search_' . $attribute->attribute_id, false);
+						
+						if ($enable_search) {
+							$taxonomy_name = wc_attribute_taxonomy_name($attribute->attribute_name);
+							
+							if ($attribute_type === 'color') {
+								$color_taxonomies[] = $taxonomy_name;
+							} else {
+								$enabled_attributes[] = array(
+									'taxonomy' => $taxonomy_name,
+									'type' => $attribute_type,
+									'attribute_id' => $attribute->attribute_id
+								);
+							}
+						}
+					}
+				}
+				
+				$attribute_choices = array();
+				
+				// Add non-color attributes
+				foreach ($enabled_attributes as $attr_data) {
+					$taxonomy = $attr_data['taxonomy'];
+					$attribute_id = $attr_data['attribute_id'];
+					
+					// Get attribute label
+					$attribute_taxonomies = wc_get_attribute_taxonomies();
+					$attribute_label = $taxonomy;
+					
+					if (!empty($attribute_taxonomies)) {
+						foreach ($attribute_taxonomies as $attr) {
+							if ($attr->attribute_id == $attribute_id && !empty($attr->attribute_label)) {
+								$attribute_label = $attr->attribute_label;
+								break;
+							}
+						}
+					}
+					
+					// Use taxonomy name as key, label as value
+					$attribute_choices[$taxonomy] = $attribute_label;
+				}
+				
+				// Add color attributes
+				if (!empty($color_taxonomies)) {
+					foreach ($color_taxonomies as $color_taxonomy) {
+						$attribute_id = wc_attribute_taxonomy_id_by_name(str_replace('pa_', '', $color_taxonomy));
+						$attribute_taxonomies = wc_get_attribute_taxonomies();
+						$attribute_label = function_exists('wc_attribute_label') ? wc_attribute_label($color_taxonomy) : $color_taxonomy;
+						
+						if ($attribute_id && !empty($attribute_taxonomies)) {
+							foreach ($attribute_taxonomies as $attr) {
+								if ($attr->attribute_id == $attribute_id && !empty($attr->attribute_label)) {
+									$attribute_label = $attr->attribute_label;
+									break;
+								}
+							}
+						}
+						
+						// Use taxonomy name as key, label as value
+						$attribute_choices[$color_taxonomy] = $attribute_label;
+					}
+				}
+				
+				// Merge base choices with attribute choices
+				$field['choices'] = array_merge($base_choices, $attribute_choices);
+				
+				return;
+			}
+			
+			// Check sub_fields if exists
+			if (isset($field['sub_fields']) && is_array($field['sub_fields'])) {
+				somnia_find_and_update_field($field['sub_fields'], $target_key, $found);
+			}
+			
+			// Check fields if exists (for groups)
+			if (isset($field['fields']) && is_array($field['fields'])) {
+				somnia_find_and_update_field($field['fields'], $target_key, $found);
+			}
+		}
 	}
 }
