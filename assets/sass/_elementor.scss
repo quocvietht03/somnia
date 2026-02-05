@@ -1046,7 +1046,7 @@
     width: 100%;
     height: 100%;
     z-index: 99998;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.83);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease-in-out;
@@ -11016,6 +11016,7 @@
             }
           }
         }
+
       }
     }
   }
@@ -13675,7 +13676,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.83);
       }
 
       .bt-modal-content {
