@@ -526,7 +526,7 @@
 												existingSwiper.destroy(true, true);
 											}
 
-											$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
+										//	$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
 
 											// Re-init quickview slider
 											setTimeout(function () {
@@ -546,7 +546,7 @@
 													}
 
 													var quickviewSlider = new Swiper('.bt-popup-quick-view .bt-gallery-slider-product', {
-														spaceBetween: 30,
+														spaceBetween: 20,
 														loop: true,
 														loopedSlides: 3,
 														pagination: {
@@ -556,11 +556,16 @@
 														slidesPerView: 1,
 														allowTouchMove: true,
 														centeredSlides: false,
+														breakpoints: {
+															768: {
+																spaceBetween: 30,
+															},
+														},
 													});
 												}
 
-												$productContainer.find('.bt-skeleton-gallery').remove();
-												$productContainer.find('.bt-gallery-slider-products').removeClass('loading');
+											//	$productContainer.find('.bt-skeleton-gallery').remove();
+											//	$productContainer.find('.bt-gallery-slider-products').removeClass('loading');
 											}, 100);
 										} else if (gallerylayout == 'gallery-slider') {
 											$productContainer.find('.bt-gallery-slider-products').html(response.data['gallery-slider']);
@@ -718,7 +723,7 @@
 				}
 
 				var quickviewSlider = new Swiper('.bt-popup-quick-view .bt-gallery-slider-product', {
-					spaceBetween: 30,
+					spaceBetween: 20,
 					loop: true,
 					loopedSlides: 3,
 					pagination: {
@@ -728,6 +733,11 @@
 					slidesPerView: 1,
 					allowTouchMove: true,
 					centeredSlides: false,
+					breakpoints: {
+						768: {
+							spaceBetween: 30,
+						},
+					},
 				});
 			}
 		}
@@ -3848,11 +3858,24 @@
 		const $fbtSelect = $fbtSection.find('.fbt-products-select');
 		if ($fbtSelect.length === 0) return;
 
-		// Initialize select2
+		// Initialize select2 (responsive to viewport)
+		const $wrapper = $('.fbt-products-select-wrapper');
 		$('.fbt-products-select').select2({
-			dropdownParent: $('.fbt-products-select-wrapper'),
-			minimumResultsForSearch: Infinity
+			dropdownParent: $wrapper,
+			minimumResultsForSearch: Infinity,
+			width: '100%'
 		});
+
+		// Sync dropdown width with wrapper on resize or open
+		function syncFbtSelect2Width() {
+			if ($wrapper.length === 0) return;
+			var w = $wrapper.outerWidth();
+			$wrapper.find('.select2-container').css('width', '100%');
+			$wrapper.find('.select2-dropdown').css('width', w + 'px');
+		}
+		$fbtSelect.on('select2:open', syncFbtSelect2Width);
+		$(window).on('resize', syncFbtSelect2Width);
+		syncFbtSelect2Width();
 
 		// Add hidden input to form when select changes
 		const $addToCartForm = $('form.cart');
