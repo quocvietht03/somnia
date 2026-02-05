@@ -1229,7 +1229,13 @@ function somnia_product_field_multiple_html($slug = '', $field_title = '', $fiel
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28.1489 8.44723C28.6566 8.98059 28.6358 9.82456 28.1025 10.3323L12.6951 24.9989C12.4319 25.2494 12.078 25.3817 11.7151 25.3652C11.3522 25.3486 11.0118 25.1848 10.7725 24.9114L4.8466 18.1422C4.36156 17.5882 4.41752 16.7458 4.97159 16.2607C5.52565 15.7757 6.36802 15.8317 6.85306 16.3857L11.8633 22.109L26.2639 8.4008C26.7972 7.89308 27.6412 7.91387 28.1489 8.44723Z" fill="white" />
                                 </svg>
                             </span>
-                            <?php echo esc_html($term->name); ?>
+                            <?php 
+                            echo esc_html($term->name);
+                            // If this is an attribute taxonomy, append description
+                            if (strpos($slug, 'pa_') === 0 && !empty($term->description)) {
+                                echo ' - ' . esc_html($term->description);
+                            }
+                            ?>
                             <div class="bt-count"><?php echo '(' . $term_count . ')'; ?></div>
                         </a>
                     </div>
