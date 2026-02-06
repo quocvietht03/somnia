@@ -40,7 +40,7 @@ class Widget_ProductCategoryItem extends Widget_Base
     }
 
 
-    private function get_product_categories() {
+    private function get_supported_categories() {
 
         $categories = get_terms([
             'taxonomy'   => 'product_cat',
@@ -80,7 +80,7 @@ class Widget_ProductCategoryItem extends Widget_Base
             ]
         );
 
-        $options = $this->get_product_categories();
+        $options = $this->get_supported_categories();
         $this->add_control(
             'product_cat',
             [

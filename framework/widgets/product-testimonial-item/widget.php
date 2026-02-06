@@ -32,7 +32,7 @@ class Widget_ProductTestimonialItem extends Widget_Base
         return ['somnia'];
     }
 
-    private function get_products_list() {
+    private function get_supported_products() {
 		$products = wc_get_products([
 			'limit' => -1,
 			'status' => 'publish',
@@ -194,7 +194,7 @@ class Widget_ProductTestimonialItem extends Widget_Base
             ]
         );
 
-        $options = $this->get_products_list();
+        $options = $this->get_supported_products();
 		$this->add_control(
 			'product_id',
 			[
