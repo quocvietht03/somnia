@@ -3074,12 +3074,12 @@
 			}
 		});
 	}
-	/* Copyright Current Year */
-	function SomniaCopyrightCurrentYear() {
+	/* Current Year Automation */
+	function SomniaCurrentYearAutomation() {
 		var searchTerm = '{Year}',
 			replaceWith = new Date().getFullYear();
-
-		$('.bt-elwg-site-copyright').each(function () {
+		
+		$('.elementor-element, .bt-elwg-site-copyright').each(function () {
 			this.innerHTML = this.innerHTML.replace(searchTerm, replaceWith);
 		});
 	}
@@ -4062,7 +4062,7 @@
 		SomniaHandleGridViewResize();
 		SomniaHookGravityFormEvents();
 		SomniaProductButtonStatus();
-		SomniaCopyrightCurrentYear();
+		SomniaCurrentYearAutomation();
 		SomniaCompareContentScroll();
 		SomniaBackToTop();
 		SomniaLoadFilterTagProduct();
