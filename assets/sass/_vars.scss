@@ -111,11 +111,25 @@ $transition: all 0.25s ease-in-out;
     line-height: 133%;
     text-transform: uppercase;
 }
+
+.__title_typo {
+    font-family: $primary-font;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 150%;
+}
+
 .__button_typo {
     font-family: $primary-font;
     font-size: 16px;
     font-weight: 500;
     line-height: 26px;
+}
+.__button_small_typo {
+    font-family: $primary-font;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 24px;
 }
 
 @media(max-width: $break-tl) {
@@ -140,8 +154,14 @@ $transition: all 0.25s ease-in-out;
     .__body_1_typo {
         font-size: 17px;
     }
+    .__title_typo {
+        font-size: 15px;
+    }
     .__button_typo {
         font-size: 15px;
+    }
+    .__button_small_typo {
+        font-size: 13px;
     }
 }
 
@@ -176,7 +196,13 @@ $transition: all 0.25s ease-in-out;
     .__caption_2_typo {
         font-size: 11px;
     }
+    .__title_typo {
+        font-size: 14px;
+    }
     .__button_typo {
         font-size: 14px;
+    }
+    .__button_small_typo {
+        font-size: 12px;
     }
 }

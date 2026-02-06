@@ -56,9 +56,64 @@ class Widget_ProductTestimonialItem extends Widget_Base
         );
 
         $this->add_control(
+            'testimonial_image',
+            [
+                'label' => __('Image', 'somnia'),
+                'type' => Controls_Manager::MEDIA,
+                'default' => [
+                    'url' => Utils::get_placeholder_image_src(),
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Image_Size::get_type(),
+            [
+                'name' => 'thumbnail',
+                'label' => __('Image Size', 'somnia'),
+                'show_label' => true,
+                'default' => 'medium_large',
+                'exclude' => ['custom'],
+                'condition' => [
+					'testimonial_image[url]!' => '',
+				],
+            ]
+        );
+
+        $this->add_control(
+			'image_position',
+			[
+				'label' => esc_html__( 'Image Position', 'somnia' ),
+				'type' => Controls_Manager::CHOOSE,
+				'default' => 'top',
+                'tablet_default' => 'top',
+                'mobile_default' => 'top',
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'somnia' ),
+						'icon' => 'eicon-h-align-left',
+					],
+					'top' => [
+						'title' => esc_html__( 'Top', 'somnia' ),
+						'icon' => 'eicon-v-align-top',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'somnia' ),
+						'icon' => 'eicon-h-align-right',
+					],
+				],
+				'prefix_class' => 'bt-image-position--',
+				'toggle' => false,
+				'condition' => [
+					'testimonial_image[url]!' => '',
+				],
+			]
+		);
+
+        $this->add_control(
             'testimonial_title',
             [
-                'label' => __('Testimonial Title', 'somnia'),
+                'label' => __('Title', 'somnia'),
                 'type' => Controls_Manager::TEXT,
                 'label_block' => true,
                 'default' => __('What Our Customers Say', 'somnia'),
@@ -69,11 +124,47 @@ class Widget_ProductTestimonialItem extends Widget_Base
         $this->add_control(
             'testimonial_text',
             [
-                'label' => __('Testimonial Text', 'somnia'),
+                'label' => __('Text', 'somnia'),
                 'type' => Controls_Manager::TEXTAREA,
                 'rows' => 5,
                 'default' => __('This is a sample testimonial quote. It helps visualize how customer feedback will appear here.', 'somnia'),
                 'placeholder' => __('Type your testimonial text', 'somnia'),
+            ]
+        );
+
+        $this->add_control(
+            'enable_text_limit',
+            [
+                'label' => esc_html__( 'Enable Text Limit', 'somnia' ),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => 'yes',
+                'condition' => [
+					'testimonial_text!' => '',
+				],
+            ]
+        );
+
+        $this->add_control(
+            'text_line_limit',
+            [
+                'label' => esc_html__( 'Text Limit Lines', 'somnia' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 10,
+                    ],
+                ],
+                'default' => [
+                    'size' => 3,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-testimonial-item--text' => '-webkit-line-clamp: {{SIZE}};display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;',
+                ],
+                'condition' => [
+					'testimonial_text!' => '',
+                    'enable_text_limit' => 'yes'
+				],
             ]
         );
 
@@ -115,28 +206,6 @@ class Widget_ProductTestimonialItem extends Widget_Base
 				'default'     => ! empty( $options ) ? array_key_first( $options ) : '',
 			]
 		);
-
-        $this->add_control(
-            'testimonial_image',
-            [
-                'label' => __('Image Banner', 'somnia'),
-                'type' => Controls_Manager::MEDIA,
-                'default' => [
-                    'url' => Utils::get_placeholder_image_src(),
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Image_Size::get_type(),
-            [
-                'name' => 'thumbnail',
-                'label' => __('Image Size', 'somnia'),
-                'show_label' => true,
-                'default' => 'medium_large',
-                'exclude' => ['custom'],
-            ]
-        );
 
         $this->end_controls_section();
     }
@@ -193,19 +262,6 @@ class Widget_ProductTestimonialItem extends Widget_Base
                 'selectors'  => [
                     '{{WRAPPER}} .bt-product-testimonial-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
-            ]
-        );
-
-        $this->add_control(
-            'align_stretch',
-            [
-                'label'        => esc_html__( 'Align Stretch', 'somnia' ),
-                'type'         => Controls_Manager::SWITCHER,
-                'label_on'     => esc_html__( 'Yes', 'somnia' ),
-                'label_off'    => esc_html__( 'No', 'somnia' ),
-                'return_value' => 'yes',
-                'default'      => '',
-                'prefix_class' => 'bt-align-stretch--',
             ]
         );
 
@@ -409,6 +465,21 @@ class Widget_ProductTestimonialItem extends Widget_Base
         ?>
         <div class="bt-elwg-product-testimonial-item">
             <div class="bt-product-testimonial-item">
+                <div class="bt-product-testimonial-item--image">
+                    <div class="bt-cover-image">
+                        <?php
+                        if (!empty($settings['testimonial_image']['id'])) {
+                            echo wp_get_attachment_image($settings['testimonial_image']['id'], $settings['thumbnail_size']);
+                        } else {
+                            if (!empty($settings['testimonial_image']['url'])) {
+                                echo '<img src="' . esc_url($settings['testimonial_image']['url']) . '" alt="' . esc_html__('Awaiting testimonial image', 'somnia') . '">';
+                            } else {
+                                echo '<img src="' . esc_url(Utils::get_placeholder_image_src()) . '" alt="' . esc_html__('Awaiting testimonial image', 'somnia') . '">';
+                            }
+                        }
+                        ?>
+                    </div>
+                </div>
                 <div class="bt-product-testimonial-item--content">
                     <div class="bt-product-testimonial-item--inner">
                         <?php if (!empty($settings['testimonial_rating'])) : ?>
@@ -457,22 +528,6 @@ class Widget_ProductTestimonialItem extends Widget_Base
                         </a>
                         </div>
                     <?php endif; ?>
-                </div>
-                
-                <div class="bt-product-testimonial-item--image">
-                    <div class="bt-testimonial-image">
-                        <?php
-                        if (!empty($settings['testimonial_image']['id'])) {
-                            echo wp_get_attachment_image($settings['testimonial_image']['id'], $settings['thumbnail_size']);
-                        } else {
-                            if (!empty($settings['testimonial_image']['url'])) {
-                                echo '<img src="' . esc_url($settings['testimonial_image']['url']) . '" alt="' . esc_html__('Awaiting testimonial image', 'somnia') . '">';
-                            } else {
-                                echo '<img src="' . esc_url(Utils::get_placeholder_image_src()) . '" alt="' . esc_html__('Awaiting testimonial image', 'somnia') . '">';
-                            }
-                        }
-                        ?>
-                    </div>
                 </div>
             </div>
         </div>

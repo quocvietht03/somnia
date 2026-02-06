@@ -324,3 +324,62 @@ body {
         }
     }
 }
+/* Section improve style */
+.bt-starting-section {
+    @media (max-width: 399.98px) {
+        .elementor-element.e-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+}
+
+.bt-product-grid-section {
+    @media (max-width: 399.98px) {
+        .elementor-grid-mobile-2 .elementor-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+        .elementor-widget-n-tabs .e-n-tab-title-text {
+            font-size: 20px;
+        }
+    }
+}
+
+.bt-customers-grid-section {
+    @media (min-width: 400px) and (max-width: $break-xs), (min-width: $break-sm) and (max-width: $break-md) {
+        .bt-product-testimonial-item {
+            &--content {
+                padding: 16px;
+            }
+            &--title {
+                font-size: 14px;
+            }
+            &--text {
+                font-size: 14px;
+            }
+            &--author {
+                font-size: 13px;
+            }
+            &--rating .star svg {
+                width: 16px;
+                height: 16px;
+            }
+            .bt-product-mini-item {
+                &--link {
+                    gap: 12px;
+                }
+                &--image {
+                    width: 48px;
+                    min-width: 48px;
+                }
+                &--title {
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+    @media (max-width: 399.98px) {
+        .elementor-element.e-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+}
