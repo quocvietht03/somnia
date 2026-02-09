@@ -368,10 +368,12 @@ body {
 }
 
 .bt-product-grid-section {
-    @media (max-width: 399.98px) {
-        .elementor-grid-mobile-2 .elementor-grid {
-            grid-template-columns: repeat(1, 1fr);
+    @media(min-width: 400px) and (max-width: $break-sm) {
+        .elementor-grid-mobile-1 .elementor-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
+    }
+    @media (max-width: 399.98px) {
         .elementor-widget-n-tabs .e-n-tab-title-text {
             font-size: 20px;
         }
@@ -379,6 +381,11 @@ body {
 }
 
 .bt-customers-grid-section {
+    @media(min-width: 400px) and (max-width: $break-sm) {
+        .elementor-element.e-grid {
+            grid-template-columns: repeat(2, 1fr); 
+        }
+    }
     @media (min-width: 400px) and (max-width: $break-xs), (min-width: $break-sm) and (max-width: $break-md) {
         .bt-product-testimonial-item {
             &--content {
@@ -409,11 +416,6 @@ body {
                     font-size: 12px;
                 }
             }
-        }
-    }
-    @media (max-width: 399.98px) {
-        .elementor-element.e-grid {
-            grid-template-columns: repeat(1, 1fr);
         }
     }
 }

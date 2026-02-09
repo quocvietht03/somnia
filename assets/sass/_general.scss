@@ -1675,7 +1675,9 @@
     top: 50%;
     transform: translateY(-50%);
     padding: 12px;
-    background: #fff;
+    border-radius: 8px;
+    background: rgba($color-black, 0.16);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1690,11 +1692,8 @@
     }
 
     &:hover {
-      background: $color-primary;
+      background: $color-secondary;
       transform: translateY(-50%);
-      svg {
-        color: #fff;
-      }
     }
     &.bt-button-prev {
       left: 15px;

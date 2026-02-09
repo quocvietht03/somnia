@@ -719,7 +719,7 @@ class Widget_InstagramPosts extends Widget_Base
 		$slider_settings = [];
 		if ($settings['enable_slider'] === 'yes') {
 			$breakpoints = Plugin::$instance->breakpoints->get_active_breakpoints();
-			$slider_settings = bt_elwg_get_slider_settings($settings, $breakpoints);
+			$slider_settings = somnia_elwg_get_slider_settings($settings, $breakpoints);
 		}
 
 		$data_slider_settings = $settings['enable_slider'] === 'yes' ? esc_attr(json_encode($slider_settings)) : '';

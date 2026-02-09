@@ -856,7 +856,7 @@ add_action('elementor/element/nested-tabs/section_title_style/before_section_end
 
 
 // Slider Swiper Setting
-function bt_elwg_get_slider_settings($settings, $breakpoints)
+function somnia_elwg_get_slider_settings($settings, $breakpoints)
 {
 	// Helper: get the first non-empty value from a list of keys
 	$get_first_nonempty = function ($keys, $default = 20) use ($settings) {
@@ -933,11 +933,19 @@ function bt_elwg_get_slider_settings($settings, $breakpoints)
 				}
 		];
 	}
+
+	if (isset($slider_settings['breakpoints'][767]['slidesPerView']) && $slider_settings['breakpoints'][767]['slidesPerView'] == 2) {
+		$slider_settings['breakpoints'][400] = array(
+			'slidesPerView'=> 2,
+			'spaceBetween'=> (int) round($slider_settings['breakpoints'][767]['spaceBetween'] * 0.67)
+		);
+	}
+
 	return $slider_settings;
 }
 
 // Grid Area Positions for Flicker Collage
-function bt_elwg_get_grid_area_positions($collage_items, $breakpoints)
+function somnia_elwg_get_grid_area_positions($collage_items, $breakpoints)
 {
 	$result = [
 		'breakpoints' => []

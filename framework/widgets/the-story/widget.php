@@ -415,7 +415,7 @@ class Widget_TheStory extends Widget_Base
         $breakpoints = Plugin::$instance->breakpoints->get_active_breakpoints();
 
         // Get slider settings using helper function
-        $slider_settings = bt_elwg_get_slider_settings($settings, $breakpoints);
+        $slider_settings = somnia_elwg_get_slider_settings($settings, $breakpoints);
         $slider_settings['autoplay_delay'] = isset($settings['slider_autoplay_delay']) ? $settings['slider_autoplay_delay'] : 5000;
 
         if (!empty($settings['story_items'])) :
