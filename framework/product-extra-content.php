@@ -406,7 +406,6 @@ function somnia_output_product_extra_content()
     echo '</div>';
 }
 add_action('woocommerce_after_single_product_summary', 'somnia_output_product_extra_content', 18);
-add_action('somnia_woocommerce_template_related_products', 'somnia_output_product_extra_content', 18);
 
 // Display notice in Extra Content editor about linked product
 function somnia_extra_content_admin_notice()

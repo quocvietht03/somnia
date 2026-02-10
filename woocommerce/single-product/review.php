@@ -33,15 +33,15 @@ if (! defined('ABSPATH')) {
 		 * @hooked woocommerce_review_display_gravatar - 10
 		 */
 		if (function_exists('get_field')) {
-            $avatar = get_field('avatar', 'user_' . $comment->user_id);
-          } else {
-            $avatar = array();
-          }
-		  if (!empty($avatar)) {
-            echo '<img src="' . esc_url($avatar['url']) . '" alt="' . esc_attr($avatar['title']) . '" class="avatar avatar-60 photo" />';
-          }else{
+			$avatar = get_field('avatar', 'user_' . $comment->user_id);
+		} else {
+			$avatar = array();
+		}
+		if (!empty($avatar)) {
+			echo '<img src="' . esc_url($avatar['url']) . '" alt="' . esc_attr($avatar['title']) . '" class="avatar avatar-60 photo" />';
+		} else {
 			do_action('woocommerce_review_before', $comment);
-		  }
+		}
 		?>
 
 		<div class="comment-text">
@@ -66,14 +66,29 @@ if (! defined('ABSPATH')) {
 		<?php
 		do_action('woocommerce_review_before_comment_text', $comment);
 
+		// Display rating
+		$rating = intval(get_comment_meta($comment->comment_ID, 'rating', true));
 		// Display review title if it exists
 		$review_title = get_comment_meta($comment->comment_ID, 'review_title', true);
-		if (!empty($review_title)) :
-			?>
-			<h4 class="review-title"><?php echo esc_html($review_title); ?></h4>
-			<?php
-		endif;
+		
+		// Only show wrapper if there's a rating or title
+		if (($rating && wc_review_ratings_enabled()) || !empty($review_title)) {
+			echo '<div class="bt-title-wrap">';
+			
+			if (post_type_supports('product', 'comments')) {
+				wc_get_template('single-product/review-rating.php');
+			}
+			if ($rating && wc_review_ratings_enabled()) {
+				echo '<span class="woocommerce-review__dash">&ndash;</span> ';
+			}
 
+			if (!empty($review_title)) :
+			?>
+				<h4 class="review-title"><?php echo esc_html($review_title); ?></h4>
+			<?php
+			endif;
+			echo '</div>';
+		}
 		/**
 		 * The woocommerce_review_comment_text hook
 		 *

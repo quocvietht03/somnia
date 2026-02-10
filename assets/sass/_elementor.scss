@@ -923,7 +923,16 @@
       font-size: 72%;
     }
   }
-
+  p,
+  span,
+  div {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    margin: 0;
+  }
   .__text-highlighted {
     position: relative;
     color: $color-accent;
@@ -4560,7 +4569,7 @@
       // Skeleton Loading
       .bt-product-skeleton {
         .bt-skeleton-thumbnail {
-          padding-bottom: 132%;
+          padding-bottom: 100%;
           border-radius: 0;
           @extend .__bt-animation-loading-card;
         }
@@ -14393,10 +14402,9 @@
     .bt-order-tracking-tabs {
       .bt-tabs-nav {
         display: flex;
-        gap: 0;
         border-bottom: none;
         margin-bottom: 40px;
-
+        gap: 15px;
         .bt-tab-btn {
           flex: 0 0 auto;
           padding: 14px 32px;
