@@ -36,9 +36,8 @@
     &--publish {
       color: $color-text;
       font-size: 12px;
-      font-style: normal;
       font-weight: 500;
-      line-height: 16px; /* 133.333% */
+      line-height: 1.3;
       letter-spacing: 0.96px;
       text-transform: uppercase;
       padding-right: 12px;
@@ -75,8 +74,17 @@
     @media(max-width: $break-tl) {
       gap: 20px;
     }
-    @media(max-width: $break-xs) {
+    @media(max-width: $break-md) {
       gap: 16px;
+      &--meta {
+        gap: 8px;
+      }
+      &--publish {
+        padding-right: 8px;
+      }
+    }
+    @media(max-width: $break-xs) {
+      gap: 12px;
     }
   }
 }

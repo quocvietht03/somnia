@@ -89,6 +89,18 @@ class Widget_RecentPosts extends Widget_Base
 		);
 
 		$this->add_control(
+			'date_format',
+			[
+				'label'       => __( 'Date Format', 'somnia' ),
+				'type'        => Controls_Manager::TEXT,
+				'placeholder' => get_option( 'date_format' ),
+				'condition'   => [
+					'show_date' => 'yes',
+				],
+			]
+		);
+
+		$this->add_control(
 			'show_category',
 			[
 				'label' => __('Show Category', 'somnia'),
@@ -417,7 +429,10 @@ class Widget_RecentPosts extends Widget_Base
 							<div class="bt-post--meta">
 								<?php if ($settings['show_date'] == 'yes') { ?>
 									<div class="bt-post--publish">
-										<?php echo get_the_date(get_option('date_format'), $post_item['ID']); ?>
+										<?php 
+										$date_format = ! empty( $settings['date_format'] ) ? $settings['date_format'] : get_option( 'date_format' );
+										echo get_the_date($date_format, $post_item['ID']); 
+										?>
 									</div>
 								<?php } ?>
 								<?php if ($settings['show_category'] == 'yes' && !empty($category) && is_array($category)) {
