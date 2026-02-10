@@ -64,8 +64,6 @@
       text-transform: uppercase;
     }
     &--title {
-      @extend .__bt-max-line-ellipsis;
-      word-break: break-word;
       margin: 4px 0 0 0;
       color: $color-primary;
       font-family: $secondary-font;

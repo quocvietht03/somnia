@@ -99,6 +99,38 @@ class Widget_RecentPosts extends Widget_Base
 			]
 		);
 
+		$this->add_control(
+            'enable_title_limit',
+            [
+                'label' => esc_html__( 'Enable Title Limit', 'somnia' ),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'title_line_limit',
+            [
+                'label' => esc_html__( 'Title Limit Lines', 'somnia' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 10,
+                    ],
+                ],
+                'default' => [
+                    'size' => 2,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-post--title' => '-webkit-line-clamp: {{SIZE}};display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;',
+                ],
+                'condition' => [
+                    'enable_title_limit' => 'yes'
+				],
+            ]
+        );
+
 		$this->end_controls_section();
 	}
 
