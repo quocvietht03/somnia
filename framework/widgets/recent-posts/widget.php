@@ -4,6 +4,7 @@ namespace SomniaElementorWidgets\Widgets\RecentPosts;
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Image_Size;
 use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
@@ -62,6 +63,20 @@ class Widget_RecentPosts extends Widget_Base
 			]
 		);
 
+		$this->add_group_control(
+			Group_Control_Image_Size::get_type(),
+			[
+				'name' => 'thumbnail',
+				'label' => __( 'Image Size', 'somnia' ),
+				'show_label' => true,
+				'default' => 'medium',
+				'exclude' => [ 'custom' ],
+				'condition' => [
+					'show_thumbnail' => 'yes',
+				],
+			]
+		);
+
 		$this->add_control(
 			'show_date',
 			[
@@ -96,6 +111,21 @@ class Widget_RecentPosts extends Widget_Base
 				'tab' => Controls_Manager::TAB_STYLE,
 			]
 		);
+
+		$this->add_control(
+			'reverse_row',
+			[
+				'label' => __( 'Reverse Row', 'somnia' ),
+				'type'  => Controls_Manager::SWITCHER,
+				'label_on' => 'Yes',
+				'label_off' => 'No',
+				'return_value' => 'yes',
+				'condition' => [
+					'show_thumbnail' => 'yes',
+				],
+			]
+		);
+
 		$this->add_control(
 			'item_padding',
 			[
@@ -122,12 +152,12 @@ class Widget_RecentPosts extends Widget_Base
 		);
 
 		$this->add_responsive_control(
-			'thumbnail_size',
+			'thumbnail_width',
 			[
-				'label' => __('Size', 'somnia'),
+				'label' => __('Width', 'somnia'),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
-					'size' => 80,
+					'size' => 90,
 				],
 				'range' => [
 					'px' => [
@@ -137,6 +167,25 @@ class Widget_RecentPosts extends Widget_Base
 				],
 				'selectors' => [
 					'{{WRAPPER}} .bt-post--thumbnail' => 'width: {{SIZE}}{{UNIT}}; min-width: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'thumbnail_height',
+			[
+				'label' => __('Height', 'somnia'),
+				'type' => Controls_Manager::SLIDER,
+				'default' => [
+					'size' => 90,
+				],
+				'range' => [
+					'px' => [
+						'min' => 50,
+						'max' => 200,
+					],
+				],
+				'selectors' => [
 					'{{WRAPPER}} .bt-post--thumbnail .bt-cover-image' => 'height: {{SIZE}}{{UNIT}};',
 				],
 			]
@@ -316,8 +365,10 @@ class Widget_RecentPosts extends Widget_Base
 			'post_status' => 'publish'
 		));
 
-?>
-		<div class="bt-elwg-recent-posts widget widget-block bt-block-recent-posts">
+		$reverse = $settings['reverse_row'] === 'yes' ? 'is-reverse' : '';
+
+		?>
+		<div class="bt-elwg-recent-posts widget widget-block bt-block-recent-posts <?php echo esc_attr( $reverse ); ?>">
 			<?php foreach ($recent_posts as $post_item) {
 				$category = get_the_terms($post_item['ID'], 'category');
 			?>
@@ -325,7 +376,7 @@ class Widget_RecentPosts extends Widget_Base
 					<?php if ($settings['show_thumbnail'] == 'yes') { ?>
 						<a href="<?php echo get_permalink($post_item['ID']) ?>" class="bt-post--thumbnail">
 							<div class="bt-cover-image">
-								<?php echo get_the_post_thumbnail($post_item['ID'], 'thumbnail'); ?>
+								<?php echo get_the_post_thumbnail($post_item['ID'], $settings['thumbnail_size']); ?>
 							</div>
 						</a>
 					<?php } ?>
