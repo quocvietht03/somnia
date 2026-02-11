@@ -5147,7 +5147,7 @@ function somnia_load_product_toast()
         </div>
 
     </div>
-    <?php
+<?php
     $output = array(
         'toast' => ob_get_clean()
     );
@@ -5285,22 +5285,22 @@ function somnia_single_product_sticky_bar()
             $default_variation_name = $variation_names[$default_variation_id];
         }
     }
-    ?>
+?>
     <div class="bt-single-product-sticky-bar" <?php echo $sticky_bar_attrs; ?>>
         <div class="bt-single-product-sticky-bar__inner">
             <div class="bt-single-product-sticky-bar__product">
-                <a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="bt-single-product-sticky-bar__thumb">
+                <div class="bt-single-product-sticky-bar__thumb">
                     <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>" />
-                </a>
+                </div>
                 <div class="bt-single-product-sticky-bar__info">
                     <h3 class="bt-single-product-sticky-bar__title"><?php echo esc_html($title); ?></h3>
                     <?php if ($price_html) { ?>
                         <div class="bt-single-product-sticky-bar__price<?php echo $is_variable ? ' bt-product-type-variable' : ''; ?>"><?php echo $price_html; ?></div>
                     <?php } ?>
                     <?php if ($is_variable) { ?>
-                    <div class="bt-single-product-sticky-bar__variation">
-                        <div class="bt-single-product-sticky-bar__variation-name"><?php echo esc_html($default_variation_name); ?></div>
-                    </div>
+                        <div class="bt-single-product-sticky-bar__variation">
+                            <div class="bt-single-product-sticky-bar__variation-name"><?php echo esc_html($default_variation_name); ?></div>
+                        </div>
                     <?php } ?>
                 </div>
             </div>
