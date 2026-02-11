@@ -795,7 +795,7 @@ class Widget_TestimonialSlider extends Widget_Base
         }
 
         $breakpoints = Plugin::$instance->breakpoints->get_active_breakpoints();
-        $slider_settings = bt_elwg_get_slider_settings($settings, $breakpoints);
+        $slider_settings = somnia_elwg_get_slider_settings($settings, $breakpoints);
         ?>
         <div class="<?php echo esc_attr(implode(' ', $classes)); ?> bt-slider-offset-sides-<?php echo esc_attr($settings['slider_offset_sides']); ?>" data-slider-settings='<?php echo esc_attr(json_encode($slider_settings)); ?>'>
             <div class="bt-testimonial js-testimonial-slider swiper">

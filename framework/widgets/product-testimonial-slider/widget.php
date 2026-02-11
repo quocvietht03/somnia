@@ -9,7 +9,6 @@ use Elementor\Utils;
 use Elementor\Group_Control_Image_Size;
 use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Css_Filter;
-use Elementor\Group_Control_BBorder;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Border;
 use Elementor\Plugin;
@@ -43,24 +42,19 @@ class Widget_ProductTestimonialSlider extends Widget_Base
     {
         return ['swiper-slider', 'elementor-widgets'];
     }
-    protected function get_supported_ids()
+    protected function get_supported_products()
     {
-        $supported_ids = [];
+        $products = wc_get_products([
+			'limit' => -1,
+			'status' => 'publish',
+		]);
 
-        $wp_query = new \WP_Query(array(
-            'post_type' => 'product',
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
-        ));
+		$options = [];
+		foreach ( $products as $product ) {
+			$options[ $product->get_id() ] = $product->get_name();
+		}
 
-        if ($wp_query->have_posts()) {
-            while ($wp_query->have_posts()) {
-                $wp_query->the_post();
-                $supported_ids[get_the_ID()] = get_the_title();
-            }
-        }
-
-        return $supported_ids;
+		return $options;
     }
     protected function register_layout_section_controls()
     {
@@ -73,16 +67,40 @@ class Widget_ProductTestimonialSlider extends Widget_Base
 
 
         $repeater = new Repeater();
+
+        $repeater->add_control(
+            'testimonial_image',
+            [
+                'label' => __('Image', 'somnia'),
+                'type' => Controls_Manager::MEDIA,
+                'default' => [
+                    'url' => Utils::get_placeholder_image_src(),
+                ],
+            ]
+        );
+
+        $repeater->add_control(
+            'testimonial_title',
+            [
+                'label' => __('Title', 'somnia'),
+                'type' => Controls_Manager::TEXT,
+                'label_block' => true,
+                'default' => __('What Our Customers Say', 'somnia'),
+                'placeholder' => __('Type your testimonial title', 'somnia'),
+            ]
+        );
+
         $repeater->add_control(
             'testimonial_text',
             [
                 'label' => __('Testimonial Text', 'somnia'),
                 'type' => Controls_Manager::TEXTAREA,
                 'rows' => 5,
-                'default' => __('Enter testimonial text here', 'somnia'),
+                'default' => __('This is a sample testimonial quote. It helps visualize how customer feedback will appear here.', 'somnia'),
                 'placeholder' => __('Type your testimonial text', 'somnia'),
             ]
         );
+
         $repeater->add_control(
             'testimonial_rating',
             [
@@ -108,40 +126,20 @@ class Widget_ProductTestimonialSlider extends Widget_Base
                 'placeholder' => __('Enter author name', 'somnia'),
             ]
         );
-        $repeater->add_control(
-            'show_testimonial_image',
-            [
-                'label' => __('Show Image Banner', 'somnia'),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => __('Yes', 'somnia'),
-                'label_off' => __('No', 'somnia'),
-                'default' => 'no',
-            ]
-        );
 
-        $repeater->add_control(
-            'testimonial_image',
-            [
-                'label' => __('Image Banner', 'somnia'),
-                'type' => Controls_Manager::MEDIA,
-                'default' => [
-                    'url' => Utils::get_placeholder_image_src(),
-                ],
-                'condition' => [
-                    'show_testimonial_image' => 'yes',
-                ],
-            ]
-        );
-        $repeater->add_control(
-            'id_product',
-            [
-                'label' => __('Select Product', 'somnia'),
-                'type' => Controls_Manager::SELECT2,
-                'options' => $this->get_supported_ids(),
-                'label_block' => true,
-                'multiple' => false,
-            ]
-        );
+        $options = $this->get_supported_products();
+		$repeater->add_control(
+			'product_id',
+			[
+				'label'       => esc_html__( 'Select Products', 'somnia' ),
+				'type'        => Controls_Manager::SELECT2,
+				'options'     => $options, // id => title
+				'multiple'    => false,
+				'label_block' => true,
+				'default'     => ! empty( $options ) ? array_key_first( $options ) : '',
+			]
+		);
+
         $this->add_control(
             'testimonial_items',
             [
@@ -150,18 +148,65 @@ class Widget_ProductTestimonialSlider extends Widget_Base
                 'fields' => $repeater->get_controls(),
                 'default' => [
                     [
-                        'testimonial_text' => __('Great product! Highly recommend it.', 'somnia'),
+                        'testimonial_title' => __('Perfect neck support and versatile for lounging.', 'somnia'),
                     ],
                     [
-                        'testimonial_text' => __('Excellent quality and fast delivery.', 'somnia'),
+                        'testimonial_title' => __('Incredibly soft and holds its shape perfectly.', 'somnia'),
                     ],
                     [
-                        'testimonial_text' => __('Best purchase I made this year!', 'somnia'),
+                        'testimonial_title' => __('Reduces neck pain while providing great comfort.', 'somnia'),
+                    ],
+                    [
+                        'testimonial_title' => __('Cozy and firm, ideal for back support and relaxation.', 'somnia'),
                     ],
                 ],
-                'title_field' => '{{{ testimonial_text }}}',
+                'title_field' => '{{{ testimonial_title }}}',
             ]
         );
+
+        $this->add_group_control(
+            Group_Control_Image_Size::get_type(),
+            [
+                'name' => 'thumbnail',
+                'label' => __('Image Size', 'somnia'),
+                'show_label' => true,
+                'default' => 'medium_large',
+                'exclude' => ['custom'],
+            ]
+        );
+
+        $this->add_control(
+            'enable_text_limit',
+            [
+                'label' => esc_html__( 'Enable Text Limit', 'somnia' ),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'text_line_limit',
+            [
+                'label' => esc_html__( 'Text Limit Lines', 'somnia' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 10,
+                    ],
+                ],
+                'default' => [
+                    'size' => 3,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-testimonial-item--text' => '-webkit-line-clamp: {{SIZE}};display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;',
+                ],
+                'condition' => [
+                    'enable_text_limit' => 'yes'
+				],
+            ]
+        );
+
         $this->end_controls_section();
 
         $this->start_controls_section(
@@ -247,7 +292,7 @@ class Widget_ProductTestimonialSlider extends Widget_Base
                     ],
                 ],
                 'default' => [
-                    'size' => 10,
+                    'size' => 30,
                 ],
 
                 'render_type' => 'template',
@@ -370,94 +415,97 @@ class Widget_ProductTestimonialSlider extends Widget_Base
     {
         // Content Style Section
         $this->start_controls_section(
-            'section_content_style',
+            'section_layout_style',
             [
-                'label' => __('Content Style', 'somnia'),
+                'label' => __('Layout', 'somnia'),
                 'tab' => Controls_Manager::TAB_STYLE,
-            ]
-        );
-        $this->add_control(
-            'content_container_heading',
-            [
-                'label' => __('Content Container', 'somnia'),
-                'type' => Controls_Manager::HEADING,
-                'separator' => 'before',
-            ]
-        );
-
-        $this->add_control(
-            'content_background',
-            [
-                'label' => __('Background', 'somnia'),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--content' => 'background: {{VALUE}};',
-                ],
             ]
         );
 
         $this->add_responsive_control(
             'content_padding',
             [
-                'label' => __('Padding', 'somnia'),
+                'label' => __('Content Padding', 'somnia'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .bt-product-testimonial-item--content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
 
         $this->add_control(
-            'content_backdrop_blur',
+            'background_color',
             [
-                'label' => __('Backdrop Blur', 'somnia'),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => ['px'],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 50,
-                        'step' => 1,
-                    ],
-                ],
+                'label' => __('Background Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--content' => 'backdrop-filter: blur({{SIZE}}{{UNIT}}); -webkit-backdrop-filter: blur({{SIZE}}{{UNIT}});',
+                    '{{WRAPPER}} .bt-product-testimonial-item' => 'background-color: {{VALUE}};',
                 ],
             ]
         );
+
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name'     => 'border',
+                'label'    => esc_html__( 'Border', 'somnia' ),
+                'selector' => '{{WRAPPER}} .bt-product-testimonial-item',
+            ]
+        );
+
         $this->add_responsive_control(
-            'content_gap',
+            'border_radius',
             [
-                'label' => __('Content Gap', 'somnia'),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => ['px', 'em', 'rem'],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 100,
-                        'step' => 1,
-                    ],
-                    'em' => [
-                        'min' => 0,
-                        'max' => 10,
-                        'step' => 0.1,
-                    ],
-                    'rem' => [
-                        'min' => 0,
-                        'max' => 10,
-                        'step' => 0.1,
-                    ],
-                ],
-                'default' => [
-                    'unit' => 'px',
-                    'size' => 20,
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--content' => 'gap: {{SIZE}}{{UNIT}};',
+                'label'      => esc_html__( 'Border Radius', 'somnia' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%' ],
+                'selectors'  => [
+                    '{{WRAPPER}} .bt-product-testimonial-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'section_content_style',
+            [
+                'label' => __('Content', 'somnia'),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'title_heading',
+            [
+                'label' => __('Testimonial Title', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'title_color',
+            [
+                'label' => __('Title Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-testimonial-item--title' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'title_typography',
+                'selector' => '{{WRAPPER}} .bt-product-testimonial-item--title',
+            ]
+        );
+
         $this->add_control(
             'text_heading',
             [
@@ -472,9 +520,9 @@ class Widget_ProductTestimonialSlider extends Widget_Base
             [
                 'label' => __('Text Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '#0C2C48',
+                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--text' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-product-testimonial-item--text' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -483,49 +531,7 @@ class Widget_ProductTestimonialSlider extends Widget_Base
             Group_Control_Typography::get_type(),
             [
                 'name' => 'text_typography',
-                'selector' => '{{WRAPPER}} .bt-product-testimonial--text',
-            ]
-        );
-
-        $this->add_control(
-            'custom_text',
-            [
-                'label' => __('Custom Text', 'somnia'),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => __('Yes', 'somnia'),
-                'label_off' => __('No', 'somnia'),
-                'default' => 'no',
-            ]
-        );
-        
-        $this->add_responsive_control(
-            'text_lines_number',
-            [
-                'label' => __('Number of Lines', 'somnia'),
-                'type' => Controls_Manager::NUMBER,
-                'default' => 4,
-                'min' => 1,
-                'condition' => [
-                    'custom_text' => 'yes',
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--text' => 'display: -webkit-box; -webkit-line-clamp: {{VALUE}}; -webkit-box-orient: vertical; overflow: hidden;',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'text_height',
-            [
-                'label' => __('Text Height', 'somnia'),
-                'type' => Controls_Manager::NUMBER,
-                'default' => 120,
-                'condition' => [
-                    'custom_text' => 'yes',
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--text' => 'height: {{SIZE}}px;',
-                ],
+                'selector' => '{{WRAPPER}} .bt-product-testimonial-item--text',
             ]
         );
 
@@ -543,9 +549,9 @@ class Widget_ProductTestimonialSlider extends Widget_Base
             [
                 'label' => __('Author Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '#0C2C48',
+                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--author' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-product-testimonial-item--author' => 'color: {{VALUE}};',
                 ],
             ]
         );
@@ -554,58 +560,7 @@ class Widget_ProductTestimonialSlider extends Widget_Base
             Group_Control_Typography::get_type(),
             [
                 'name' => 'author_typography',
-                'selector' => '{{WRAPPER}} .bt-product-testimonial--author',
-            ]
-        );
-
-        $this->add_control(
-            'Product_heading',
-            [
-                'label' => __('Product', 'somnia'),
-                'type' => Controls_Manager::HEADING,
-                'separator' => 'before',
-            ]
-        );
-
-        $this->add_control(
-            'custom_product_title',
-            [
-                'label' => __('Custom Product title', 'somnia'),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => __('Yes', 'somnia'),
-                'label_off' => __('No', 'somnia'),
-                'default' => 'no',
-            ]
-        );
-        
-        $this->add_responsive_control(
-            'product_title_lines_number',
-            [
-                'label' => __('Number of Lines', 'somnia'),
-                'type' => Controls_Manager::NUMBER,
-                'default' => 1,
-                'min' => 1,
-                'condition' => [
-                    'custom_product_title' => 'yes',
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-product-title .bt-product-link' => 'display: -webkit-box; -webkit-line-clamp: {{VALUE}}; -webkit-box-orient: vertical; overflow: hidden;',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'product_title_height',
-            [
-                'label' => __('Product Title Height', 'somnia'),
-                'type' => Controls_Manager::NUMBER,
-                'default' => 23,
-                'condition' => [
-                    'custom_product_title' => 'yes',
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-product-title .bt-product-link' => 'height: {{SIZE}}px;',
-                ],
+                'selector' => '{{WRAPPER}} .bt-product-testimonial-item--author',
             ]
         );
 
@@ -623,8 +578,9 @@ class Widget_ProductTestimonialSlider extends Widget_Base
             [
                 'label' => __('Star Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
+                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--rating .star.filled svg path' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .bt-product-testimonial-item--rating .star.filled svg path' => 'fill: {{VALUE}};',
                 ],
             ]
         );
@@ -634,34 +590,64 @@ class Widget_ProductTestimonialSlider extends Widget_Base
             [
                 'label' => __('Empty Star Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
+                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--rating .star svg path' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .bt-product-testimonial-item--rating .star:not(.filled) svg path' => 'fill: {{VALUE}};',
                 ],
             ]
         );
 
-        $this->add_responsive_control(
-            'rating_size',
+        $this->add_control(
+            'line_heading',
             [
-                'label' => __('Star Size', 'somnia'),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => ['px'],
-                'range' => [
-                    'px' => [
-                        'min' => 10,
-                        'max' => 50,
-                        'step' => 1,
-                    ],
-                ],
-                'default' => [
-                    'unit' => 'px',
-                    'size' => 20,
-                ],
+                'label' => __('Line', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'line_color',
+            [
+                'label' => __('Line Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-product-testimonial--rating .star svg' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bt-product-mini-item' => 'border-color: {{VALUE}};',
                 ],
             ]
         );
+
+        $this->add_control(
+            'product_heading',
+            [
+                'label' => __('Product', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'prd_name_color',
+            [
+                'label' => __('Title Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-mini-item--title' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'prd_typography',
+                'label' => __('Title Typography', 'somnia'),
+                'selector' => '{{WRAPPER}} .bt-product-mini-item--title',
+            ]
+        );
+        
         $this->end_controls_section();
 
         // Navigation Arrows Style Section
@@ -953,7 +939,9 @@ class Widget_ProductTestimonialSlider extends Widget_Base
         }
 
         $breakpoints = Plugin::$instance->breakpoints->get_active_breakpoints();
-        $slider_settings = bt_elwg_get_slider_settings($settings, $breakpoints);
+        
+        $slider_settings = somnia_elwg_get_slider_settings($settings, $breakpoints);
+        
         $slider_settings['autoplay_delay'] = isset($settings['slider_autoplay_delay']) ? $settings['slider_autoplay_delay'] : 3000;
 ?>
         <div class="<?php echo esc_attr(implode(' ', $classes)); ?> bt-slider-offset-sides-<?php echo esc_attr($settings['slider_offset_sides']); ?> js-data-product-testimonial-slider" data-slider-settings='<?php echo json_encode($slider_settings); ?>'>
@@ -962,83 +950,71 @@ class Widget_ProductTestimonialSlider extends Widget_Base
                     <div class="swiper-wrapper">
                         <?php if (!empty($settings['testimonial_items'])) : ?>
                             <?php foreach ($settings['testimonial_items'] as $item) : ?>
-                                <div class="swiper-slide <?php echo (!empty($item['show_testimonial_image']) && $item['show_testimonial_image'] === 'yes') ? 'bt-testimonial-image' : ''; ?>">
-                                    <div class="bt-product-testimonial--item">
-                                        <?php if (!empty($item['show_testimonial_image']) && $item['show_testimonial_image'] === 'yes' && !empty($item['testimonial_image']['url'])) : ?>
-                                            <div class="bt-product-testimonial--images">
-                                                <div class="bt-cover-image">
-                                                    <img src="<?php echo esc_url($item['testimonial_image']['url']); ?>" alt="<?php echo esc_attr($item['testimonial_author']); ?>" />
-                                                </div>
-                                            </div>
-                                        <?php endif; ?>
-
-                                        <div class="bt-product-testimonial--content">
-                                            <?php if (!empty($item['testimonial_rating'])) : ?>
-                                                <div class="bt-product-testimonial--rating">
-                                                    <?php
-                                                    $rating = intval($item['testimonial_rating']);
-                                                    for ($i = 1; $i <= 5; $i++) :
-                                                        $filled_class = ($i <= $rating) ? 'filled' : '';
-                                                    ?>
-                                                        <span class="star <?php echo esc_attr($filled_class); ?>">
-                                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M10 1.66667L12.575 6.88334L18.3333 7.725L14.1667 11.7833L15.15 17.5167L10 14.8083L4.85 17.5167L5.83333 11.7833L1.66667 7.725L7.425 6.88334L10 1.66667Z" fill="currentColor" />
-                                                            </svg>
-                                                        </span>
-                                                    <?php endfor; ?>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <?php if (!empty($item['testimonial_text'])) : ?>
-                                                <div class="bt-product-testimonial--text">
-                                                    <?php echo wp_kses_post($item['testimonial_text']); ?>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <?php if (!empty($item['testimonial_author'])) : ?>
-                                                <div class="bt-product-testimonial--author">
-                                                    <?php echo esc_html($item['testimonial_author']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <?php if (!empty($item['id_product'])) :
-                                            $product = wc_get_product($item['id_product']);
-                                            if ($product) : 
-                                                $is_variable = $product->is_type('variable') ? 'bt-product-variable' : '';
+                                <div class="swiper-slide">
+                                    <div class="bt-product-testimonial-item">
+                                        <div class="bt-product-testimonial-item--image">
+                                            <div class="bt-cover-image">
+                                                <?php
+                                                if (!empty($item['testimonial_image']['id'])) {
+                                                    echo wp_get_attachment_image($item['testimonial_image']['id'], $settings['thumbnail_size']);
+                                                } else {
+                                                    if (!empty($item['testimonial_image']['url'])) {
+                                                        echo '<img src="' . esc_url($item['testimonial_image']['url']) . '" alt="' . esc_html__('Awaiting testimonial image', 'somnia') . '">';
+                                                    } else {
+                                                        echo '<img src="' . esc_url(Utils::get_placeholder_image_src()) . '" alt="' . esc_html__('Awaiting testimonial image', 'somnia') . '">';
+                                                    }
+                                                }
                                                 ?>
-                                                <div class="bt-product-item-minimal active <?php echo esc_attr($is_variable); ?>"
-                                                    data-product-id="<?php echo esc_attr($item['id_product']); ?>">
-                                                    <div class="bt-product-thumbnail">
-                                                        <a href="<?php echo esc_url($product->get_permalink()); ?>">
-                                                            <?php
-                                                            if (has_post_thumbnail($item['id_product'])) {
-                                                                echo get_the_post_thumbnail($item['id_product'], 'thumbnail');
+                                            </div>
+                                        </div>
+                                        <div class="bt-product-testimonial-item--content">
+                                            <div class="bt-product-testimonial-item--inner">
+                                                <?php if (!empty($item['testimonial_rating'])) : ?>
+                                                    <div class="bt-product-testimonial-item--rating">
+                                                        <?php
+                                                        $rating = intval($item['testimonial_rating']);
+                                                        for ($i = 1; $i <= 5; $i++) :
+                                                            $filled_class = ($i <= $rating) ? 'filled' : '';
+                                                        ?>
+                                                            <span class="star <?php echo esc_attr($filled_class); ?>">
+                                                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M10 1.66667L12.575 6.88334L18.3333 7.725L14.1667 11.7833L15.15 17.5167L10 14.8083L4.85 17.5167L5.83333 11.7833L1.66667 7.725L7.425 6.88334L10 1.66667Z" />
+                                                                </svg>
+                                                            </span>
+                                                        <?php endfor; ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if (!empty($item['testimonial_title'])) : ?>
+                                                    <h4 class="bt-product-testimonial-item--title"><?php echo esc_html($item['testimonial_title']); ?></h4>
+                                                <?php endif; ?>
+                                                <?php if (!empty($item['testimonial_text'])) : ?>
+                                                    <div class="bt-product-testimonial-item--text"><?php echo esc_html($item['testimonial_text']); ?></div>
+                                                <?php endif; ?>
+                                                <?php if (!empty($item['testimonial_author'])) : ?>
+                                                    <div class="bt-product-testimonial-item--author"><?php echo esc_html($item['testimonial_author']); ?></div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <?php if (!empty($item['product_id'])) : 
+                                                    $product = wc_get_product($item['product_id']);
+                                                ?>
+                                                <div class="bt-product-mini-item">
+                                                <a class="bt-product-mini-item--link" href="<?php echo esc_url($product->get_permalink()); ?>">
+                                                    <div class="bt-product-mini-item--image">
+                                                        <?php
+                                                            if (has_post_thumbnail($item['product_id'])) {
+                                                                echo get_the_post_thumbnail($item['product_id'], 'thumbnail');
                                                             } else {
                                                                 echo '<img src="' . esc_url(wc_placeholder_img_src('woocommerce_thumbnail')) . '" alt="' . esc_html__('Awaiting product image', 'somnia') . '" class="wp-post-image" />';
                                                             }
-                                                            ?>
-                                                        </a>
+                                                        ?>
                                                     </div>
-                                                    <div class="bt-product-content">
-                                                        <h4 class="bt-product-title"><a href="<?php echo esc_url($product->get_permalink()); ?>" class="bt-product-link"><?php echo esc_html($product->get_name()); ?></a></h4>
-                                                        <div class="bt-product-price">
-                                                            <?php 
-                                                                $price_html  = $product->get_price_html();
-                                                                echo wp_kses_post( $price_html );
-                                                            ?>
-                                                        </div>
-                                                        <div class="bt-product-add-to-cart">
-                                                            <?php if ($product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock()) : ?>
-                                                                <a href="?add-to-cart=<?php echo esc_attr($product->get_id()); ?>" aria-describedby="woocommerce_loop_add_to_cart_link_describedby_<?php echo esc_attr($product->get_id()); ?>" data-quantity="1" class="bt-button product_type_simple add_to_cart_button ajax_add_to_cart bt-button-hover" data-product_id="<?php echo esc_attr($product->get_id()); ?>" data-product_sku="" rel="nofollow"><?php echo esc_html__('Add to cart', 'somnia') ?></a>
-                                                            <?php else : ?>
-                                                                <a href="<?php echo esc_url($product->get_permalink()); ?>" class="bt-button bt-view-product"><?php echo esc_html__('View Product', 'somnia'); ?></a>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </div>
+                                                    <h4 class="bt-product-mini-item--title">
+                                                        <?php echo esc_html($product->get_name()); ?>
+                                                    </h4>
+                                                </a>
                                                 </div>
                                             <?php endif; ?>
-                                        <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -1048,13 +1024,13 @@ class Widget_ProductTestimonialSlider extends Widget_Base
                 <?php if ($settings['slider_arrows'] === 'yes') : ?>
                     <div class="bt-swiper-navigation">
                         <div class="bt-nav bt-button-prev">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="14" viewBox="0 0 16 14" fill="none">
-                                <path d="M15.4995 7.00035C15.4995 7.16611 15.4337 7.32508 15.3165 7.44229C15.1992 7.5595 15.0403 7.62535 14.8745 7.62535H2.63311L7.1917 12.1832C7.24977 12.2412 7.29583 12.3102 7.32726 12.386C7.35869 12.4619 7.37486 12.5432 7.37486 12.6253C7.37486 12.7075 7.35869 12.7888 7.32726 12.8647C7.29583 12.9405 7.24977 13.0095 7.1917 13.0675C7.13363 13.1256 7.0647 13.1717 6.98882 13.2031C6.91295 13.2345 6.83164 13.2507 6.74951 13.2507C6.66739 13.2507 6.58607 13.2345 6.5102 13.2031C6.43433 13.1717 6.3654 13.1256 6.30733 13.0675L0.682328 7.44254C0.624217 7.38449 0.578118 7.31556 0.546665 7.23969C0.515213 7.16381 0.499023 7.08248 0.499023 7.00035C0.499023 6.91821 0.515213 6.83688 0.546665 6.76101C0.578118 6.68514 0.624217 6.61621 0.682328 6.55816L6.30733 0.93316C6.4246 0.815885 6.58366 0.75 6.74951 0.75C6.91537 0.75 7.07443 0.815885 7.1917 0.93316C7.30898 1.05044 7.37486 1.2095 7.37486 1.37535C7.37486 1.5412 7.30898 1.70026 7.1917 1.81753L2.63311 6.37535H14.8745C15.0403 6.37535 15.1992 6.4412 15.3165 6.55841C15.4337 6.67562 15.4995 6.83459 15.4995 7.00035Z" fill="currentColor" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="currentColor">
+                                <path d="M23.2968 28.4547C23.4013 28.5592 23.4843 28.6833 23.5408 28.8199C23.5974 28.9564 23.6265 29.1028 23.6265 29.2506C23.6265 29.3984 23.5974 29.5448 23.5408 29.6814C23.4843 29.818 23.4013 29.942 23.2968 30.0466C23.1923 30.1511 23.0682 30.234 22.9316 30.2906C22.7951 30.3471 22.6487 30.3763 22.5009 30.3763C22.3531 30.3763 22.2067 30.3471 22.0701 30.2906C21.9336 30.234 21.8095 30.1511 21.7049 30.0466L10.4549 18.7966C10.3503 18.6921 10.2674 18.568 10.2108 18.4314C10.1541 18.2949 10.125 18.1485 10.125 18.0006C10.125 17.8528 10.1541 17.7064 10.2108 17.5698C10.2674 17.4332 10.3503 17.3092 10.4549 17.2047L21.7049 5.95469C21.916 5.74359 22.2024 5.625 22.5009 5.625C22.7994 5.625 23.0857 5.74359 23.2968 5.95469C23.5079 6.16578 23.6265 6.45209 23.6265 6.75063C23.6265 7.04916 23.5079 7.33547 23.2968 7.54656L12.8414 18.0006L23.2968 28.4547Z"/>
                             </svg>
                         </div>
                         <div class="bt-nav bt-button-next">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M17.3172 10.4425L11.6922 16.0675C11.5749 16.1848 11.4159 16.2507 11.25 16.2507C11.0841 16.2507 10.9251 16.1848 10.8078 16.0675C10.6905 15.9503 10.6247 15.7912 10.6247 15.6253C10.6247 15.4595 10.6905 15.3004 10.8078 15.1832L15.3664 10.6253H3.125C2.95924 10.6253 2.80027 10.5595 2.68306 10.4423C2.56585 10.3251 2.5 10.1661 2.5 10.0003C2.5 9.83459 2.56585 9.67562 2.68306 9.55841C2.80027 9.4412 2.95924 9.37535 3.125 9.37535H15.3664L10.8078 4.81753C10.6905 4.70026 10.6247 4.5412 10.6247 4.37535C10.6247 4.2095 10.6905 4.05044 10.8078 3.93316C10.9251 3.81588 11.0841 3.75 11.25 3.75C11.4159 3.75 11.5749 3.81588 11.6922 3.93316L17.3172 9.55816C17.3753 9.61621 17.4214 9.68514 17.4528 9.76101C17.4843 9.83688 17.5005 9.91821 17.5005 10.0003C17.5005 10.0825 17.4843 10.1638 17.4528 10.2397C17.4214 10.3156 17.3753 10.3845 17.3172 10.4425Z" fill="currentColor" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="currentColor">
+                                <path d="M25.5466 18.7966L14.2966 30.0466C14.192 30.1511 14.068 30.234 13.9314 30.2906C13.7948 30.3471 13.6484 30.3763 13.5006 30.3763C13.3528 30.3763 13.2064 30.3471 13.0699 30.2906C12.9333 30.234 12.8092 30.1511 12.7047 30.0466C12.6002 29.942 12.5173 29.818 12.4607 29.6814C12.4041 29.5448 12.375 29.3984 12.375 29.2506C12.375 29.1028 12.4041 28.9564 12.4607 28.8199C12.5173 28.6833 12.6002 28.5592 12.7047 28.4547L23.1602 18.0006L12.7047 7.54656C12.4936 7.33547 12.375 7.04916 12.375 6.75063C12.375 6.45209 12.4936 6.16578 12.7047 5.95469C12.9158 5.74359 13.2021 5.625 13.5006 5.625C13.7992 5.625 14.0855 5.74359 14.2966 5.95469L25.5466 17.2047C25.6512 17.3092 25.7341 17.4332 25.7908 17.5698C25.8474 17.7064 25.8765 17.8528 25.8765 18.0006C25.8765 18.1485 25.8474 18.2949 25.7908 18.4314C25.7341 18.568 25.6512 18.6921 25.5466 18.7966Z"/>
                             </svg>
                         </div>
                     </div>

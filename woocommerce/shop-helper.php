@@ -4543,7 +4543,7 @@ function somnia_render_product_reviews()
 ?>
     <section class="somnia-product-reviews">
         <?php if (!empty($reviews_title)) : ?>
-            <h2 class="somnia-reviews-title"><?php echo wp_kses_post($reviews_title); ?></h2>
+            <h3 class="somnia-reviews-title"><?php echo wp_kses_post($reviews_title); ?></h3>
         <?php endif; ?>
         <?php if (!empty($reviews_subtitle)) : ?>
             <p class="somnia-reviews-subtitle"><?php echo wp_kses_post($reviews_subtitle); ?></p>
@@ -5212,6 +5212,104 @@ function somnia_woocommerce_after_add_to_cart_button()
         class="bt-btn-read-more bt-button-hover" 
         rel="nofollow">' . esc_html__('Read more', 'somnia') . '</a>';
     }
+}
+
+/**
+ * Output single-product sticky bar in footer.
+ * Shown only when product is simple or variable, purchasable and in stock.
+ */
+add_action('wp_footer', 'somnia_single_product_sticky_bar', 20);
+function somnia_single_product_sticky_bar()
+{
+    if (!is_product() || !function_exists('wc_get_product')) {
+        return;
+    }
+    global $product;
+    if (!$product || !is_a($product, 'WC_Product')) {
+        $product = wc_get_product(get_the_ID());
+    }
+    if (!$product || !$product->is_purchasable() || !$product->is_in_stock()) {
+        return;
+    }
+    $is_simple   = $product->is_type('simple');
+    $is_variable = $product->is_type('variable');
+    if (!$is_simple && !$is_variable) {
+        return;
+    }
+
+    $title = $product->get_name();
+    $image_id = $product->get_image_id();
+    $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : wc_placeholder_img_src('thumbnail');
+    $rating_html = $product->get_rating_count() > 0 ? wc_get_rating_html($product->get_average_rating()) : '';
+    $price_html = $product->get_price_html();
+    $product_id = $product->get_id();
+
+    $btn_label_add = esc_html__('Add to cart', 'somnia');
+    $btn_label_select = esc_html__('Select options', 'somnia');
+
+    $sticky_bar_attrs = 'id="bt-single-product-sticky-bar" aria-hidden="true"';
+    if ($is_variable) {
+        $variation_names = array();
+        $variation_prices = array();
+        foreach ($product->get_available_variations() as $var) {
+            $vid = (int) $var['variation_id'];
+            $labels = array();
+            if (!empty($var['attributes']) && is_array($var['attributes'])) {
+                foreach ($var['attributes'] as $attr_key => $value_slug) {
+                    if ((string) $value_slug === '') {
+                        continue;
+                    }
+                    $attr_name = str_replace('attribute_', '', $attr_key);
+                    if (taxonomy_exists($attr_name)) {
+                        $term = get_term_by('slug', $value_slug, $attr_name);
+                        $labels[] = $term && !is_wp_error($term) ? $term->name : $value_slug;
+                    } else {
+                        $labels[] = $value_slug;
+                    }
+                }
+            }
+            $variation_names[$vid] = implode(' / ', $labels);
+            $variation_prices[$vid] = isset($var['price_html']) ? $var['price_html'] : '';
+        }
+        $sticky_bar_attrs .= ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '"';
+        $sticky_bar_attrs .= ' data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
+    }
+    $default_variation_name = '';
+    if ($is_variable) {
+        $default_variation_id = get_default_variation_id($product);
+        if ($default_variation_id && !empty($variation_names[$default_variation_id])) {
+            $default_variation_name = $variation_names[$default_variation_id];
+        }
+    }
+    ?>
+    <div class="bt-single-product-sticky-bar" <?php echo $sticky_bar_attrs; ?>>
+        <div class="bt-single-product-sticky-bar__inner">
+            <div class="bt-single-product-sticky-bar__product">
+                <a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="bt-single-product-sticky-bar__thumb">
+                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>" />
+                </a>
+                <div class="bt-single-product-sticky-bar__info">
+                    <h3 class="bt-single-product-sticky-bar__title"><?php echo esc_html($title); ?></h3>
+                    <?php if ($price_html) { ?>
+                        <div class="bt-single-product-sticky-bar__price<?php echo $is_variable ? ' bt-product-type-variable' : ''; ?>"><?php echo $price_html; ?></div>
+                    <?php } ?>
+                    <?php if ($is_variable) { ?>
+                    <div class="bt-single-product-sticky-bar__variation">
+                        <div class="bt-single-product-sticky-bar__variation-name"><?php echo esc_html($default_variation_name); ?></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="bt-single-product-sticky-bar__action">
+                <?php if ($is_simple) { ?>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="simple"><?php echo $btn_label_add; ?></a>
+                <?php } else { ?>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo $btn_label_select; ?></a>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <?php
 }
 
 function get_default_variation_id($product)

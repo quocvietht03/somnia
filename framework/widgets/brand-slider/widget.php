@@ -704,7 +704,7 @@ class Widget_BrandSlider extends Widget_Base
 		}
 		$slider_settings = [];
 		$breakpoints = Plugin::$instance->breakpoints->get_active_breakpoints();
-		$slider_settings = bt_elwg_get_slider_settings($settings, $breakpoints);
+		$slider_settings = somnia_elwg_get_slider_settings($settings, $breakpoints);
 	 if($settings['slider_continuous'] === 'yes') {
 		$slider_continuous = [];
 		$slider_continuous['speed'] = $settings['slider_continuous_speed'];

@@ -38,25 +38,19 @@ class Widget_ProductShowcaseStyle2 extends Widget_Base
 		return ['swiper-slider', 'elementor-widgets'];
 	}
 
-	public function get_supported_products()
+	private function get_supported_products()
 	{
-		$supported_products = [];
+		$products = wc_get_products([
+			'limit' => -1,
+			'status' => 'publish',
+		]);
 
-		$args = array(
-			'post_type' => 'product',
-			'posts_per_page' => -1,
-			'post_status' => 'publish'
-		);
-
-		$products = get_posts($args);
-
-		if (!empty($products)) {
-			foreach ($products as $product) {
-				$supported_products[$product->ID] = $product->post_title;
-			}
+		$options = [];
+		foreach ( $products as $product ) {
+			$options[ $product->get_id() ] = $product->get_name();
 		}
 
-		return $supported_products;
+		return $options;
 	}
 
 	protected function register_layout_section_controls()
@@ -77,14 +71,16 @@ class Widget_ProductShowcaseStyle2 extends Widget_Base
 			]
 		);
 
+		$options = $this->get_supported_products();
 		$this->add_control(
 			'products',
 			[
 				'label' => __('Select Product', 'somnia'),
 				'type' => Controls_Manager::SELECT2,
-				'options' => $this->get_supported_products(),
+				'options' => $options, // id => title
 				'label_block' => true,
 				'multiple' => false,
+				'default'     => ! empty( $options ) ? array_key_first( $options ) : '',
 			]
 		);
 

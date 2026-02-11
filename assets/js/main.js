@@ -697,6 +697,25 @@
 				// Initial update for single product page
 				updateAvailableOptions();
 			});
+
+			// Custom select box: click to open/close, update display on choose
+			$(document).on('click', '.bt-attributes-wrap .bt-select-display', function (e) {
+				e.stopPropagation();
+				$(this).closest('.bt-select-box').toggleClass('is-open');
+			});
+			$(document).on('click', '.bt-attributes-wrap .bt-value-select .bt-js-item', function () {
+				var $box = $(this).closest('.bt-select-box');
+				if ($box.length) {
+					var $attr = $(this).closest('.bt-attributes--item');
+					$box.find('.bt-select-display').html($attr.find('.bt-result').html());
+					$box.removeClass('is-open');
+				}
+			});
+			$(document).on('click', function (e) {
+				if (!$(e.target).closest('.bt-select-box').length) {
+					$('.bt-select-box').removeClass('is-open');
+				}
+			});
 		}
 	}
 	/* load Shop Quick View */
@@ -3074,12 +3093,12 @@
 			}
 		});
 	}
-	/* Copyright Current Year */
-	function SomniaCopyrightCurrentYear() {
+	/* Current Year Automation */
+	function SomniaCurrentYearAutomation() {
 		var searchTerm = '{Year}',
 			replaceWith = new Date().getFullYear();
 
-		$('.bt-elwg-site-copyright').each(function () {
+		$('.elementor-element, .bt-elwg-site-copyright').each(function () {
 			this.innerHTML = this.innerHTML.replace(searchTerm, replaceWith);
 		});
 	}
@@ -3664,6 +3683,139 @@
 			});
 		});
 	}
+	/**
+	 * Single product sticky bottom bar: show when user scrolls past add-to-cart/variations.
+ */
+	function SomniaSingleProductStickyBar() {
+		if (!$('body').hasClass('single-product') || $('#bt-single-product-sticky-bar').length === 0) {
+			return;
+		}
+		var $stickyBar = $('#bt-single-product-sticky-bar');
+		var $stickyAddToCartButton = $stickyBar.find('.bt-js-sticky-add-to-cart');
+		var $productAddToCartSection = $('.bt-product-inner .bt-product-excerpt-add-to-cart');
+		var $productFormCart = $('.bt-product-inner .summary form.cart');
+		if ($productAddToCartSection.length === 0) {
+			$productAddToCartSection = $productFormCart;
+		}
+		if ($productAddToCartSection.length === 0) {
+			return;
+		}
+		if ($productFormCart.length === 0) {
+			return;
+		}
+		function updateStickyBarVisibility() {
+			var formCartTop = $productFormCart.offset().top;
+			var formCartHeight = $productFormCart.outerHeight();
+			var formCartBottom = formCartTop + formCartHeight;
+			var currentScrollTop = $(window).scrollTop();
+			// Show bar when section has scrolled out above viewport (user passed variations/add-to-cart)
+			if (formCartBottom < currentScrollTop) {
+				$stickyBar.addClass('is-visible').attr('aria-hidden', 'false');
+				// From 930px down: back-to-top 10px above sticky bar (JS sets inline style only when bar visible)
+				if ($(window).width() <= 930) {
+					var barHeight = $stickyBar.outerHeight();
+					$('.bt-back-to-top').css('bottom', (10 + barHeight + 10) + 'px');
+				} else {
+					$('.bt-back-to-top').css('bottom', '');
+				}
+			} else {
+				$stickyBar.removeClass('is-visible').attr('aria-hidden', 'true');
+				$('.bt-back-to-top').css('bottom', '');
+			}
+		}
+		function updateStickyAddToCartButtonState() {
+			if ($stickyAddToCartButton.data('type') !== 'variable') {
+				return;
+			}
+			var $mainVariableAddToCartButton = $('.bt-product-inner .bt-js-add-to-cart-variable');
+			if ($mainVariableAddToCartButton.length === 0) {
+				return;
+			}
+		
+			var isMainButtonDisabled = $mainVariableAddToCartButton.hasClass('disabled');
+			var addToCartLabel = $stickyAddToCartButton.attr('data-label-add') || 'Add to cart';
+			var selectOptionsLabel = $stickyAddToCartButton.attr('data-label-select') || 'Select options';
+			if (!isMainButtonDisabled) {
+				$stickyAddToCartButton.text(addToCartLabel).addClass('bt-style-add-to-cart');
+			} else {
+				$stickyAddToCartButton.text(selectOptionsLabel).removeClass('bt-style-add-to-cart');
+			}
+		}
+
+		$(window).on('scroll.somniaStickyBar resize.somniaStickyBar', function () {
+			updateStickyBarVisibility();
+		});
+		updateStickyBarVisibility();
+		updateStickyAddToCartButtonState();
+		// Cache initial price HTML for variable product (restore on hide_variation)
+		var $stickyPriceEl = $stickyBar.find('.bt-single-product-sticky-bar__price');
+		var initialStickyPriceHtml = $stickyAddToCartButton.data('type') === 'variable' && $stickyPriceEl.length ? $stickyPriceEl.html() : '';
+
+		// Sync sticky button, variation name and price with main variable form on variation change
+		$('.bt-product-inner .variations_form').off('show_variation.somniasingleproductSticky hide_variation.somniasingleproductSticky').on('show_variation.somniasingleproductSticky', function (event, variation) {
+			setTimeout(function() {
+				updateStickyAddToCartButtonState();
+			}, 500);
+			var variationId = variation && variation.variation_id ? variation.variation_id : 0;
+			var variationNamesRaw = $stickyBar.attr('data-variation-names');
+			var variationNames = variationNamesRaw ? (typeof variationNamesRaw === 'string' ? JSON.parse(variationNamesRaw) : variationNamesRaw) : null;
+			var $variationNameEl = $stickyBar.find('.bt-single-product-sticky-bar__variation-name');
+			if ($variationNameEl.length && variationNames) {
+				$variationNameEl.text(variationId && variationNames[variationId] ? variationNames[variationId] : '');
+			}
+			// Update sticky bar price from variation (event price_html or fallback to data-variation-prices)
+			if ($stickyPriceEl.length) {
+				var priceHtml = (variation && variation.price_html) ? variation.price_html : null;
+				if (!priceHtml) {
+					var variationPricesRaw = $stickyBar.attr('data-variation-prices');
+					var variationPrices = variationPricesRaw ? (typeof variationPricesRaw === 'string' ? JSON.parse(variationPricesRaw) : variationPricesRaw) : null;
+					if (variationId && variationPrices && variationPrices[variationId]) {
+						priceHtml = variationPrices[variationId];
+					}
+				}
+				if (priceHtml) {
+					$stickyPriceEl.html(priceHtml);
+				}
+			}
+		}).on('hide_variation.somniasingleproductSticky', function () {
+			setTimeout(function() {
+				updateStickyAddToCartButtonState();
+			}, 500);
+			$stickyBar.find('.bt-single-product-sticky-bar__variation-name').text('');
+			if ($stickyPriceEl.length && initialStickyPriceHtml) {
+				$stickyPriceEl.html(initialStickyPriceHtml);
+			}
+		});
+		$stickyBar.on('click', '.bt-js-sticky-add-to-cart', function (e) {
+			e.preventDefault();
+			var $clickedButton = $(this);
+			if ($clickedButton.hasClass('loading')) {
+				return;
+			}
+			var productType = $clickedButton.data('type');
+			if (productType === 'variable') {
+				var $mainVariableAddToCartButton = $('.bt-product-inner .bt-js-add-to-cart-variable');
+				var canAddToCart = $mainVariableAddToCartButton.length && !$mainVariableAddToCartButton.hasClass('disabled');
+				if (canAddToCart) {
+					$clickedButton.addClass('loading');
+					$mainVariableAddToCartButton.trigger('click');
+				} else {
+					$productAddToCartSection.get(0) && $productAddToCartSection.get(0).scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			} else {
+				var $mainSimpleAddToCartButton = $('.bt-product-inner .bt-js-add-to-cart-simple');
+				if ($mainSimpleAddToCartButton.length) {
+					$clickedButton.addClass('loading');
+					$mainSimpleAddToCartButton.trigger('click');
+				}
+			}
+		});
+		// instead of WooCommerce's default `added_to_cart` event, so listen to that.
+		$(document.body).on('wc_fragments_refreshed', function () {
+			$stickyAddToCartButton.removeClass('loading');
+		});
+	}
+
 	/* add to cart ajax product simple */
 	function SomniaAddToCartSimple() {
 		$(document).on('click', '.bt-js-add-to-cart-simple', function (e) {
@@ -4119,7 +4271,7 @@
 		SomniaHandleGridViewResize();
 		SomniaHookGravityFormEvents();
 		SomniaProductButtonStatus();
-		SomniaCopyrightCurrentYear();
+		SomniaCurrentYearAutomation();
 		SomniaCompareContentScroll();
 		SomniaBackToTop();
 		SomniaLoadFilterTagProduct();
@@ -4133,6 +4285,7 @@
 		SomniaUpdateBodyWidthVariable();
 		SomniaAddToCartVariable();
 		SomniaAddToCartSimple();
+		SomniaSingleProductStickyBar();
 		SomniaLoadDefaultActiveVariations(); // Load data for default active variations
 		SomniaFrequentlyBoughtTogether();
 		SomniaElementorSliderControl(); // Elementor slider control via button clicks

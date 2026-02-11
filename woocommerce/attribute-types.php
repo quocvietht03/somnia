@@ -902,28 +902,34 @@ if (!function_exists('somnia_woocommerce_custom_attributes')) {
 							</div>
 						<?php endforeach; ?>
 					</div>
-				<?php } elseif ($is_select_attr) { ?>
+				<?php } elseif ($is_select_attr) {
+					$selected_display_name = '';
+					if ($selected_value) {
+						$selected_term = get_term_by('slug', $selected_value, $attribute_name);
+						$selected_display_name = $selected_term ? $selected_term->name : $selected_value;
+					}
+					?>
 					<div class="bt-attributes--value bt-value-select">
-						<select class="bt-js-select" data-attribute="<?php echo esc_attr($data_attribute_slug); ?>">
-							<option value=""><?php echo esc_html__('Choose an option', 'somnia'); ?></option>
-							<?php
-							foreach ($ordered_options as $option) :
-								$term = get_term_by('slug', $option, $attribute_name);
-								$display_name = $term ? $term->name : $option;
-								$display_desc = $term ? $term->description : '';
-								$is_selected = ($selected_value === $option);
-								$is_available = $check_option_availability($option, $attribute_name, $attributes, $selected_attributes, $available_variations);
-							?>
-								<option
-									value="<?php echo esc_attr($option); ?>"
-									<?php selected($is_selected, true); ?>
-									<?php disabled(!$is_available, true); ?>
-								>
-									<?php echo esc_html($display_name); ?>
-									<?php if (!empty($display_desc)) echo '<span class="bt-item-desc">' . esc_html($display_desc) . '</span>'; ?>
-								</option>
-							<?php endforeach; ?>
-						</select>
+						<div class="bt-select-box">
+							<div class="bt-select-display" tabindex="0"><?php echo $selected_display_name ? esc_html($selected_display_name) : esc_html__('Choose an option', 'somnia'); ?></div>
+							<div class="bt-select-options">
+								<?php
+								foreach ($ordered_options as $option) :
+									$term = get_term_by('slug', $option, $attribute_name);
+									$display_name = $term ? $term->name : $option;
+									$display_desc = $term ? $term->description : '';
+									$is_selected = ($selected_value === $option);
+									$class_active = $is_selected ? ' active' : '';
+									$is_available = $check_option_availability($option, $attribute_name, $attributes, $selected_attributes, $available_variations);
+									$class_disabled = !$is_available ? ' disabled' : '';
+								?>
+									<span class="bt-js-item bt-item-value<?php echo esc_attr($class_active . $class_disabled); ?>" data-value="<?php echo esc_attr($option); ?>">
+										<?php echo esc_html($display_name); ?>
+										<?php if (!empty($display_desc)) echo '<span class="bt-item-desc">' . esc_html($display_desc) . '</span>'; ?>
+									</span>
+								<?php endforeach; ?>
+							</div>
+						</div>
 					</div>
 				<?php } else { ?>
 					<div class="bt-attributes--value">

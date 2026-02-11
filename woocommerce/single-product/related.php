@@ -53,13 +53,13 @@ if ( $show_section ) :
 		<div class="bt-related-tab-heading">
 			<div class="bt-tab-nav">
 				<?php if ( $related_products ) : ?>
-					<h2 class="bt-main-text bt-tab-title active related" data-tab="related"><?php echo esc_html( $related_heading ); ?></h2>
+					<h3 class="bt-main-text bt-tab-title active related" data-tab="related"><?php echo esc_html( $related_heading ); ?></h3>
 					<?php if ( $related_description ) : ?>
 					<div class="related-products-description"><?php echo wp_kses_post( wpautop( $related_description ) ); ?></div>
 				<?php endif; ?>
 				<?php endif; ?>
 				<?php if ( $enable_recently_viewed ) : ?>
-					<h2 class="bt-main-text bt-tab-title recently-viewed<?php echo empty( $related_products ) ? ' active' : ''; ?>" data-tab="recently-viewed"><?php echo esc_html__( 'Recently Viewed', 'somnia' ); ?></h2>
+					<h3 class="bt-main-text bt-tab-title recently-viewed<?php echo empty( $related_products ) ? ' active' : ''; ?>" data-tab="recently-viewed"><?php echo esc_html__( 'Recently Viewed', 'somnia' ); ?></h3>
 				<?php endif; ?>
 			</div>
 		</div>

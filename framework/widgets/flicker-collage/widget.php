@@ -479,7 +479,7 @@ class Widget_FlickerCollage extends Widget_Base
                     <?php if (!empty($collage_items)) :
                         $breakpoints = Plugin::$instance->breakpoints->get_active_breakpoints();
                         // Get responsive grid area positions
-                        $grid_positions = bt_elwg_get_grid_area_positions($collage_items, $breakpoints);
+                        $grid_positions = somnia_elwg_get_grid_area_positions($collage_items, $breakpoints);
                     ?>
                         <div class="bt-flicker-collage--list-images" data-grid-positions="<?php echo esc_attr(json_encode($grid_positions)); ?>">
                             <?php
