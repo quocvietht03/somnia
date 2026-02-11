@@ -7162,6 +7162,7 @@
             flex: none;
             top: 3px;
             position: relative;
+            fill: $color-primary;
             rect {
               transition: all 800ms;
               transform: rotate(0);
@@ -7194,11 +7195,17 @@
           padding: 28px 0 0 0 !important;
           border: none !important;
           border-top: 1px solid #e9e9e9 !important;
+          border-radius: 0 !important;
           @media (max-width: $break-lg) {
             padding: 20px 0 0 0 !important;
           }
           @media (max-width: $break-xs) {
             padding: 16px 0 0 0 !important;
+          }
+          &#tab-benefits{
+            .benefits-list{
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
           }
         }
       }
@@ -11123,7 +11130,7 @@
       opacity 0.2s,
       background 0.2s;
     position: relative;
-
+    text-transform: capitalize;
     &.loading {
       color: transparent;
 

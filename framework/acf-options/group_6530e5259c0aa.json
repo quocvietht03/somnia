@@ -1665,7 +1665,7 @@
         },
         {
             "key": "field_692ff607f0227",
-            "label": "Enable AJAX add to cart buttons on single product",
+            "label": "Enable AJAX add to cart buttons",
             "name": "enable_ajax_add_to_cart_buttons_on_single_product",
             "aria-label": "",
             "type": "true_false",
@@ -1673,7 +1673,28 @@
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "",
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "allow_in_bindings": 1,
+            "ui_on_text": "",
+            "ui_off_text": "",
+            "ui": 1
+        },
+        {
+            "key": "field_698c2dcf70cce",
+            "label": "Enable Sticky add to cart buttons",
+            "name": "enable_sticky_add_to_cart_buttons_on_single_product",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
                 "class": "",
                 "id": ""
             },
@@ -2885,5 +2906,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1770686076
+    "modified": 1770794668
 }

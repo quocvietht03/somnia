@@ -78,7 +78,7 @@ global $product;
         } elseif ($args['layout'] === 'gallery-stacked') {
             $show_number = 5;
         } else {
-            $show_number = 3;
+            $show_number = 4;
         }
 
         ?>
@@ -138,11 +138,18 @@ global $product;
         </div>
     </div>
     <?php
+    /**
+     * Hook: somnia_woocommerce_single_product_after_summary.
+     * Fires after the product summary section. Use for extra content, reviews, etc.
+     * Does not depend on related products setting.
+     *
+     * @since 1.0.0
+     */
+    do_action('somnia_woocommerce_single_product_after_summary');
 
     /**
      * Hook: somnia_woocommerce_template_related_products.
      *
-     * @hooked somnia_output_product_extra_content - 18
      * @hooked woocommerce_output_related_products - 20
      */
     if (function_exists('get_field')) {

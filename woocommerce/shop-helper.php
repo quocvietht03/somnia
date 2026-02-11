@@ -4495,6 +4495,7 @@ add_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
  * This function can be called anywhere you want to display reviews
  */
 add_action('woocommerce_after_single_product_summary', 'somnia_render_product_reviews', 19);
+add_action('somnia_woocommerce_single_product_after_summary', 'somnia_render_product_reviews', 19);
 function somnia_render_product_reviews()
 {
     global $product;
@@ -5221,6 +5222,9 @@ function somnia_woocommerce_after_add_to_cart_button()
 add_action('wp_footer', 'somnia_single_product_sticky_bar', 20);
 function somnia_single_product_sticky_bar()
 {
+    if (!function_exists('get_field') || !get_field('enable_sticky_add_to_cart_buttons_on_single_product', 'options')) {
+        return;
+    }
     if (!is_product() || !function_exists('wc_get_product')) {
         return;
     }
