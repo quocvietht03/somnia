@@ -485,7 +485,7 @@ class Widget_ProductTestimonialItem extends Widget_Base
                         <?php if (!empty($settings['testimonial_rating'])) : ?>
                             <div class="bt-product-testimonial-item--rating">
                                 <?php
-                                $rating = intval($item['testimonial_rating']);
+                                $rating = intval($settings['testimonial_rating']);
                                 for ($i = 1; $i <= 5; $i++) :
                                     $filled_class = ($i <= $rating) ? 'filled' : '';
                                 ?>

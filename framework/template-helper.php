@@ -433,6 +433,60 @@ if (!function_exists('somnia_popup_newslleter_form')) {
 	add_action('wp_footer', 'somnia_popup_newslleter_form');
 }
 
+/* Add Blur control to Elementor Container */
+add_action( 'elementor/element/container/section_layout/after_section_end', function ( $element ) {
+
+    $element->start_controls_section(
+        'somnia_container_blur',
+        [
+            'label' => __( 'Backdrop Blur', 'somnia' ),
+            'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+        ]
+    );
+
+    // Enable Blur
+    $element->add_control(
+        'somnia_backdrop_blur',
+        [
+            'label'        => __( 'Enable Blur', 'somnia' ),
+            'type'         => \Elementor\Controls_Manager::SWITCHER,
+            'label_on'     => __( 'Yes', 'somnia' ),
+            'label_off'    => __( 'No', 'somnia' ),
+            'return_value' => 'yes',
+            'default'      => 'no',
+        ]
+    );
+
+    // Blur Amount
+    $element->add_control(
+        'somnia_backdrop_blur_amount',
+        [
+            'label' => __( 'Blur Amount', 'somnia' ),
+            'type'  => \Elementor\Controls_Manager::SLIDER,
+            'size_units' => [ 'px' ],
+            'range' => [
+                'px' => [
+                    'min' => 0,
+                    'max' => 30,
+                ],
+            ],
+            'default' => [
+                'size' => 10,
+                'unit' => 'px',
+            ],
+            'condition' => [
+                'somnia_backdrop_blur' => 'yes',
+            ],
+            'selectors' => [
+                '{{WRAPPER}}' => 'backdrop-filter: blur({{SIZE}}{{UNIT}}); -webkit-backdrop-filter: blur({{SIZE}}{{UNIT}});',
+            ],
+        ]
+    );
+
+    $element->end_controls_section();
+
+}, 10 );
+
 /* Hook add Field Loop Caroucel Elementor */
 add_action('elementor/element/loop-carousel/section_carousel_pagination/before_section_end', function ($element) {
 	$element->add_control(

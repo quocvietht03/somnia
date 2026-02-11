@@ -89,6 +89,18 @@ class Widget_RecentPosts extends Widget_Base
 		);
 
 		$this->add_control(
+			'date_format',
+			[
+				'label'       => __( 'Date Format', 'somnia' ),
+				'type'        => Controls_Manager::TEXT,
+				'placeholder' => get_option( 'date_format' ),
+				'condition'   => [
+					'show_date' => 'yes',
+				],
+			]
+		);
+
+		$this->add_control(
 			'show_category',
 			[
 				'label' => __('Show Category', 'somnia'),
@@ -98,6 +110,38 @@ class Widget_RecentPosts extends Widget_Base
 				'default' => 'yes',
 			]
 		);
+
+		$this->add_control(
+            'enable_title_limit',
+            [
+                'label' => esc_html__( 'Enable Title Limit', 'somnia' ),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'title_line_limit',
+            [
+                'label' => esc_html__( 'Title Limit Lines', 'somnia' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 10,
+                    ],
+                ],
+                'default' => [
+                    'size' => 2,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-post--title' => '-webkit-line-clamp: {{SIZE}};display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;',
+                ],
+                'condition' => [
+                    'enable_title_limit' => 'yes'
+				],
+            ]
+        );
 
 		$this->end_controls_section();
 	}
@@ -385,7 +429,10 @@ class Widget_RecentPosts extends Widget_Base
 							<div class="bt-post--meta">
 								<?php if ($settings['show_date'] == 'yes') { ?>
 									<div class="bt-post--publish">
-										<?php echo get_the_date(get_option('date_format'), $post_item['ID']); ?>
+										<?php 
+										$date_format = ! empty( $settings['date_format'] ) ? $settings['date_format'] : get_option( 'date_format' );
+										echo get_the_date($date_format, $post_item['ID']); 
+										?>
 									</div>
 								<?php } ?>
 								<?php if ($settings['show_category'] == 'yes' && !empty($category) && is_array($category)) {

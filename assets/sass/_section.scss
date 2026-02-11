@@ -325,6 +325,11 @@ body {
     }
 }
 /* Section improve style */
+.bt-heading-left-wrap {
+    @media (min-width: 600px) and (max-width: $break-sm) {
+        max-width: calc(100% - 200px);
+    }
+}
 .elementor-widget-smartslider {
     @media (max-width: $break-tl) {
         .bt-button {
@@ -430,6 +435,75 @@ body {
                     font-size: 12px;
                 }
             }
+        }
+    }
+}
+
+.bt-customers-carousel-section {
+    @media (min-width: 400px) and (max-width: $break-xs) {
+        .bt-product-testimonial-item {
+            &--content {
+                padding: 16px;
+            }
+            &--title {
+                font-size: 14px;
+            }
+            &--text {
+                font-size: 14px;
+            }
+            &--author {
+                font-size: 13px;
+            }
+            &--rating .star svg {
+                width: 16px;
+                height: 16px;
+            }
+            .bt-product-mini-item {
+                &--link {
+                    gap: 12px;
+                }
+                &--image {
+                    width: 48px;
+                    min-width: 48px;
+                }
+                &--title {
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}
+
+.bt-banners-section {
+    @media(min-width: 600px) and (max-width: $break-sm) {
+        .bt-banner-lg, 
+        .bt-banner-md {
+            width: calc(50% - 6px);
+        }
+    }
+    @media(min-width: 560px) and (max-width: $break-sm) {
+        .bt-banner-item {
+            width: calc(50% - 10px);
+        }
+    }
+    @media(min-width: 400px) and (max-width: $break-sm) {
+        .bt-banner-sm {
+            width: calc(50% - 6px);
+            padding: 20px;
+            .elementor-button {
+                padding: 8px 16px;
+            }
+        }
+    }
+}
+
+.bt-recent-news-section {
+    @media(min-width: 580px) and (max-width: $break-sm) {
+        > div.e-con-inner > div.elementor-element > div.elementor-element {
+            width: calc(50% - 10px);
+        }
+        .bt-post--meta {
+            gap: 8px;
         }
     }
 }
