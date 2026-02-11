@@ -325,6 +325,11 @@ body {
     }
 }
 /* Section improve style */
+.bt-heading-left-wrap {
+    @media (min-width: 600px) and (max-width: $break-sm) {
+        max-width: calc(100% - 200px);
+    }
+}
 .elementor-widget-smartslider {
     @media (max-width: $break-tl) {
         .bt-button {
@@ -457,26 +462,22 @@ body {
 
 .bt-banners-section {
     @media(min-width: 600px) and (max-width: $break-sm) {
-        > div.elementor-element {
-            &:first-child,
-            &:nth-child(2) {
-                width: calc(50% - 6px);
-            }
+        .bt-banner-lg, 
+        .bt-banner-md {
+            width: calc(50% - 6px);
         }
     }
     @media(min-width: 560px) and (max-width: $break-sm) {
-        > div.e-con-inner > div.elementor-element {
+        .bt-banner-item {
             width: calc(50% - 10px);
         }
     }
     @media(min-width: 400px) and (max-width: $break-sm) {
-        > div.elementor-element:last-child {
-            > div.elementor-element {
-                width: calc(50% - 6px);
-                padding: 20px;
-                .elementor-button {
-                    padding: 8px 16px;
-                }
+        .bt-banner-sm {
+            width: calc(50% - 6px);
+            padding: 20px;
+            .elementor-button {
+                padding: 8px 16px;
             }
         }
     }
