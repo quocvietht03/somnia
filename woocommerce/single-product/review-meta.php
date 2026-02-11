@@ -37,18 +37,6 @@ if ('0' === $comment->comment_approved) { ?>
 		if ('yes' === get_option('woocommerce_review_rating_verification_label') && $verified) {
 			echo '<em class="woocommerce-review__verified verified">(' . esc_attr__('verified owner', 'somnia') . ')</em> ';
 		}
-		$rating = intval(get_comment_meta($comment->comment_ID, 'rating', true));
-
-		if ($rating && wc_review_ratings_enabled()) {
-			echo '<span class="woocommerce-review__dash">&ndash;</span> ';
-		}
-		?>
-
-		<?php
-
-		if (post_type_supports('product', 'comments')) {
-			wc_get_template('single-product/review-rating.php');
-		}
 		?>
 	</div>
 

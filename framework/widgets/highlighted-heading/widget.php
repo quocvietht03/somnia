@@ -95,6 +95,9 @@ class Widget_HighlightedHeading extends Widget_Base
 					'h4' => 'h4',
 					'h5' => 'h5',
 					'h6' => 'h6',
+					'p' => 'p',
+					'span' => 'span',
+					'div' => 'div',
 				],
 			]
 		);
@@ -153,6 +156,9 @@ class Widget_HighlightedHeading extends Widget_Base
 					'{{WRAPPER}} .bt-elwg-highlighted-heading h4' => 'color: {{VALUE}};',
 					'{{WRAPPER}} .bt-elwg-highlighted-heading h5' => 'color: {{VALUE}};',
 					'{{WRAPPER}} .bt-elwg-highlighted-heading h6' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-elwg-highlighted-heading p' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-elwg-highlighted-heading span' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-elwg-highlighted-heading div' => 'color: {{VALUE}};',
 				],
 			]
 		);
@@ -163,7 +169,7 @@ class Widget_HighlightedHeading extends Widget_Base
 				'name'     => 'text_typography',
 				'label'    => __('Typography', 'somnia'),
 				'default'  => '',
-				'selector' => '{{WRAPPER}} .bt-elwg-highlighted-heading h1, {{WRAPPER}} .bt-elwg-highlighted-heading h2, {{WRAPPER}} .bt-elwg-highlighted-heading h3, {{WRAPPER}} .bt-elwg-highlighted-heading h4, {{WRAPPER}} .bt-elwg-highlighted-heading h5, {{WRAPPER}} .bt-elwg-highlighted-heading h6',
+				'selector' => '{{WRAPPER}} .bt-elwg-highlighted-heading h1, {{WRAPPER}} .bt-elwg-highlighted-heading h2, {{WRAPPER}} .bt-elwg-highlighted-heading h3, {{WRAPPER}} .bt-elwg-highlighted-heading h4, {{WRAPPER}} .bt-elwg-highlighted-heading h5, {{WRAPPER}} .bt-elwg-highlighted-heading h6, {{WRAPPER}} .bt-elwg-highlighted-heading p, {{WRAPPER}} .bt-elwg-highlighted-heading span, {{WRAPPER}} .bt-elwg-highlighted-heading div',
 			]
 		);
 
@@ -192,7 +198,7 @@ class Widget_HighlightedHeading extends Widget_Base
 				'name'     => 'highlighted_text_typography',
 				'label'    => __('Typography', 'somnia'),
 				'default'  => '',
-				'selector' => '{{WRAPPER}} .bt-elwg-highlighted-heading h1 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h2 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h3 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h4 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h5 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h6 .__text-highlighted',
+				'selector' => '{{WRAPPER}} .bt-elwg-highlighted-heading h1 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h2 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h3 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h4 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h5 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading h6 .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading p .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading span .__text-highlighted, {{WRAPPER}} .bt-elwg-highlighted-heading div .__text-highlighted',
 			]
 		);
 

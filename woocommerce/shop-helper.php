@@ -341,12 +341,12 @@ function somnia_size_guide_button_before_quantity()
     }
 
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
@@ -422,17 +422,17 @@ add_action('somnia_woocommerce_template_loop_product_thumbnail', 'somnia_woocomm
 function somnia_woocommerce_template_loop_product_thumbnail()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     $post_thumbnail_id = $product->get_image_id();
     echo '<div class="bt-product-images-wrapper">';
     if ($post_thumbnail_id) {
@@ -763,17 +763,17 @@ add_action('somnia_woocommerce_shop_loop_item_sold', 'somnia_woocommerce_item_so
 function somnia_display_sold_after_rating()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     somnia_woocommerce_item_sold($product->get_id());
 }
 
@@ -784,29 +784,11 @@ add_filter('woocommerce_product_tabs', 'somnia_woocommerce_custom_additional_inf
 function somnia_woocommerce_custom_additional_information_tab_title($tabs)
 {
     if (isset($tabs['additional_information'])) {
-        global $product;
-        $mobile_text = '<span class="mobile-text">' . esc_html__('Information', 'somnia') . '</span>';
-        $tabs['additional_information']['title'] = sprintf(
-            esc_html__('Additional Information', 'somnia')
-        ) . ' ' . $mobile_text;
+        $tabs['additional_information']['title'] = esc_html__('Information', 'somnia');
     }
     return $tabs;
 }
 
-/* Custom the "Review" tab title */
-add_filter('woocommerce_product_tabs', 'somnia_woocommerce_custom_reviews_tab_title');
-
-function somnia_woocommerce_custom_reviews_tab_title($tabs)
-{
-    if (isset($tabs['reviews'])) {
-        global $product;
-        $mobile_text = '<span class="mobile-text">' . esc_html__('Reviews', 'somnia') . '</span>';
-        $tabs['reviews']['title'] = sprintf(
-            esc_html__('Customer Reviews', 'somnia')
-        ) . ' ' . $mobile_text;
-    }
-    return $tabs;
-}
 
 // Add meta box for review title
 function somnia_add_review_title_meta_box()
@@ -1106,7 +1088,7 @@ function somnia_product_field_radio_html($slug = '', $field_title = '', $field_v
                 <?php echo esc_html($field_title_default) ?>
                 <span class="bt-field-toggle">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M13.5326 6.52927L8.53255 11.5293C8.46287 11.5992 8.38008 11.6547 8.28892 11.6925C8.19775 11.7304 8.10001 11.7499 8.0013 11.7499C7.90259 11.7499 7.80485 11.7304 7.71369 11.6925C7.62252 11.6547 7.53973 11.5992 7.47005 11.5293L2.47005 6.52927C2.32915 6.38837 2.25 6.19728 2.25 5.99802C2.25 5.79876 2.32915 5.60767 2.47005 5.46677C2.61095 5.32587 2.80204 5.24672 3.0013 5.24672C3.20056 5.24672 3.39165 5.32587 3.53255 5.46677L8.00193 9.93614L12.4713 5.46615C12.6122 5.32525 12.8033 5.24609 13.0026 5.24609C13.2018 5.24609 13.3929 5.32525 13.5338 5.46615C13.6747 5.60704 13.7539 5.79814 13.7539 5.9974C13.7539 6.19665 13.6747 6.38775 13.5338 6.52865L13.5326 6.52927Z"/>
+                        <path d="M13.5326 6.52927L8.53255 11.5293C8.46287 11.5992 8.38008 11.6547 8.28892 11.6925C8.19775 11.7304 8.10001 11.7499 8.0013 11.7499C7.90259 11.7499 7.80485 11.7304 7.71369 11.6925C7.62252 11.6547 7.53973 11.5992 7.47005 11.5293L2.47005 6.52927C2.32915 6.38837 2.25 6.19728 2.25 5.99802C2.25 5.79876 2.32915 5.60767 2.47005 5.46677C2.61095 5.32587 2.80204 5.24672 3.0013 5.24672C3.20056 5.24672 3.39165 5.32587 3.53255 5.46677L8.00193 9.93614L12.4713 5.46615C12.6122 5.32525 12.8033 5.24609 13.0026 5.24609C13.2018 5.24609 13.3929 5.32525 13.5338 5.46615C13.6747 5.60704 13.7539 5.79814 13.7539 5.9974C13.7539 6.19665 13.6747 6.38775 13.5338 6.52865L13.5326 6.52927Z" />
                     </svg>
                 </span>
             </div>
@@ -1229,7 +1211,7 @@ function somnia_product_field_multiple_html($slug = '', $field_title = '', $fiel
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28.1489 8.44723C28.6566 8.98059 28.6358 9.82456 28.1025 10.3323L12.6951 24.9989C12.4319 25.2494 12.078 25.3817 11.7151 25.3652C11.3522 25.3486 11.0118 25.1848 10.7725 24.9114L4.8466 18.1422C4.36156 17.5882 4.41752 16.7458 4.97159 16.2607C5.52565 15.7757 6.36802 15.8317 6.85306 16.3857L11.8633 22.109L26.2639 8.4008C26.7972 7.89308 27.6412 7.91387 28.1489 8.44723Z" fill="white" />
                                 </svg>
                             </span>
-                            <?php 
+                            <?php
                             echo esc_html($term->name);
                             // If this is an attribute taxonomy, append description
                             if (strpos($slug, 'pa_') === 0 && !empty($term->description)) {
@@ -1379,7 +1361,7 @@ function somnia_product_field_rating($slug = '', $field_title = '', $field_value
             <?php echo esc_html($field_title_default) ?>
             <span class="bt-field-toggle">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M13.5326 6.52927L8.53255 11.5293C8.46287 11.5992 8.38008 11.6547 8.28892 11.6925C8.19775 11.7304 8.10001 11.7499 8.0013 11.7499C7.90259 11.7499 7.80485 11.7304 7.71369 11.6925C7.62252 11.6547 7.53973 11.5992 7.47005 11.5293L2.47005 6.52927C2.32915 6.38837 2.25 6.19728 2.25 5.99802C2.25 5.79876 2.32915 5.60767 2.47005 5.46677C2.61095 5.32587 2.80204 5.24672 3.0013 5.24672C3.20056 5.24672 3.39165 5.32587 3.53255 5.46677L8.00193 9.93614L12.4713 5.46615C12.6122 5.32525 12.8033 5.24609 13.0026 5.24609C13.2018 5.24609 13.3929 5.32525 13.5338 5.46615C13.6747 5.60704 13.7539 5.79814 13.7539 5.9974C13.7539 6.19665 13.6747 6.38775 13.5338 6.52865L13.5326 6.52927Z"/>
+                    <path d="M13.5326 6.52927L8.53255 11.5293C8.46287 11.5992 8.38008 11.6547 8.28892 11.6925C8.19775 11.7304 8.10001 11.7499 8.0013 11.7499C7.90259 11.7499 7.80485 11.7304 7.71369 11.6925C7.62252 11.6547 7.53973 11.5992 7.47005 11.5293L2.47005 6.52927C2.32915 6.38837 2.25 6.19728 2.25 5.99802C2.25 5.79876 2.32915 5.60767 2.47005 5.46677C2.61095 5.32587 2.80204 5.24672 3.0013 5.24672C3.20056 5.24672 3.39165 5.32587 3.53255 5.46677L8.00193 9.93614L12.4713 5.46615C12.6122 5.32525 12.8033 5.24609 13.0026 5.24609C13.2018 5.24609 13.3929 5.32525 13.5338 5.46615C13.6747 5.60704 13.7539 5.79814 13.7539 5.9974C13.7539 6.19665 13.6747 6.38775 13.5338 6.52865L13.5326 6.52927Z" />
                 </svg>
             </span>
         </div>
@@ -2519,17 +2501,17 @@ add_action('somnia_woocommerce_template_loop_list_cta_button', 'somnia_display_b
 function somnia_display_button_wishlist_compare()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     $archive_shop = function_exists('get_field') ? get_field('archive_shop', 'options') : array();
     $show_wishlist = isset($archive_shop['show_wishlist']) ? $archive_shop['show_wishlist'] : true;
     $show_compare = isset($archive_shop['show_compare']) ? $archive_shop['show_compare'] : true;
@@ -3062,17 +3044,17 @@ add_action('somnia_woocommerce_shop_loop_item_label', 'somnia_woocommerce_produc
 function somnia_woocommerce_product_label()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     $label = get_post_meta($product->get_id(), '_label', true);
     $label_text = str_replace('-', ' ', $label);
 
@@ -3085,17 +3067,17 @@ add_action('woocommerce_after_add_to_cart_button', 'somnia_display_button_buy_no
 function somnia_display_button_buy_now()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     if ($product->is_type('simple')) {
         if ($product->is_in_stock() && $product->is_purchasable()) {
             echo '<div class="bt-button-buy-now">';
@@ -3923,12 +3905,12 @@ function somnia_after_checkout_product($order_id)
     foreach ($items as $item) {
         $item_product_id = $item->get_product_id();
         $product = wc_get_product($item_product_id);
-        
+
         // Skip if product is invalid
         if (!$product || !is_a($product, 'WC_Product')) {
             continue;
         }
-        
+
         $sale_date_start = get_post_meta($item_product_id, '_product_start_datetime', true);
         $sale_date = get_post_meta($item_product_id, '_product_datetime', true);
         $sale_date_start = new DateTime($sale_date_start, new DateTimeZone(wp_timezone_string()));
@@ -3986,17 +3968,17 @@ function somnia_after_checkout_product($order_id)
 function somnia_check_sale_date_countdown()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     // Get sale end date from product meta
     $sale_date = get_post_meta($product->get_id(), '_product_datetime', true);
     $disable_sale = get_post_meta($product->get_id(), '_disable_sale_price', true);
@@ -4299,17 +4281,17 @@ add_action('somnia_woocommerce_template_single_out_of_stock', 'somnia_woocommerc
 function somnia_woocommerce_single_product_out_of_stock()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     // Check if ACF function exists
     if (!function_exists('get_field')) {
         return;
@@ -4495,6 +4477,179 @@ function somnia_render_product_info_toggle()
 }
 
 /**
+ * Remove reviews tab from product tabs
+ * This allows reviews to be rendered separately
+ */
+function somnia_remove_reviews_from_tabs($tabs)
+{
+    if (is_product() && isset($tabs['reviews'])) {
+        unset($tabs['reviews']);
+    }
+
+    return $tabs;
+}
+add_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
+
+/**
+ * Render product reviews separately
+ * This function can be called anywhere you want to display reviews
+ */
+add_action('woocommerce_after_single_product_summary', 'somnia_render_product_reviews', 19);
+add_action('somnia_woocommerce_single_product_after_summary', 'somnia_render_product_reviews', 19);
+function somnia_render_product_reviews()
+{
+    global $product;
+
+    if (!$product) {
+        return;
+    }
+
+    // Check if comments are open
+    if (!comments_open()) {
+        return;
+    }
+
+    // Get product tabs to access reviews tab data (before filter removes it)
+    // We need to get original tabs, so we temporarily remove our filter
+    remove_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
+    $product_tabs = apply_filters('woocommerce_product_tabs', array());
+    add_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
+
+    // Check if reviews tab exists
+    if (!isset($product_tabs['reviews'])) {
+        return;
+    }
+
+    $reviews_tab = $product_tabs['reviews'];
+
+    // Default: "Customer Reviews" + "Share your thoughts with other customers!"
+    $reviews_title   = __('Customer Reviews', 'somnia');
+    $reviews_subtitle = __('Share your thoughts with other customers!', 'somnia');
+
+    // Override from Theme Options > Single Products > Customer Reviews
+    if (function_exists('get_field')) {
+        $customer_reviews = get_field('customer_reviews', 'option');
+        if (!empty($customer_reviews['enable_custom_reviews'])) {
+            if (!empty($customer_reviews['heading'])) {
+                $reviews_title = $customer_reviews['heading'];
+            }
+            if (isset($customer_reviews['description']) && $customer_reviews['description'] !== '') {
+                $reviews_subtitle = $customer_reviews['description'];
+            }
+        }
+    }
+    $reviews_title = apply_filters('woocommerce_product_reviews_tab_title', $reviews_title);
+
+    $reviews_callback = isset($reviews_tab['callback']) ? $reviews_tab['callback'] : 'comments_template';
+?>
+    <section class="somnia-product-reviews">
+        <?php if (!empty($reviews_title)) : ?>
+            <h3 class="somnia-reviews-title"><?php echo wp_kses_post($reviews_title); ?></h3>
+        <?php endif; ?>
+        <?php if (!empty($reviews_subtitle)) : ?>
+            <p class="somnia-reviews-subtitle"><?php echo wp_kses_post($reviews_subtitle); ?></p>
+        <?php endif; ?>
+        <div class="somnia-reviews-content">
+            <?php
+            if (is_callable($reviews_callback)) {
+                call_user_func($reviews_callback, 'reviews', $reviews_tab);
+            }
+            ?>
+        </div>
+    </section>
+<?php
+}
+
+/**
+ * Render benefits tab content
+ * 
+ * @param string $key Tab key
+ * @param array $tab Tab data
+ */
+function somnia_render_benefits_tab($key, $tab)
+{
+    global $product;
+
+    if (!$product || !function_exists('get_field')) {
+        return;
+    }
+
+    // Get list_benefits field from product
+    $list_benefits = get_field('list_benefits', $product->get_id());
+
+    if (empty($list_benefits) || !is_array($list_benefits)) {
+        return;
+    }
+?>
+    <div class="benefits-list">
+        <?php foreach ($list_benefits as $benefit) :
+            $icon = isset($benefit['icon']) ? $benefit['icon'] : '';
+            $heading = isset($benefit['heading']) ? $benefit['heading'] : '';
+            $description = isset($benefit['description']) ? $benefit['description'] : '';
+
+            if (empty($heading) && empty($description)) {
+                continue;
+            }
+        ?>
+            <div class="benefit-item">
+                <?php if (!empty($icon)) :
+                    $icon_url = is_array($icon) ? $icon['url'] : $icon;
+                    $icon_alt = is_array($icon) ? $icon['alt'] : '';
+                ?>
+                    <div class="benefit-icon">
+                        <img src="<?php echo esc_url($icon_url); ?>" alt="<?php echo esc_attr($icon_alt); ?>" />
+                    </div>
+                <?php endif; ?>
+
+                <div class="benefit-content">
+                    <?php if (!empty($heading)) : ?>
+                        <h4 class="benefit-heading"><?php echo esc_html($heading); ?></h4>
+                    <?php endif; ?>
+
+                    <?php if (!empty($description)) : ?>
+                        <div class="benefit-description"><?php echo wp_kses_post(nl2br($description)); ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+<?php
+}
+
+/**
+ * Add Benefits tab to WooCommerce product tabs
+ * 
+ * @param array $tabs Existing tabs
+ * @return array Modified tabs
+ */
+function somnia_add_benefits_tab($tabs)
+{
+    global $product;
+
+    if (!is_product() || !$product || !function_exists('get_field')) {
+        return $tabs;
+    }
+
+    // Check if product has benefits
+    $list_benefits = get_field('list_benefits', $product->get_id());
+
+    if (empty($list_benefits) || !is_array($list_benefits)) {
+        return $tabs;
+    }
+
+    // Add Benefits tab - priority 5 to appear first
+    $tabs['benefits'] = array(
+        'title'    => __('Benefits', 'somnia'),
+        'priority' => 5,
+        'callback' => 'somnia_render_benefits_tab',
+    );
+
+    return $tabs;
+}
+add_filter('woocommerce_product_tabs', 'somnia_add_benefits_tab', 5);
+
+/**
  * Add or modify placeholders for existing WooCommerce checkout fields
  */
 
@@ -4660,7 +4815,18 @@ function somnia_get_gallery_image_html($attachment_id, $main_image = false, $swi
     if (\Elementor\Plugin::$instance->editor->is_edit_mode()) {
         $gallery_thumbnail = wc_get_image_size('woocommerce_thumbnail');
     } else {
-        $gallery_thumbnail = is_product() ? wc_get_image_size('gallery_thumbnail') : wc_get_image_size('woocommerce_thumbnail');
+        // Check if we're in related products section first (priority check)
+        global $somnia_is_related_products;
+        if (isset($somnia_is_related_products) && $somnia_is_related_products) {
+            // Use woocommerce_thumbnail for related products (same as shop page)
+            $gallery_thumbnail = wc_get_image_size('woocommerce_thumbnail');
+        } elseif (is_product() && !is_shop() && !is_product_category() && !is_product_tag()) {
+            // Single product page gallery (not in related products)
+            $gallery_thumbnail = wc_get_image_size('gallery_thumbnail');
+        } else {
+            // Shop/archive pages - use woocommerce_thumbnail
+            $gallery_thumbnail = wc_get_image_size('woocommerce_thumbnail');
+        }
     }
     $thumbnail_size    = apply_filters('woocommerce_gallery_thumbnail_size', array((int)$gallery_thumbnail['width'], (int)$gallery_thumbnail['height']));
     $image_size        = apply_filters('woocommerce_gallery_image_size', $flexslider || $main_image ? 'woocommerce_single' : $thumbnail_size);
@@ -4981,7 +5147,7 @@ function somnia_load_product_toast()
         </div>
 
     </div>
-    <?php
+<?php
     $output = array(
         'toast' => ob_get_clean()
     );
@@ -4995,17 +5161,17 @@ add_action('somnia_woocommerce_template_loop_add_to_cart_variable', 'somnia_wooc
 function somnia_woocommerce_template_loop_add_to_cart_variable()
 {
     global $product;
-    
+
     // Get product if global is not set
     if (!$product) {
         $product = wc_get_product();
     }
-    
+
     // Check if product is valid
     if (!$product || !is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     if ($product->is_type('variable')) {
         $product_id = $product->get_id();
         echo '<a class="button add_to_cart_button product_type_variable bt-loop-add-to-cart-btn" href="#" data-id="' . esc_attr($product_id) . '">';
@@ -5018,12 +5184,12 @@ add_action('woocommerce_after_add_to_cart_button', 'somnia_woocommerce_after_add
 function somnia_woocommerce_after_add_to_cart_button()
 {
     global $product;
-    
+
     // Check if product exists
     if (empty($product) || ! is_a($product, 'WC_Product')) {
         return;
     }
-    
+
     $variation_id = 0;
     if (isset($_REQUEST['variation_id'])) {
         $variation_id = intval($_REQUEST['variation_id']);
@@ -5047,6 +5213,107 @@ function somnia_woocommerce_after_add_to_cart_button()
         class="bt-btn-read-more bt-button-hover" 
         rel="nofollow">' . esc_html__('Read more', 'somnia') . '</a>';
     }
+}
+
+/**
+ * Output single-product sticky bar in footer.
+ * Shown only when product is simple or variable, purchasable and in stock.
+ */
+add_action('wp_footer', 'somnia_single_product_sticky_bar', 20);
+function somnia_single_product_sticky_bar()
+{
+    if (!function_exists('get_field') || !get_field('enable_sticky_add_to_cart_buttons_on_single_product', 'options')) {
+        return;
+    }
+    if (!is_product() || !function_exists('wc_get_product')) {
+        return;
+    }
+    global $product;
+    if (!$product || !is_a($product, 'WC_Product')) {
+        $product = wc_get_product(get_the_ID());
+    }
+    if (!$product || !$product->is_purchasable() || !$product->is_in_stock()) {
+        return;
+    }
+    $is_simple   = $product->is_type('simple');
+    $is_variable = $product->is_type('variable');
+    if (!$is_simple && !$is_variable) {
+        return;
+    }
+
+    $title = $product->get_name();
+    $image_id = $product->get_image_id();
+    $image_url = $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : wc_placeholder_img_src('thumbnail');
+    $rating_html = $product->get_rating_count() > 0 ? wc_get_rating_html($product->get_average_rating()) : '';
+    $price_html = $product->get_price_html();
+    $product_id = $product->get_id();
+
+    $btn_label_add = esc_html__('Add to cart', 'somnia');
+    $btn_label_select = esc_html__('Select options', 'somnia');
+
+    $sticky_bar_attrs = 'id="bt-single-product-sticky-bar" aria-hidden="true"';
+    if ($is_variable) {
+        $variation_names = array();
+        $variation_prices = array();
+        foreach ($product->get_available_variations() as $var) {
+            $vid = (int) $var['variation_id'];
+            $labels = array();
+            if (!empty($var['attributes']) && is_array($var['attributes'])) {
+                foreach ($var['attributes'] as $attr_key => $value_slug) {
+                    if ((string) $value_slug === '') {
+                        continue;
+                    }
+                    $attr_name = str_replace('attribute_', '', $attr_key);
+                    if (taxonomy_exists($attr_name)) {
+                        $term = get_term_by('slug', $value_slug, $attr_name);
+                        $labels[] = $term && !is_wp_error($term) ? $term->name : $value_slug;
+                    } else {
+                        $labels[] = $value_slug;
+                    }
+                }
+            }
+            $variation_names[$vid] = implode(' / ', $labels);
+            $variation_prices[$vid] = isset($var['price_html']) ? $var['price_html'] : '';
+        }
+        $sticky_bar_attrs .= ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '"';
+        $sticky_bar_attrs .= ' data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
+    }
+    $default_variation_name = '';
+    if ($is_variable) {
+        $default_variation_id = get_default_variation_id($product);
+        if ($default_variation_id && !empty($variation_names[$default_variation_id])) {
+            $default_variation_name = $variation_names[$default_variation_id];
+        }
+    }
+?>
+    <div class="bt-single-product-sticky-bar" <?php echo $sticky_bar_attrs; ?>>
+        <div class="bt-single-product-sticky-bar__inner">
+            <div class="bt-single-product-sticky-bar__product">
+                <div class="bt-single-product-sticky-bar__thumb">
+                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>" />
+                </div>
+                <div class="bt-single-product-sticky-bar__info">
+                    <h3 class="bt-single-product-sticky-bar__title"><?php echo esc_html($title); ?></h3>
+                    <?php if ($price_html) { ?>
+                        <div class="bt-single-product-sticky-bar__price<?php echo $is_variable ? ' bt-product-type-variable' : ''; ?>"><?php echo $price_html; ?></div>
+                    <?php } ?>
+                    <?php if ($is_variable) { ?>
+                        <div class="bt-single-product-sticky-bar__variation">
+                            <div class="bt-single-product-sticky-bar__variation-name"><?php echo esc_html($default_variation_name); ?></div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="bt-single-product-sticky-bar__action">
+                <?php if ($is_simple) { ?>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="simple"><?php echo $btn_label_add; ?></a>
+                <?php } else { ?>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo $btn_label_select; ?></a>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <?php
 }
 
 function get_default_variation_id($product)
@@ -5391,22 +5658,22 @@ function somnia_auto_add_fbt_product($cart_item_key, $product_id, $quantity, $va
     // Check if FBT product ID is provided from form submission
     if (isset($_REQUEST['fbt_product_id']) && !empty($_REQUEST['fbt_product_id'])) {
         $fbt_product_id = intval($_REQUEST['fbt_product_id']);
-        
+
         // Verify it's a valid product
         $fbt_product = wc_get_product($fbt_product_id);
-        
+
         if ($fbt_product && $fbt_product->is_purchasable() && $fbt_product->is_in_stock()) {
             // Check if FBT product is not already in cart to avoid duplicates
             $cart = WC()->cart->get_cart();
             $already_in_cart = false;
-            
+
             foreach ($cart as $item_key => $item) {
                 if ($item['product_id'] == $fbt_product_id || $item['variation_id'] == $fbt_product_id) {
                     $already_in_cart = true;
                     break;
                 }
             }
-            
+
             // Add FBT product to cart if not already there
             if (!$already_in_cart) {
                 WC()->cart->add_to_cart($fbt_product_id, 1);

@@ -18,67 +18,91 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-if ( $related_products || !empty($recently_viewed_products) ) :
+
+$enable_recently_viewed = false;
+$related_description   = '';
+$related_heading       = __( 'Related Products', 'somnia' );
+if ( function_exists( 'get_field' ) ) {
+	$product_related_posts = get_field( 'product_related_posts', 'options' );
+	if ( $product_related_posts ) {
+		$enable_recently_viewed = ! empty( $product_related_posts['enable_recently_viewed'] );
+		if ( ! empty( $product_related_posts['heading'] ) ) {
+			$related_heading = $product_related_posts['heading'];
+		}
+		if ( ! $enable_recently_viewed && ! empty( $product_related_posts['description'] ) ) {
+			$related_description = $product_related_posts['description'];
+		}
+	}
+}
+
+$show_section = $related_products || $enable_recently_viewed;
+if ( $show_section ) :
+	// Set global flag to indicate we're in related products section
+	// This helps improve image quality in related products
+	global $somnia_is_related_products;
+	$somnia_is_related_products = true;
+
 	if ( function_exists( 'wp_increase_content_media_count' ) ) {
 		$content_media_count = wp_increase_content_media_count( 0 );
 		if ( $content_media_count < wp_omit_loading_attr_threshold() ) {
 			wp_increase_content_media_count( wp_omit_loading_attr_threshold() - $content_media_count );
 		}
 	}
-	if(function_exists('get_field')){
-		$related_posts = get_field('product_related_posts', 'options');
-	} else {
-		$related_posts = array(
-			'heading' => __( 'Related Products', 'somnia' ),
-		);
-	}
-
 ?>
-	<section class="related products">
+	<section class="related products <?php echo empty( $enable_recently_viewed ) ? 'related-products-only' : ''; ?>">
 		<div class="bt-related-tab-heading">
 			<div class="bt-tab-nav">
-				<?php if ($related_products && !empty($related_posts['heading'])) : ?>
-					<h2 class="bt-main-text bt-tab-title active related" data-tab="related"><?php echo esc_html($related_posts['heading']); ?></h2>
+				<?php if ( $related_products ) : ?>
+					<h3 class="bt-main-text bt-tab-title active related" data-tab="related"><?php echo esc_html( $related_heading ); ?></h3>
+					<?php if ( $related_description ) : ?>
+					<div class="related-products-description"><?php echo wp_kses_post( wpautop( $related_description ) ); ?></div>
 				<?php endif; ?>
-				<h2 class="bt-main-text bt-tab-title recently-viewed" data-tab="recently-viewed"><?php echo esc_html__('Recently Viewed', 'somnia'); ?></h2>
+				<?php endif; ?>
+				<?php if ( $enable_recently_viewed ) : ?>
+					<h3 class="bt-main-text bt-tab-title recently-viewed<?php echo empty( $related_products ) ? ' active' : ''; ?>" data-tab="recently-viewed"><?php echo esc_html__( 'Recently Viewed', 'somnia' ); ?></h3>
+				<?php endif; ?>
 			</div>
 		</div>
 
 		<div class="bt-tab-content">
-			<?php if ($related_products) : ?>
+			<?php if ( $related_products ) : ?>
 			<div class="bt-tab-pane<?php echo ' active'; ?>" data-tab-content="related">
 				<?php woocommerce_product_loop_start(); ?>
-					<?php foreach ($related_products as $related_product) : ?>
+					<?php foreach ( $related_products as $related_product ) : ?>
 						<?php
-						$post_object = get_post($related_product->get_id());
-						setup_postdata($GLOBALS['post'] =& $post_object);
-						wc_get_template_part('content', 'product');
+						$post_object = get_post( $related_product->get_id() );
+						setup_postdata( $GLOBALS['post'] = &$post_object );
+						wc_get_template_part( 'content', 'product' );
 						?>
 					<?php endforeach; ?>
 				<?php woocommerce_product_loop_end(); ?>
 			</div>
 			<?php endif; ?>
 
-			<div class="bt-tab-pane<?php echo empty($related_products) ? ' active' : ''; ?>" data-tab-content="recently-viewed">
+			<?php if ( $enable_recently_viewed ) : ?>
+			<div class="bt-tab-pane<?php echo empty( $related_products ) ? ' active' : ''; ?>" data-tab-content="recently-viewed">
 				<div class="recently-viewed-products">
-					<?php if (!empty($recently_viewed_products)) : ?>
+					<?php if ( ! empty( $recently_viewed_products ) ) : ?>
 						<?php woocommerce_product_loop_start(); ?>
-						<?php foreach ($recently_viewed_products as $recent_product) : ?>
+						<?php foreach ( $recently_viewed_products as $recent_product ) : ?>
 							<?php
-							$post_object = get_post($recent_product->get_id());
-							setup_postdata($GLOBALS['post'] =& $post_object);
-							wc_get_template_part('content', 'product');
+							$post_object = get_post( $recent_product->get_id() );
+							setup_postdata( $GLOBALS['post'] = &$post_object );
+							wc_get_template_part( 'content', 'product' );
 							?>
 						<?php endforeach; ?>
 						<?php woocommerce_product_loop_end(); ?>
 					<?php else : ?>
-						<p class="no-products"><?php esc_html_e('No recently viewed products.', 'somnia'); ?></p>
+						<p class="no-products"><?php esc_html_e( 'No recently viewed products.', 'somnia' ); ?></p>
 					<?php endif; ?>
 				</div>
 			</div>
+			<?php endif; ?>
 		</div>
 	</section>
 	<?php
+	// Reset global flag
+	$somnia_is_related_products = false;
 endif;
 
 wp_reset_postdata();

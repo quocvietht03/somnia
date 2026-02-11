@@ -697,6 +697,25 @@
 				// Initial update for single product page
 				updateAvailableOptions();
 			});
+
+			// Custom select box: click to open/close, update display on choose
+			$(document).on('click', '.bt-attributes-wrap .bt-select-display', function (e) {
+				e.stopPropagation();
+				$(this).closest('.bt-select-box').toggleClass('is-open');
+			});
+			$(document).on('click', '.bt-attributes-wrap .bt-value-select .bt-js-item', function () {
+				var $box = $(this).closest('.bt-select-box');
+				if ($box.length) {
+					var $attr = $(this).closest('.bt-attributes--item');
+					$box.find('.bt-select-display').html($attr.find('.bt-result').html());
+					$box.removeClass('is-open');
+				}
+			});
+			$(document).on('click', function (e) {
+				if (!$(e.target).closest('.bt-select-box').length) {
+					$('.bt-select-box').removeClass('is-open');
+				}
+			});
 		}
 	}
 	/* load Shop Quick View */
@@ -3078,7 +3097,7 @@
 	function SomniaCurrentYearAutomation() {
 		var searchTerm = '{Year}',
 			replaceWith = new Date().getFullYear();
-		
+
 		$('.elementor-element, .bt-elwg-site-copyright').each(function () {
 			this.innerHTML = this.innerHTML.replace(searchTerm, replaceWith);
 		});
@@ -3612,58 +3631,191 @@
 				beforeSend: function () {
 
 				},
-			success: function (response) {
-				if (response.success) {
-					$('.bt-js-add-to-cart-variable').removeClass('loading');
-					var productId = variation_id || product_id;
-					var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
+				success: function (response) {
+					if (response.success) {
+						$('.bt-js-add-to-cart-variable').removeClass('loading');
+						var productId = variation_id || product_id;
+						var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
 
-					// Update mini cart after successful add to cart
-					$.ajax({
-						url: wc_cart_fragments_params.wc_ajax_url.toString().replace('%%endpoint%%', 'get_refreshed_fragments'),
-						type: 'POST',
-						success: function (response) {
-							if (response && response.fragments) {
-								$.each(response.fragments, function (key, value) {
-									$(key).replaceWith(value);
-								});
-								const cartCount = parseInt($('.bt-mini-cart .cart_total').text());
-								if (cartCount === 0) {
-									$(".bt-mini-cart-sidebar .bt-progress-content").addClass("bt-hide");
-								} else {
-									$(".bt-mini-cart-sidebar .bt-progress-content").removeClass("bt-hide");
-								}
-								// Trigger fragments refreshed event to update note button class
-								$(document.body).trigger('wc_fragments_refreshed');
+						// Update mini cart after successful add to cart
+						$.ajax({
+							url: wc_cart_fragments_params.wc_ajax_url.toString().replace('%%endpoint%%', 'get_refreshed_fragments'),
+							type: 'POST',
+							success: function (response) {
+								if (response && response.fragments) {
+									$.each(response.fragments, function (key, value) {
+										$(key).replaceWith(value);
+									});
+									const cartCount = parseInt($('.bt-mini-cart .cart_total').text());
+									if (cartCount === 0) {
+										$(".bt-mini-cart-sidebar .bt-progress-content").addClass("bt-hide");
+									} else {
+										$(".bt-mini-cart-sidebar .bt-progress-content").removeClass("bt-hide");
+									}
+									// Trigger fragments refreshed event to update note button class
+									$(document.body).trigger('wc_fragments_refreshed');
 
-								// Open mini cart after fragments are loaded
-								if (productId) {
-									SomniaHandleCartAction(productId);
+									// Open mini cart after fragments are loaded
+									if (productId) {
+										SomniaHandleCartAction(productId);
+									}
+									// Show notification for FBT product if it exists
+									if (fbtProductId) {
+										setTimeout(function () {
+											SomniaHandleCartAction(fbtProductId);
+										}, 500);
+									}
+									// Free shipping message
+									SomniaFreeShippingMessage();
 								}
-								// Show notification for FBT product if it exists
-								if (fbtProductId) {
-									setTimeout(function() {
-										SomniaHandleCartAction(fbtProductId);
-									}, 500);
-								}
-								// Free shipping message
-								SomniaFreeShippingMessage();
+							},
+							error: function () {
+								console.error('Failed to update mini cart.');
 							}
-						},
-						error: function () {
-							console.error('Failed to update mini cart.');
-						}
-					});
-				} else {
-					console.log('error');
-				}
-			},
+						});
+					} else {
+						console.log('error');
+					}
+				},
 				error: function (jqXHR, textStatus, errorThrown) {
 					console.log('The following error occured: ' + textStatus, errorThrown);
 				}
 			});
 		});
 	}
+	/**
+	 * Single product sticky bottom bar: show when user scrolls past add-to-cart/variations.
+ */
+	function SomniaSingleProductStickyBar() {
+		if (!$('body').hasClass('single-product') || $('#bt-single-product-sticky-bar').length === 0) {
+			return;
+		}
+		var $stickyBar = $('#bt-single-product-sticky-bar');
+		var $stickyAddToCartButton = $stickyBar.find('.bt-js-sticky-add-to-cart');
+		var $productAddToCartSection = $('.bt-product-inner .bt-product-excerpt-add-to-cart');
+		var $productFormCart = $('.bt-product-inner .summary form.cart');
+		if ($productAddToCartSection.length === 0) {
+			$productAddToCartSection = $productFormCart;
+		}
+		if ($productAddToCartSection.length === 0) {
+			return;
+		}
+		if ($productFormCart.length === 0) {
+			return;
+		}
+		function updateStickyBarVisibility() {
+			var formCartTop = $productFormCart.offset().top;
+			var formCartHeight = $productFormCart.outerHeight();
+			var formCartBottom = formCartTop + formCartHeight;
+			var currentScrollTop = $(window).scrollTop();
+			// Show bar when section has scrolled out above viewport (user passed variations/add-to-cart)
+			if (formCartBottom < currentScrollTop) {
+				$stickyBar.addClass('is-visible').attr('aria-hidden', 'false');
+				// From 930px down: back-to-top 10px above sticky bar (JS sets inline style only when bar visible)
+				if ($(window).width() <= 930) {
+					var barHeight = $stickyBar.outerHeight();
+					$('.bt-back-to-top').css('bottom', (10 + barHeight + 10) + 'px');
+				} else {
+					$('.bt-back-to-top').css('bottom', '');
+				}
+			} else {
+				$stickyBar.removeClass('is-visible').attr('aria-hidden', 'true');
+				$('.bt-back-to-top').css('bottom', '');
+			}
+		}
+		function updateStickyAddToCartButtonState() {
+			if ($stickyAddToCartButton.data('type') !== 'variable') {
+				return;
+			}
+			var $mainVariableAddToCartButton = $('.bt-product-inner .bt-js-add-to-cart-variable');
+			if ($mainVariableAddToCartButton.length === 0) {
+				return;
+			}
+		
+			var isMainButtonDisabled = $mainVariableAddToCartButton.hasClass('disabled');
+			var addToCartLabel = $stickyAddToCartButton.attr('data-label-add') || 'Add to cart';
+			var selectOptionsLabel = $stickyAddToCartButton.attr('data-label-select') || 'Select options';
+			if (!isMainButtonDisabled) {
+				$stickyAddToCartButton.text(addToCartLabel).addClass('bt-style-add-to-cart');
+			} else {
+				$stickyAddToCartButton.text(selectOptionsLabel).removeClass('bt-style-add-to-cart');
+			}
+		}
+
+		$(window).on('scroll.somniaStickyBar resize.somniaStickyBar', function () {
+			updateStickyBarVisibility();
+		});
+		updateStickyBarVisibility();
+		updateStickyAddToCartButtonState();
+		// Cache initial price HTML for variable product (restore on hide_variation)
+		var $stickyPriceEl = $stickyBar.find('.bt-single-product-sticky-bar__price');
+		var initialStickyPriceHtml = $stickyAddToCartButton.data('type') === 'variable' && $stickyPriceEl.length ? $stickyPriceEl.html() : '';
+
+		// Sync sticky button, variation name and price with main variable form on variation change
+		$('.bt-product-inner .variations_form').off('show_variation.somniasingleproductSticky hide_variation.somniasingleproductSticky').on('show_variation.somniasingleproductSticky', function (event, variation) {
+			setTimeout(function() {
+				updateStickyAddToCartButtonState();
+			}, 500);
+			var variationId = variation && variation.variation_id ? variation.variation_id : 0;
+			var variationNamesRaw = $stickyBar.attr('data-variation-names');
+			var variationNames = variationNamesRaw ? (typeof variationNamesRaw === 'string' ? JSON.parse(variationNamesRaw) : variationNamesRaw) : null;
+			var $variationNameEl = $stickyBar.find('.bt-single-product-sticky-bar__variation-name');
+			if ($variationNameEl.length && variationNames) {
+				$variationNameEl.text(variationId && variationNames[variationId] ? variationNames[variationId] : '');
+			}
+			// Update sticky bar price from variation (event price_html or fallback to data-variation-prices)
+			if ($stickyPriceEl.length) {
+				var priceHtml = (variation && variation.price_html) ? variation.price_html : null;
+				if (!priceHtml) {
+					var variationPricesRaw = $stickyBar.attr('data-variation-prices');
+					var variationPrices = variationPricesRaw ? (typeof variationPricesRaw === 'string' ? JSON.parse(variationPricesRaw) : variationPricesRaw) : null;
+					if (variationId && variationPrices && variationPrices[variationId]) {
+						priceHtml = variationPrices[variationId];
+					}
+				}
+				if (priceHtml) {
+					$stickyPriceEl.html(priceHtml);
+				}
+			}
+		}).on('hide_variation.somniasingleproductSticky', function () {
+			setTimeout(function() {
+				updateStickyAddToCartButtonState();
+			}, 500);
+			$stickyBar.find('.bt-single-product-sticky-bar__variation-name').text('');
+			if ($stickyPriceEl.length && initialStickyPriceHtml) {
+				$stickyPriceEl.html(initialStickyPriceHtml);
+			}
+		});
+		$stickyBar.on('click', '.bt-js-sticky-add-to-cart', function (e) {
+			e.preventDefault();
+			var $clickedButton = $(this);
+			if ($clickedButton.hasClass('loading')) {
+				return;
+			}
+			var productType = $clickedButton.data('type');
+			if (productType === 'variable') {
+				var $mainVariableAddToCartButton = $('.bt-product-inner .bt-js-add-to-cart-variable');
+				var canAddToCart = $mainVariableAddToCartButton.length && !$mainVariableAddToCartButton.hasClass('disabled');
+				if (canAddToCart) {
+					$clickedButton.addClass('loading');
+					$mainVariableAddToCartButton.trigger('click');
+				} else {
+					$productAddToCartSection.get(0) && $productAddToCartSection.get(0).scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			} else {
+				var $mainSimpleAddToCartButton = $('.bt-product-inner .bt-js-add-to-cart-simple');
+				if ($mainSimpleAddToCartButton.length) {
+					$clickedButton.addClass('loading');
+					$mainSimpleAddToCartButton.trigger('click');
+				}
+			}
+		});
+		// instead of WooCommerce's default `added_to_cart` event, so listen to that.
+		$(document.body).on('wc_fragments_refreshed', function () {
+			$stickyAddToCartButton.removeClass('loading');
+		});
+	}
+
 	/* add to cart ajax product simple */
 	function SomniaAddToCartSimple() {
 		$(document).on('click', '.bt-js-add-to-cart-simple', function (e) {
@@ -3702,51 +3854,51 @@
 				beforeSend: function () {
 
 				},
-			success: function (response) {
-				if (response.success) {
-					$('.bt-js-add-to-cart-simple').removeClass('loading');
-					var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
+				success: function (response) {
+					if (response.success) {
+						$('.bt-js-add-to-cart-simple').removeClass('loading');
+						var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
 
-					// Update mini cart after successful add to cart
-					$.ajax({
-						url: wc_cart_fragments_params.wc_ajax_url.toString().replace('%%endpoint%%', 'get_refreshed_fragments'),
-						type: 'POST',
-						success: function (response) {
-							if (response && response.fragments) {
-								$.each(response.fragments, function (key, value) {
-									$(key).replaceWith(value);
-								});
-								const cartCount = parseInt($('.bt-mini-cart .cart_total').text());
-								if (cartCount === 0) {
-									$(".bt-mini-cart-sidebar .bt-progress-content").addClass("bt-hide");
-								} else {
-									$(".bt-mini-cart-sidebar .bt-progress-content").removeClass("bt-hide");
-								}
-								// Trigger fragments refreshed event to update note button class
-								$(document.body).trigger('wc_fragments_refreshed');
+						// Update mini cart after successful add to cart
+						$.ajax({
+							url: wc_cart_fragments_params.wc_ajax_url.toString().replace('%%endpoint%%', 'get_refreshed_fragments'),
+							type: 'POST',
+							success: function (response) {
+								if (response && response.fragments) {
+									$.each(response.fragments, function (key, value) {
+										$(key).replaceWith(value);
+									});
+									const cartCount = parseInt($('.bt-mini-cart .cart_total').text());
+									if (cartCount === 0) {
+										$(".bt-mini-cart-sidebar .bt-progress-content").addClass("bt-hide");
+									} else {
+										$(".bt-mini-cart-sidebar .bt-progress-content").removeClass("bt-hide");
+									}
+									// Trigger fragments refreshed event to update note button class
+									$(document.body).trigger('wc_fragments_refreshed');
 
-								// Open mini cart after fragments are loaded
-								if (product_id) {
-									SomniaHandleCartAction(product_id);
+									// Open mini cart after fragments are loaded
+									if (product_id) {
+										SomniaHandleCartAction(product_id);
+									}
+									// Show notification for FBT product if it exists
+									if (fbtProductId) {
+										setTimeout(function () {
+											SomniaHandleCartAction(fbtProductId);
+										}, 500);
+									}
+									// Free shipping message
+									SomniaFreeShippingMessage();
 								}
-								// Show notification for FBT product if it exists
-								if (fbtProductId) {
-									setTimeout(function() {
-										SomniaHandleCartAction(fbtProductId);
-									}, 500);
-								}
-								// Free shipping message
-								SomniaFreeShippingMessage();
+							},
+							error: function () {
+								console.error('Failed to update mini cart.');
 							}
-						},
-						error: function () {
-							console.error('Failed to update mini cart.');
-						}
-					});
-				} else {
-					console.log('error');
-				}
-			},
+						});
+					} else {
+						console.log('error');
+					}
+				},
 				error: function (jqXHR, textStatus, errorThrown) {
 					console.log('The following error occured: ' + textStatus, errorThrown);
 				}
@@ -3877,7 +4029,7 @@
 		// Add hidden input to form when select changes
 		const $addToCartForm = $('form.cart');
 		const $buttonAddToCart = $addToCartForm.find('button[type="submit"]');
-		
+
 		// Create hidden input if not exists
 		if ($addToCartForm.find('input[name="fbt_product_id"]').length === 0) {
 			$buttonAddToCart.before('<input type="hidden" name="fbt_product_id" value="">');
@@ -3886,7 +4038,7 @@
 		const $hiddenInput = $addToCartForm.find('input[name="fbt_product_id"]');
 
 		// Update hidden input when select changes
-		$fbtSelect.on('change', function() {
+		$fbtSelect.on('change', function () {
 			const fbtProductId = $(this).val();
 			$hiddenInput.val(fbtProductId);
 		});
@@ -4036,6 +4188,63 @@
 			}
 		}, 3000);
 	}
+	/**
+ * Check if current URL hash is comment-related (#comment-*, #reviews, etc.)
+ * When such hash exists, WooCommerce single-product.js hides all tab panels
+ * and tries to open reviews tab (which theme may have removed), leaving all closed.
+ */
+	function SomniaIsCommentHash() {
+		var hash = (window.location.hash || '').toLowerCase();
+		var url = window.location.href || '';
+		return hash.indexOf('comment-') >= 0 ||
+			hash === '#reviews' ||
+			hash === '#tab-reviews' ||
+			url.indexOf('comment-page-') > 0 ||
+			url.indexOf('cpage=') > 0;
+	}
+
+	/**
+	 * Restore product tabs/toggle state when URL has comment hash.
+	 * Run after WooCommerce single-product init so our state is not left all closed.
+	 */
+	function SomniaRestoreProductTabsOnCommentHash() {
+		if (!$('body').hasClass('single-product')) {
+			return;
+		}
+		if (!SomniaIsCommentHash()) {
+			return;
+		}
+
+		// Toggle mode: restore open state from data-toggle-state
+		$('.bt-product-toggle-js').each(function () {
+			var $container = $(this);
+			var toggleState = $container.data('toggle-state') || 'first';
+			var $titles = $container.find('.bt-item-title');
+			var $contents = $container.find('.bt-item-content');
+
+			$titles.removeClass('active');
+			$contents.hide();
+
+			if (toggleState === 'all') {
+				$titles.addClass('active');
+				$contents.show();
+			} else {
+				$titles.first().addClass('active');
+				$contents.first().show();
+			}
+		});
+
+		// Tab mode (default WooCommerce tabs): if no panel is visible, open first tab
+		$('.woocommerce-tabs').not('.bt-product-toggle-js').each(function () {
+			var $wrapper = $(this);
+			var $tabs = $wrapper.find('.wc-tabs, ul.tabs').first();
+			var $panels = $wrapper.find('.wc-tab, .panel:not(.panel .panel)');
+			var anyVisible = $panels.filter(function () { return $(this).css('display') !== 'none'; }).length > 0;
+			if (!anyVisible && $tabs.length) {
+				$tabs.find('li:first a').trigger('click');
+			}
+		});
+	}
 	jQuery(document).ready(function ($) {
 		SomniaSubmenuAuto();
 		SomniaToggleMenuMobile();
@@ -4076,11 +4285,14 @@
 		SomniaUpdateBodyWidthVariable();
 		SomniaAddToCartVariable();
 		SomniaAddToCartSimple();
+		SomniaSingleProductStickyBar();
 		SomniaLoadDefaultActiveVariations(); // Load data for default active variations
 		SomniaFrequentlyBoughtTogether();
 		SomniaElementorSliderControl(); // Elementor slider control via button clicks
 		SomniaMiniCartNoteHandler();	// Initialize Mini Cart Note Handler
 		SomniaPreloader(); // Initialize Preloader
+		// Restore product tabs/toggle when URL has comment hash (#comment-4, etc.)
+		setTimeout(SomniaRestoreProductTabsOnCommentHash, 50);
 	});
 	// Block WooCommerce from changing images
 	jQuery(function ($) {

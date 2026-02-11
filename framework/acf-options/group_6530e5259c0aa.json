@@ -1590,13 +1590,13 @@
                             "choices": {
                                 "search_form": "Search Form",
                                 "categories": "Product Categories",
-                                "brand": "Brand",
-                                "comfort_scale": "Comfort Scale",
-                                "mattress_type": "Mattress Type",
                                 "price": "Price",
                                 "customer_rating": "Customer Rating",
                                 "text_editor": "Text Editor",
+                                "pa_button": "Button",
+                                "pa_images": "images",
                                 "pa_size": "Size",
+                                "pa_background": "Background",
                                 "pa_color": "Color"
                             },
                             "default_value": false,
@@ -1665,7 +1665,7 @@
         },
         {
             "key": "field_692ff607f0227",
-            "label": "Enable AJAX add to cart buttons on single product",
+            "label": "Enable AJAX add to cart buttons",
             "name": "enable_ajax_add_to_cart_buttons_on_single_product",
             "aria-label": "",
             "type": "true_false",
@@ -1673,7 +1673,28 @@
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "",
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "allow_in_bindings": 1,
+            "ui_on_text": "",
+            "ui_off_text": "",
+            "ui": 1
+        },
+        {
+            "key": "field_698c2dcf70cce",
+            "label": "Enable Sticky add to cart buttons",
+            "name": "enable_sticky_add_to_cart_buttons_on_single_product",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
                 "class": "",
                 "id": ""
             },
@@ -1706,8 +1727,105 @@
             "delay": 0
         },
         {
+            "key": "field_698942177700e",
+            "label": "Customer Reviews",
+            "name": "customer_reviews",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_698942177700f",
+                    "label": "Enable Custom Reviews",
+                    "name": "enable_custom_reviews",
+                    "aria-label": "",
+                    "type": "true_false",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "message": "",
+                    "default_value": 0,
+                    "allow_in_bindings": 1,
+                    "ui_on_text": "",
+                    "ui_off_text": "",
+                    "ui": 1
+                },
+                {
+                    "key": "field_6989421777010",
+                    "label": "Heading",
+                    "name": "heading",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": [
+                        [
+                            {
+                                "field": "field_698942177700f",
+                                "operator": "==",
+                                "value": "1"
+                            }
+                        ]
+                    ],
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 1,
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_6989425777012",
+                    "label": "Description",
+                    "name": "description",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": [
+                        [
+                            {
+                                "field": "field_698942177700f",
+                                "operator": "==",
+                                "value": "1"
+                            }
+                        ]
+                    ],
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "rows": "",
+                    "placeholder": "",
+                    "new_lines": ""
+                }
+            ]
+        },
+        {
             "key": "field_653c78511e517",
-            "label": "Related Posts",
+            "label": "Related Product",
             "name": "product_related_posts",
             "aria-label": "",
             "type": "group",
@@ -1723,7 +1841,7 @@
             "sub_fields": [
                 {
                     "key": "field_668cadcc8c2b9",
-                    "label": "Enable Related Posts",
+                    "label": "Enable Related Product",
                     "name": "enable_related_product",
                     "aria-label": "",
                     "type": "true_false",
@@ -1731,7 +1849,28 @@
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
-                        "width": "",
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "message": "",
+                    "default_value": 0,
+                    "allow_in_bindings": 1,
+                    "ui_on_text": "",
+                    "ui_off_text": "",
+                    "ui": 1
+                },
+                {
+                    "key": "field_698a8272f947d",
+                    "label": "Enable Recently Viewed",
+                    "name": "enable_recently_viewed",
+                    "aria-label": "",
+                    "type": "true_false",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
                         "class": "",
                         "id": ""
                     },
@@ -1801,6 +1940,35 @@
                     "step": "",
                     "prepend": "",
                     "append": ""
+                },
+                {
+                    "key": "field_698a8295f947e",
+                    "label": "Description",
+                    "name": "description",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": [
+                        [
+                            {
+                                "field": "field_698a8272f947d",
+                                "operator": "!=",
+                                "value": "1"
+                            }
+                        ]
+                    ],
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "allow_in_bindings": 0,
+                    "rows": 2,
+                    "placeholder": "",
+                    "new_lines": ""
                 }
             ]
         },
@@ -2737,5 +2905,6 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1770277002
+    "display_title": "",
+    "modified": 1770794668
 }

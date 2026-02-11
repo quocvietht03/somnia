@@ -528,55 +528,6 @@ if (!function_exists('somnia_get_all_enabled_search_attributes')) {
 }
 
 /**
- * Get image taxonomy dynamically by checking attribute type
- */
-if (!function_exists('somnia_get_image_taxonomy')) {
-	function somnia_get_image_taxonomy()
-	{
-		static $image_taxonomy = null;
-
-		if ($image_taxonomy !== null) {
-			return $image_taxonomy;
-		}
-
-		$image_taxonomy = false;
-		$attribute_taxonomies = wc_get_attribute_taxonomies();
-
-		if (!empty($attribute_taxonomies)) {
-			foreach ($attribute_taxonomies as $attribute) {
-				$attribute_type = get_option('somnia_attribute_type_' . $attribute->attribute_id, 'select');
-				if ($attribute_type === 'image') {
-					$image_taxonomy = wc_attribute_taxonomy_name($attribute->attribute_name);
-					break;
-				}
-			}
-		}
-
-		return $image_taxonomy;
-	}
-}
-
-
-/**
- * Check if attribute is select type
- */
-if (!function_exists('somnia_is_select_attribute')) {
-	function somnia_is_select_attribute($attribute_name)
-	{
-		// Remove 'pa_' prefix if present
-		$attribute_slug = str_replace('pa_', '', $attribute_name);
-		$attribute_id = wc_attribute_taxonomy_id_by_name($attribute_slug);
-
-		if ($attribute_id) {
-			$attribute_type = get_option('somnia_attribute_type_' . $attribute_id, 'select');
-			return $attribute_type === 'select';
-		}
-
-		return false;
-	}
-}
-
-/**
  * Check if attribute is enabled in search
  */
 if (!function_exists('somnia_is_attribute_enabled_in_search')) {
@@ -784,3 +735,230 @@ if (!function_exists('somnia_find_and_update_field')) {
 		}
 	}
 }
+
+/**
+ * Render BT attributes wrap content for variable product (image/color/select/button swatches).
+ * Hook: somnia_bt_attributes_wrap — called from variable.php with $attributes, $product, $available_variations.
+ */
+if (!function_exists('somnia_woocommerce_custom_attributes')) {
+	function somnia_woocommerce_custom_attributes($attributes, $product, $available_variations)
+	{
+		// Helper to check if an option is available based on selected attributes
+		$check_option_availability = function ($option_value, $current_attribute_name, $all_attributes, $selected_attributes, $available_variations) {
+			if (!is_array($available_variations) || empty($available_variations)) {
+				return true;
+			}
+			$test_attributes = $selected_attributes;
+			unset($test_attributes[$current_attribute_name]);
+			$test_attributes[$current_attribute_name] = $option_value;
+			$current_attr_key = 'attribute_' . sanitize_title($current_attribute_name);
+
+			foreach ($available_variations as $variation) {
+				if (!isset($variation['attributes'])) {
+					continue;
+				}
+				$variation_attrs = $variation['attributes'];
+				$matches = true;
+				$variation_current_value = isset($variation_attrs[$current_attr_key]) ? $variation_attrs[$current_attr_key] : '';
+				if ($variation_current_value !== '' && $variation_current_value !== $option_value) {
+					continue;
+				}
+				foreach ($test_attributes as $attr_name => $test_value) {
+					if ($attr_name === $current_attribute_name || $test_value === '') {
+						continue;
+					}
+					$attr_key = 'attribute_' . sanitize_title($attr_name);
+					$variation_value = isset($variation_attrs[$attr_key]) ? $variation_attrs[$attr_key] : '';
+					if ($variation_value !== '' && $variation_value !== $test_value) {
+						$matches = false;
+						break;
+					}
+				}
+				if ($matches) {
+					return true;
+				}
+			}
+			return false;
+		};
+
+		$selected_attributes = array();
+		foreach ($attributes as $attr_name => $attr_options) {
+			$attr_slug = sanitize_title($attr_name);
+			$selected_attr = isset($_REQUEST['attribute_' . $attr_slug])
+				? wc_clean(wp_unslash($_REQUEST['attribute_' . $attr_slug]))
+				: $product->get_variation_default_attribute($attr_name);
+			if ($selected_attr) {
+				$selected_attributes[$attr_name] = $selected_attr;
+			}
+		}
+		?>
+		<div class="bt-attributes-wrap">
+		<?php
+		foreach ($attributes as $attribute_name => $options) {
+			$data_attribute = strtolower($attribute_name);
+			$data_attribute_slug = sanitize_title($attribute_name);
+			$selected_value = isset($_REQUEST['attribute_' . $data_attribute_slug]) ? wc_clean(wp_unslash($_REQUEST['attribute_' . $data_attribute_slug])) : $product->get_variation_default_attribute($attribute_name);
+			$is_size_attr = (strpos(strtolower($attribute_name), 'size') !== false);
+			$attr_type = function_exists('somnia_get_attribute_type') ? somnia_get_attribute_type($attribute_name) : 'select';
+			$is_image_attr = ($attr_type === 'image');
+			$is_color_attr = ($attr_type === 'color');
+			$is_select_attr = ($attr_type === 'select');
+			$attr_class = in_array($attr_type, array('image', 'color', 'select'), true) ? ' bt-is-' . $attr_type . '-attribute' : '';
+			?>
+			<div class="bt-attributes--item<?php echo esc_attr($attr_class); ?>" data-attribute-name="<?php echo esc_attr($data_attribute_slug); ?>">
+				<div class="bt-attributes--name">
+					<div class="bt-name"><?php echo wc_attribute_label($attribute_name) . ':'; ?></div>
+					<div class="bt-result"></div>
+					<?php
+					if ($is_size_attr && is_product()) {
+						$enable_size_guide = get_post_meta($product->get_id(), '_enable_size_guide', true);
+						$size_guide = get_field('size_guide', 'option');
+						if ($enable_size_guide === 'yes' && !empty($size_guide)) {
+					?>
+							<div class="bt-size-guide-wrapper bt-inline-position">
+								<a href="#bt-size-guide-popup" class="bt-size-guide-button bt-js-open-popup-link">
+									<?php echo esc_html__('Size Guide', 'somnia'); ?>
+								</a>
+							</div>
+					<?php
+						}
+					}
+					?>
+				</div>
+				<?php
+				$ordered_options = $options;
+				if ($product && taxonomy_exists($attribute_name)) {
+					$terms = wc_get_product_terms(
+						$product->get_id(),
+						$attribute_name,
+						array('fields' => 'all')
+					);
+					$ordered_options = array();
+					foreach ($terms as $term) {
+						if (in_array($term->slug, $options, true)) {
+							$ordered_options[] = $term->slug;
+						}
+					}
+				}
+
+				if ($is_image_attr) { ?>
+					<div class="bt-attributes--value bt-value-image">
+						<?php
+						foreach ($ordered_options as $option) :
+							$term = get_term_by('slug', $option, $attribute_name);
+							$term_id = $term ? $term->term_id : '';
+							$image_id = $term_id ? get_term_meta($term_id, 'somnia_term_image', true) : 0;
+							$image_id = absint($image_id);
+							$image_url = $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '';
+							$is_selected = ($selected_value === $option);
+							$class_active = $is_selected ? ' active' : '';
+							$is_available = $check_option_availability($option, $attribute_name, $attributes, $selected_attributes, $available_variations);
+							$class_disabled = !$is_available ? ' disabled' : '';
+						?>
+							<div class="bt-js-item bt-item-image<?php echo esc_attr($class_active . $class_disabled); ?>" data-value="<?php echo esc_attr($option); ?>">
+								<div class="bt-image">
+									<?php if ($image_url) : ?>
+										<span style="background-image: url('<?php echo esc_url($image_url); ?>');">
+											<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+												<path d="M16 3C13.4288 3 10.9154 3.76244 8.77759 5.19089C6.63975 6.61935 4.97351 8.64968 3.98957 11.0251C3.00563 13.4006 2.74819 16.0144 3.2498 18.5362C3.75141 21.0579 4.98953 23.3743 6.80762 25.1924C8.6257 27.0105 10.9421 28.2486 13.4638 28.7502C15.9856 29.2518 18.5994 28.9944 20.9749 28.0104C23.3503 27.0265 25.3807 25.3603 26.8091 23.2224C28.2376 21.0846 29 18.5712 29 16C28.9964 12.5533 27.6256 9.24882 25.1884 6.81163C22.7512 4.37445 19.4467 3.00364 16 3ZM21.7075 13.7075L14.7075 20.7075C14.6146 20.8005 14.5043 20.8742 14.3829 20.9246C14.2615 20.9749 14.1314 21.0008 14 21.0008C13.8686 21.0008 13.7385 20.9749 13.6171 20.9246C13.4957 20.8742 13.3854 20.8005 13.2925 20.7075L10.2925 17.7075C10.1049 17.5199 9.99945 17.2654 9.99945 17C9.99945 16.7346 10.1049 16.4801 10.2925 16.2925C10.4801 16.1049 10.7346 15.9994 11 15.9994C11.2654 15.9994 11.5199 16.1049 11.7075 16.2925L14 18.5862L20.2925 12.2925C20.3854 12.1996 20.4957 12.1259 20.6171 12.0756C20.7385 12.0253 20.8686 11.9994 21 11.9994C21.1314 11.9994 21.2615 12.0253 21.3829 12.0756C21.5043 12.1259 21.6146 12.1996 21.7075 12.2925C21.8004 12.3854 21.8741 12.4957 21.9244 12.6171C21.9747 12.7385 22.0006 12.8686 22.0006 13C22.0006 13.1314 21.9747 13.2615 21.9244 13.3829C21.8741 13.5043 21.8004 13.6146 21.7075 13.7075Z" fill="white" />
+											</svg>
+										</span>
+									<?php else : ?>
+										<span style="background-color: #e5e7eb;">
+											<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+												<path d="M16 3C13.4288 3 10.9154 3.76244 8.77759 5.19089C6.63975 6.61935 4.97351 8.64968 3.98957 11.0251C3.00563 13.4006 2.74819 16.0144 3.2498 18.5362C3.75141 21.0579 4.98953 23.3743 6.80762 25.1924C8.6257 27.0105 10.9421 28.2486 13.4638 28.7502C15.9856 29.2518 18.5994 28.9944 20.9749 28.0104C23.3503 27.0265 25.3807 25.3603 26.8091 23.2224C28.2376 21.0846 29 18.5712 29 16C28.9964 12.5533 27.6256 9.24882 25.1884 6.81163C22.7512 4.37445 19.4467 3.00364 16 3ZM21.7075 13.7075L14.7075 20.7075C14.6146 20.8005 14.5043 20.8742 14.3829 20.9246C14.2615 20.9749 14.1314 21.0008 14 21.0008C13.8686 21.0008 13.7385 20.9749 13.6171 20.9246C13.4957 20.8742 13.3854 20.8005 13.2925 20.7075L10.2925 17.7075C10.1049 17.5199 9.99945 17.2654 9.99945 17C9.99945 16.7346 10.1049 16.4801 10.2925 16.2925C10.4801 16.1049 10.7346 15.9994 11 15.9994C11.2654 15.9994 11.5199 16.1049 11.7075 16.2925L14 18.5862L20.2925 12.2925C20.3854 12.1996 20.4957 12.1259 20.6171 12.0756C20.7385 12.0253 20.8686 11.9994 21 11.9994C21.1314 11.9994 21.2615 12.0253 21.3829 12.0756C21.5043 12.1259 21.6146 12.1996 21.7075 12.2925C21.8004 12.3854 21.8741 12.4957 21.9244 12.6171C21.9747 12.7385 22.0006 12.8686 22.0006 13C22.0006 13.1314 21.9747 13.2615 21.9244 13.3829C21.8741 13.5043 21.8004 13.6146 21.7075 13.7075Z" fill="white" />
+											</svg>
+										</span>
+									<?php endif; ?>
+								</div>
+								<label><?php echo esc_html($term ? $term->name : $option); ?></label>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				<?php } elseif ($is_color_attr) { ?>
+					<div class="bt-attributes--value bt-value-color">
+						<?php
+						foreach ($ordered_options as $option) :
+							$term = get_term_by('slug', $option, $attribute_name);
+							$term_id = $term ? $term->term_id : '';
+							$color = $term_id ? get_term_meta($term_id, 'somnia_term_color', true) : '';
+							if (!$color) {
+								$color = $option;
+							}
+							$is_selected = ($selected_value === $option);
+							$class_active = $is_selected ? ' active' : '';
+							$is_available = $check_option_availability($option, $attribute_name, $attributes, $selected_attributes, $available_variations);
+							$class_disabled = !$is_available ? ' disabled' : '';
+						?>
+							<div class="bt-js-item bt-item-color<?php echo esc_attr($class_active . $class_disabled); ?>" data-value="<?php echo esc_attr($option); ?>">
+								<div class="bt-color">
+									<span style="background-color: <?php echo esc_attr($color); ?>;">
+										<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+											<path d="M16 3C13.4288 3 10.9154 3.76244 8.77759 5.19089C6.63975 6.61935 4.97351 8.64968 3.98957 11.0251C3.00563 13.4006 2.74819 16.0144 3.2498 18.5362C3.75141 21.0579 4.98953 23.3743 6.80762 25.1924C8.6257 27.0105 10.9421 28.2486 13.4638 28.7502C15.9856 29.2518 18.5994 28.9944 20.9749 28.0104C23.3503 27.0265 25.3807 25.3603 26.8091 23.2224C28.2376 21.0846 29 18.5712 29 16C28.9964 12.5533 27.6256 9.24882 25.1884 6.81163C22.7512 4.37445 19.4467 3.00364 16 3ZM21.7075 13.7075L14.7075 20.7075C14.6146 20.8005 14.5043 20.8742 14.3829 20.9246C14.2615 20.9749 14.1314 21.0008 14 21.0008C13.8686 21.0008 13.7385 20.9749 13.6171 20.9246C13.4957 20.8742 13.3854 20.8005 13.2925 20.7075L10.2925 17.7075C10.1049 17.5199 9.99945 17.2654 9.99945 17C9.99945 16.7346 10.1049 16.4801 10.2925 16.2925C10.4801 16.1049 10.7346 15.9994 11 15.9994C11.2654 15.9994 11.5199 16.1049 11.7075 16.2925L14 18.5862L20.2925 12.2925C20.3854 12.1996 20.4957 12.1259 20.6171 12.0756C20.7385 12.0253 20.8686 11.9994 21 11.9994C21.1314 11.9994 21.2615 12.0253 21.3829 12.0756C21.5043 12.1259 21.6146 12.1996 21.7075 12.2925C21.8004 12.3854 21.8741 12.4957 21.9244 12.6171C21.9747 12.7385 22.0006 12.8686 22.0006 13C22.0006 13.1314 21.9747 13.2615 21.9244 13.3829C21.8741 13.5043 21.8004 13.6146 21.7075 13.7075Z" fill="white" />
+										</svg>
+									</span>
+								</div>
+								<label><?php echo esc_html($term ? $term->name : $option); ?></label>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				<?php } elseif ($is_select_attr) {
+					$selected_display_name = '';
+					if ($selected_value) {
+						$selected_term = get_term_by('slug', $selected_value, $attribute_name);
+						$selected_display_name = $selected_term ? $selected_term->name : $selected_value;
+					}
+					?>
+					<div class="bt-attributes--value bt-value-select">
+						<div class="bt-select-box">
+							<div class="bt-select-display" tabindex="0"><?php echo $selected_display_name ? esc_html($selected_display_name) : esc_html__('Choose an option', 'somnia'); ?></div>
+							<div class="bt-select-options">
+								<?php
+								foreach ($ordered_options as $option) :
+									$term = get_term_by('slug', $option, $attribute_name);
+									$display_name = $term ? $term->name : $option;
+									$display_desc = $term ? $term->description : '';
+									$is_selected = ($selected_value === $option);
+									$class_active = $is_selected ? ' active' : '';
+									$is_available = $check_option_availability($option, $attribute_name, $attributes, $selected_attributes, $available_variations);
+									$class_disabled = !$is_available ? ' disabled' : '';
+								?>
+									<span class="bt-js-item bt-item-value<?php echo esc_attr($class_active . $class_disabled); ?>" data-value="<?php echo esc_attr($option); ?>">
+										<?php echo esc_html($display_name); ?>
+										<?php if (!empty($display_desc)) echo '<span class="bt-item-desc">' . esc_html($display_desc) . '</span>'; ?>
+									</span>
+								<?php endforeach; ?>
+							</div>
+						</div>
+					</div>
+				<?php } else { ?>
+					<div class="bt-attributes--value">
+						<?php foreach ($ordered_options as $option) : ?>
+							<?php
+							$term = get_term_by('slug', $option, $attribute_name);
+							$display_name = $term ? $term->name : $option;
+							$display_desc = $term ? $term->description : '';
+							$is_selected = ($selected_value === $option);
+							$class_active = $is_selected ? ' active' : '';
+							$is_available = $check_option_availability($option, $attribute_name, $attributes, $selected_attributes, $available_variations);
+							$class_disabled = !$is_available ? ' disabled' : '';
+							?>
+							<span class="bt-js-item bt-item-value<?php echo esc_attr($class_active . $class_disabled); ?>" data-value="<?php echo esc_attr($option); ?>">
+								<?php
+								echo esc_html($display_name);
+								if (!empty($display_desc)) echo '<span class="bt-item-desc">' . esc_html($display_desc) . '</span>';
+								?>
+							</span>
+						<?php endforeach; ?>
+					</div>
+				<?php } ?>
+			</div>
+		<?php
+		}
+		?>
+		</div>
+		<?php
+	}
+	add_action('somnia_woocommerce_custom_attributes', 'somnia_woocommerce_custom_attributes', 10, 3);	
+}
+
