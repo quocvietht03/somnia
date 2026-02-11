@@ -485,7 +485,8 @@ body {
 
 .bt-recent-news-section {
     @media(min-width: 580px) and (max-width: $break-sm) {
-        > div.e-con-inner > div.elementor-element > div.elementor-element {
+        .bt-banner-block,
+        .bt-news-block {
             width: calc(50% - 10px);
         }
         .bt-post--meta {
