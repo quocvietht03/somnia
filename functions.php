@@ -217,6 +217,19 @@ if (!function_exists('somnia_enqueue_admin_scripts')) {
 				'ajaxUrl' => admin_url('admin-ajax.php'),
 			));
 		}
+
+		// Localize script for Mega Menu (in admin-main.js)
+		if ($screen && $screen->id === 'nav-menus') {
+			wp_localize_script('somnia-admin-main', 'somniaMegamenu', array(
+				'ajaxurl' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('somnia-megamenu-nonce'),
+				'i18n' => array(
+					'creating' => __('Creating...', 'somnia'),
+					'newBlock' => __('New Mega Menu Block', 'somnia'),
+					'errorCreating' => __('Error creating block', 'somnia'),
+				),
+			));
+		}
 	}
 	add_action('admin_enqueue_scripts', 'somnia_enqueue_admin_scripts');
 }
@@ -251,6 +264,9 @@ if (class_exists('Woocommerce')) {
 
 /* Product Extra Content */
 require_once get_template_directory() . '/framework/product-extra-content.php';
+
+/* Mega Menu */
+require_once get_template_directory() . '/framework/megamenu.php';
 
 /* Custom search posts */
 function bt_custom_search_filter($query)

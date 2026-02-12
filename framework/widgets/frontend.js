@@ -2344,6 +2344,7 @@
 					loopedSlides: 5,
 					watchSlidesVisibility: true,
 					watchSlidesProgress: true,
+					threshold: 5,
 					breakpoints: {
 						0: {
 							slidesPerView: 'vertical' == thumbDirection ? 'auto' : 4,
@@ -4119,6 +4120,41 @@
 		}
 	}
 
+	const MegaMenuHandler = function ($scope, $) {
+		const $megamenuDropdowns = $scope.find('.bt-megamenu-dropdown');
+
+		if ($megamenuDropdowns.length === 0) {
+			return;
+		}
+
+		// Set --fullwidth-mega, --left-mega-full (full width), --left-mega-center (fit content center)
+		function setMegaMenuDropdownVariables() {
+			var windowWidth = $(window).width();
+			$megamenuDropdowns.each(function () {
+				var $dropdown = $(this);
+				$dropdown.css('--fullwidth-mega', windowWidth + 'px');
+				var dropdownWidth = $dropdown.outerWidth();
+				var $container = $dropdown.closest('.bt-megamenu-wrapper');
+				var containerLeft = $container.length ? $container[0].getBoundingClientRect().left : 0;
+				if ($dropdown.hasClass('bt-megamenu-full-width')) {
+					var offsetParent = $dropdown[0].offsetParent;
+					var positioningContextLeft = offsetParent ? offsetParent.getBoundingClientRect().left : 0;
+					$dropdown.css('--left-mega-full', positioningContextLeft + 'px');
+				}
+				var leftCenter = (windowWidth - dropdownWidth) / 2 - containerLeft;
+				$dropdown.css('--left-mega-center', leftCenter + 'px');
+			});
+		}
+
+		setMegaMenuDropdownVariables();
+
+		var resizeTimeout;
+		$(window).on('resize', function () {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(setMegaMenuDropdownVariables, 100);
+		});
+	};
+
 	// Make sure you run this code under Elementor.
 	$(window).on('elementor/frontend/init', function () {
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-mobile-menu.default', SubmenuToggleHandler);
@@ -4165,6 +4201,7 @@
 
 
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-hotspot.default', AccordionHotspotHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-megamenu.default', MegaMenuHandler);
 	});
 
 })(jQuery);

@@ -431,9 +431,119 @@
 		});
 	}
 
+	// Mega Menu handlers
+	function somniaMegamenuHandlers() {
+		if (!$('.somnia-megamenu-fields').length) {
+			return;
+		}
+
+		// Update edit link visibility and URL when dropdown changes
+		function updateEditLink($select) {
+			var blockId = $select.val(),
+				$container = $select.closest('.somnia-megamenu-fields'),
+				$editLink = $container.find('.somnia-megamenu-edit-link'),
+				$metaSep = $container.find('.meta-sep'),
+				baseUrl = $editLink.data('base-edit-url');
+
+			if (blockId) {
+				$editLink.attr('href', baseUrl.replace('%id%', blockId)).show();
+				if ($metaSep.length === 0 && $editLink.length) {
+					$editLink.after('<span class="meta-sep"> | </span>');
+				}
+				$metaSep.show();
+			} else {
+				$editLink.hide();
+				$metaSep.hide();
+			}
+		}
+
+		// Update Content Horizontal Position field visibility based on Content Width
+		function updateHorizontalPositionVisibility($contentWidthSelect) {
+			var contentWidth = $contentWidthSelect.val(),
+				$container = $contentWidthSelect.closest('.somnia-megamenu-fields'),
+				$horizontalPositionField = $container.find('.somnia-megamenu-horizontal-position-field');
+
+			if (contentWidth === 'fit-to-content') {
+				$horizontalPositionField.show();
+			} else {
+				$horizontalPositionField.hide();
+			}
+		}
+
+		// Initialize edit link visibility on page load
+		$('.somnia-megamenu-block-select').each(function () {
+			updateEditLink($(this));
+		});
+
+		// Initialize Content Horizontal Position visibility on page load
+		$('.somnia-megamenu-content-width-select').each(function () {
+			updateHorizontalPositionVisibility($(this));
+		});
+
+		// Update when dropdown changes
+		$(document).on('change', '.somnia-megamenu-block-select', function () {
+			updateEditLink($(this));
+		});
+
+		// Update Content Horizontal Position visibility when Content Width changes
+		$(document).on('change', '.somnia-megamenu-content-width-select', function () {
+			updateHorizontalPositionVisibility($(this));
+		});
+
+		// Handle "Add megamenu block" click
+		$(document).on('click', '.somnia-megamenu-add-link', function (e) {
+			e.preventDefault();
+
+			var $link = $(this),
+				$container = $link.closest('.somnia-megamenu-fields'),
+				$select = $container.find('.somnia-megamenu-block-select'),
+				itemId = $link.data('item-id');
+
+			// Show loading state
+			var originalText = $link.text();
+			$link.text(somniaMegamenu.i18n.creating || 'Creating...').prop('disabled', true);
+
+			// AJAX request to create block
+			$.ajax({
+				url: somniaMegamenu.ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'somnia_create_megamenu_block',
+					nonce: somniaMegamenu.nonce,
+				},
+				success: function (response) {
+					if (response.success) {
+						// Add new option to dropdown
+						var option = $('<option>', {
+							value: response.data.block_id,
+							text: response.data.block_title || (somniaMegamenu.i18n.newBlock || 'New Mega Menu Block'),
+							selected: true
+						});
+						$select.append(option);
+
+						// Update edit link
+						updateEditLink($select);
+
+						// Open Elementor editor in new tab
+						window.open(response.data.edit_link, '_blank');
+					} else {
+						alert(response.data.message || (somniaMegamenu.i18n.errorCreating || 'Error creating block'));
+					}
+				},
+				error: function () {
+					alert(somniaMegamenu.i18n.errorCreating || 'Error creating block');
+				},
+				complete: function () {
+					$link.text(originalText).prop('disabled', false);
+				}
+			});
+		});
+	}
+
 	jQuery(document).ready(function ($) {
 		somniaExtraContentHandlers();
 		somniaAttributeTypesHandlers();
+		somniaMegamenuHandlers();
 		if (!$('#woocommerce-product-data').length) {
 			return;
 		}

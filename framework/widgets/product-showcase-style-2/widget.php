@@ -120,7 +120,8 @@ class Widget_ProductShowcaseStyle2 extends Widget_Base
 		}
 
 		$settings = $this->get_settings_for_display();
-
+	  
+		
 		$products = $settings['products'];
 
 		if (empty($products)) {
@@ -257,7 +258,7 @@ class Widget_ProductShowcaseStyle2 extends Widget_Base
 								</div>
 							</div>
 						</div>
-						<div class="summary entry-summary bt-product-showcase--item-content">
+						<div class="summary entry-summary bt-product-showcase--item-content woocommerce">
 							<div class="woocommerce-product-rating-sold">
 								<?php
 								do_action('somnia_woocommerce_shop_loop_item_label');
