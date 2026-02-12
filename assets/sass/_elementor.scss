@@ -16866,14 +16866,20 @@
       }
       &--price {
         @extend .__title_typo;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        column-gap: 8px;
         color: $color-primary;
+        @media (max-width: $break-lg) {
+          font-size: 14px;
+        }
         del {
           opacity: 1;
           text-decoration-line: line-through;
-          font-size: 16px;
-          font-style: normal;
+          font-size: 12px;
           font-weight: 400;
-          line-height: 26px;
           color: $color-secondary-2;
         }
         ins {

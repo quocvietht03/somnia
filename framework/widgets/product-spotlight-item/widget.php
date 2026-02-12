@@ -228,7 +228,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
 				'label' => __('Color', 'somnia'),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .woocommerce-loop-product__infor .woocommerce-loop-product__title' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-product-mini-item--title' => 'color: {{VALUE}};',
 				],
 			]
 		);
@@ -238,7 +238,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
 				'label' => __('Hover Color', 'somnia'),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .woocommerce-loop-product__infor .woocommerce-loop-product__title:hover' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-product-mini-item--title:hover' => 'color: {{VALUE}};',
 				],
 			]
 		);
@@ -246,7 +246,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'title_typography',
-				'selector' => '{{WRAPPER}} .woocommerce-loop-product__infor .woocommerce-loop-product__title',
+				'selector' => '{{WRAPPER}} .bt-product-mini-item--title',
 			]
 		);
 
@@ -267,9 +267,9 @@ class Widget_ProductSpotlightItem extends Widget_Base
 				'label' => __('Color', 'somnia'),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .bt-elwg-product-loop-item .woocommerce-loop-product__infor .price' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .bt-elwg-product-loop-item .woocommerce-loop-product__infor .price ins' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .bt-elwg-product-loop-item .woocommerce-loop-product__infor .price .woocommerce-Price-amount' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-product-mini-item--price' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-product-mini-item--price ins' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-product-mini-item--price .woocommerce-Price-amount' => 'color: {{VALUE}};',
 				],
 			]
 		);
@@ -277,7 +277,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'price_typography',
-				'selector' => '{{WRAPPER}} .bt-elwg-product-loop-item .woocommerce-loop-product__infor .price .woocommerce-Price-amount',
+				'selector' => '{{WRAPPER}} .bt-product-mini-item--price .woocommerce-Price-amount',
 			]
 		);
 		$this->add_control(
@@ -286,8 +286,8 @@ class Widget_ProductSpotlightItem extends Widget_Base
 				'label' => __('Sale Price Color', 'somnia'),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .bt-elwg-product-loop-item .woocommerce-loop-product__infor .price del' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .bt-elwg-product-loop-item .woocommerce-loop-product__infor .price del .woocommerce-Price-amount' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-product-mini-item--price del' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-product-mini-item--price del .woocommerce-Price-amount' => 'color: {{VALUE}};',
 				],
 				'separator' => 'before',
 			]
@@ -297,7 +297,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
 			[
 				'name' => 'price_sale_typography',
 				'label' => __('Sale Price Typography', 'somnia'),
-				'selector' => '{{WRAPPER}} .bt-elwg-product-loop-item .woocommerce-loop-product__infor .price del .woocommerce-Price-amount',
+				'selector' => '{{WRAPPER}} .bt-product-mini-item--price del .woocommerce-Price-amount',
 			]
 		);
 
