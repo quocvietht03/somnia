@@ -34,12 +34,8 @@
       gap: 12px;
     }
     &--publish {
+      @extend .__caption_2_typo;
       color: $color-text;
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 1.3;
-      letter-spacing: 0.96px;
-      text-transform: uppercase;
       padding-right: 12px;
       position: relative;
       &::before {
@@ -48,28 +44,34 @@
         transform: translateY(-50%);
         width: 1px;
         height: 12px;
-        background: #e9e9e9;
+        background: $color-line;
         right: 0;
         content: "";
       }
     }
     &--category {
+      @extend .__caption_2_typo;
       color: $color-text;
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 16px; /* 133.333% */
-      letter-spacing: 0.96px;
-      text-transform: uppercase;
+      a {
+        color: inherit;
+        &:hover {
+          color: $color-primary
+        }
+      }
     }
     &--title {
-      margin: 4px 0 0 0;
+      @extend .__heading_5_typo;
       color: $color-primary;
-      font-family: $secondary-font;
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 24px;
+      margin: 4px 0 0 0;
+      a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-color: transparent;
+        &:hover {
+          text-decoration-color: inherit;
+        }
+      }
     }
     @media(max-width: $break-tl) {
       gap: 20px;

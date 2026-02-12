@@ -67,6 +67,38 @@ class Widget_PostLoopItem extends Widget_Base {
 			]
 		);
 		$this->add_control(
+            'enable_title_limit',
+            [
+                'label' => esc_html__( 'Enable Title Limit', 'somnia' ),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'title_line_limit',
+            [
+                'label' => esc_html__( 'Title Limit Lines', 'somnia' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 10,
+                    ],
+                ],
+                'default' => [
+                    'size' => 2,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-post--title' => '-webkit-line-clamp: {{SIZE}};display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;',
+                ],
+                'condition' => [
+                    'enable_title_limit' => 'yes'
+				],
+            ]
+        );
+
+		$this->add_control(
 			'show_excerpt',
 			[
 				'label' => esc_html__('Show Excerpt', 'somnia'),
@@ -76,6 +108,43 @@ class Widget_PostLoopItem extends Widget_Base {
 				'default' => 'yes',
 			]
 		);
+
+		$this->add_control(
+            'enable_excerpt_limit',
+            [
+                'label' => esc_html__( 'Enable Excerpt Limit', 'somnia' ),
+                'type' => Controls_Manager::SWITCHER,
+                'default' => 'yes',
+				'condition' => [
+                    'show_excerpt' => 'yes'
+				],
+            ]
+        );
+
+        $this->add_control(
+            'excerpt_line_limit',
+            [
+                'label' => esc_html__( 'Excerpt Limit Lines', 'somnia' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 10,
+                    ],
+                ],
+                'default' => [
+                    'size' => 2,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-post--excerpt' => '-webkit-line-clamp: {{SIZE}};display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;',
+                ],
+                'condition' => [
+					'show_excerpt' => 'yes',
+                    'enable_excerpt_limit' => 'yes'
+				],
+            ]
+        );
+
 		$this->add_control(
 			'show_read_more',
 			[
@@ -164,13 +233,26 @@ class Widget_PostLoopItem extends Widget_Base {
 			]
 		);
 
-		// Post Date
 		$this->add_control(
-			'post_date_heading',
+			'date_style',
 			[
-				'label' => esc_html__('Date', 'somnia'),
+				'label' => __('Date', 'somnia'),
 				'type' => Controls_Manager::HEADING,
-				'separator' => 'before',
+				'condition' => [
+					'show_date' => 'yes',
+				],
+			]
+		);
+
+		$this->add_control(
+			'date_color',
+			[
+				'label' => __('Color', 'somnia'),
+				'type' => Controls_Manager::COLOR,
+				'default' => '',
+				'selectors' => [
+					'{{WRAPPER}} .bt-post--publish' => 'color: {{VALUE}};',
+				],
 			]
 		);
 
@@ -178,47 +260,59 @@ class Widget_PostLoopItem extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'date_typography',
-				'label' => esc_html__('Typography', 'somnia'),
+				'label' => __('Typography', 'somnia'),
 				'selector' => '{{WRAPPER}} .bt-post--publish',
 			]
 		);
 
 		$this->add_control(
-			'date_color',
+			'category_style',
 			[
-				'label' => esc_html__('Color', 'somnia'),
+				'label' => __('Category', 'somnia'),
+				'type' => Controls_Manager::HEADING,
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_control(
+			'category_color',
+			[
+				'label' => __('Color', 'somnia'),
 				'type' => Controls_Manager::COLOR,
+				'default' => '',
 				'selectors' => [
-					'{{WRAPPER}} .bt-post--publish' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .bt-post--category a' => 'color: {{VALUE}};',
 				],
 			]
 		);
 
-		// Post Title
 		$this->add_control(
-			'post_title_heading',
+			'category_color_hover',
 			[
-				'label' => esc_html__('Title', 'somnia'),
-				'type' => Controls_Manager::HEADING,
-				'separator' => 'before',
+				'label' => __('Color Hover', 'somnia'),
+				'type' => Controls_Manager::COLOR,
+				'default' => '',
+				'selectors' => [
+					'{{WRAPPER}} .bt-post--category a:hover' => 'color: {{VALUE}};',
+				],
 			]
 		);
 
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			[
-				'name' => 'title_typography',
-				'label' => esc_html__('Typography', 'somnia'),
-				'selector' => '{{WRAPPER}} .bt-post--title a',
+				'name' => 'category_typography',
+				'label' => __('Typography', 'somnia'),
+				'selector' => '{{WRAPPER}} .bt-post--category a',
 			]
 		);
 
-		$this->start_controls_tabs('title_color_tabs');
-
-		$this->start_controls_tab(
-			'title_color_normal',
+		$this->add_control(
+			'post_title_heading',
 			[
-				'label' => esc_html__('Normal', 'somnia'),
+				'label' => esc_html__('Title', 'somnia'),
+				'type' => Controls_Manager::HEADING,
+				'separator' => 'before',
 			]
 		);
 
@@ -232,16 +326,7 @@ class Widget_PostLoopItem extends Widget_Base {
 				],
 			]
 		);
-
-		$this->end_controls_tab();
-
-		$this->start_controls_tab(
-			'title_color_hover',
-			[
-				'label' => esc_html__('Hover', 'somnia'),
-			]
-		);
-
+		
 		$this->add_control(
 			'title_hover_color',
 			[
@@ -253,9 +338,14 @@ class Widget_PostLoopItem extends Widget_Base {
 			]
 		);
 
-		$this->end_controls_tab();
-
-		$this->end_controls_tabs();
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name' => 'title_typography',
+				'label' => esc_html__('Typography', 'somnia'),
+				'selector' => '{{WRAPPER}} .bt-post--title a',
+			]
+		);
 
 		// Post Excerpt
 		$this->add_control(
