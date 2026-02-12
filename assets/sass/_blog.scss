@@ -189,6 +189,7 @@
 
     &--featured {
       .bt-cover-image {
+        border-radius: 8px;
         img {
           transform: scale(1, 1) translateZ(0);
           transition: all 2s cubic-bezier(0, 0, 0.44, 1.18);
@@ -201,73 +202,64 @@
         padding-top: 14px;
       }
     }
-    &--publish {
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 22px; /* 157.143% */
-      text-transform: uppercase;
-      color: $color-secondary;
-      letter-spacing: 0.8px;
+    &--meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    &--title {
-      margin: 0;
-      line-height: 1;
-      word-break: break-word;
-      margin: 12px 0 0 0;
-      @extend .__bt-max-line-ellipsis;
+    &--publish {
+      @extend .__caption_2_typo;
+      color: $color-text;
+      padding-right: 12px;
+      position: relative;
+      &::before {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 12px;
+        background: $color-line;
+        right: 0;
+        content: "";
+      }
+    }
+    &--category {
+      @extend .__caption_2_typo;
+      color: $color-text;
       a {
-        color: $color-primary;
-        font-size: 24px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 1.25;
-        display: inline;
-        background-repeat: no-repeat;
-        background-position-y: 0px;
-        background-image: linear-gradient(transparent calc(100% - 1px), currentColor 1px);
-        transition: 0.45s cubic-bezier(0.215, 0.61, 0.355, 1);
-        background-size: 0 100%;
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
+        color: inherit;
         &:hover {
-          background-size: 100% 100%;
-          transition-delay: 0.2s;
+          color: $color-primary
         }
       }
-      @media (max-width: $break-xs) {
-        a {
-          font-size: 20px;
-          line-height: 30px;
-          display: block;
-          background: transparent;
+    }
+    &--title {
+      @extend .__heading_5_typo;
+      color: $color-primary;
+      margin: 12px 0 0 0;
+      a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-color: transparent;
+        &:hover {
+          text-decoration-color: inherit;
         }
       }
     }
     &--excerpt {
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 26px;
+      @extend .__body_typo;
       color: $color-text;
       margin: 8px 0 0 0;
-      @extend .__bt-max-line-ellipsis;
     }
     &--button {
       a {
-        margin: 24px 0 0 0;
+        @extend .__button_typo;
         color: $color-primary;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 22px;
-        text-transform: uppercase;
-        text-decoration: underline;
-        text-underline-offset: 5px;
-        text-decoration-thickness: 2px;
+        margin: 24px 0 0 0;
         display: block;
         @media (max-width: $break-xs) {
-          margin: 18px 0 0 0;
+          margin: 16px 0 0 0;
         }
       }
     }

@@ -2165,6 +2165,32 @@
 		}
 	};
 
+	const VideoAutoPlayHoverHandler = function ($scope) {
+		const $item = $scope.find('.bt-video-hover-enabled');
+		const $video = $scope.find('.bt-hover-video');
+		const $coverImage = $scope.find('.bt-cover-image img');
+
+		if ($video.length) {
+			$item.on('mouseenter', function () {
+				$coverImage.css('opacity', '0');
+				$video[0].play();
+			});
+
+			$item.on('mouseleave', function () {
+				$coverImage.css('opacity', '1');
+				$video[0].pause();
+			});
+
+			$item.on('click', function () {
+				if ($video[0].paused) {
+					$video[0].play();
+				} else {
+					$video[0].pause();
+				}
+			});
+		}
+	};
+
 	const BannerProductSliderHandler = function ($scope) {
 		const $bannerProductSlider = $scope.find('.bt-elwg-banner-product-slider');
 
@@ -4247,6 +4273,7 @@
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-search-product-style-1.default', SearchProductStyle1Handler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-heading-animation.default', headingAnimationHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-instagram-posts.default', InstagramPostsHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-spotlight-item.default', VideoAutoPlayHoverHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-banner-product-slider.default', BannerProductSliderHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-offers-slider.default', OffersSliderHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-tooltip-hotspot.default', ProductTooltipHotspotHandler);

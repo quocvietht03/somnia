@@ -69,7 +69,7 @@ $transition: all 0.25s ease-in-out;
     font-weight: 500;
     line-height: 125%;
 }
-.__heading_5 {
+.__heading_5_typo {
     font-family: $primary-font;
     font-size: 24px;
     font-weight: 500;
@@ -129,7 +129,7 @@ $transition: all 0.25s ease-in-out;
     font-family: $primary-font;
     font-size: 14px;
     font-weight: 500;
-    line-height: 24px;
+    line-height: 22px;
 }
 
 @media(max-width: $break-tl) {
@@ -159,9 +159,11 @@ $transition: all 0.25s ease-in-out;
     }
     .__button_typo {
         font-size: 15px;
+        line-height: 24px;
     }
     .__button_small_typo {
         font-size: 13px;
+        line-height: 20px;
     }
 }
 
@@ -201,8 +203,10 @@ $transition: all 0.25s ease-in-out;
     }
     .__button_typo {
         font-size: 14px;
+        line-height: 22px;
     }
     .__button_small_typo {
         font-size: 12px;
+        line-height: 18px;
     }
 }
