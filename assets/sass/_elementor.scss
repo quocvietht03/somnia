@@ -339,8 +339,14 @@
 
 // BT MegaMenu Widget
 .bt-elwg-megamenu--default {
+  position: relative;
+
   .bt-megamenu-wrapper {
     position: relative;
+  }
+
+  @media (max-width: 1024px) {
+    overflow: visible;
   }
 
   .bt-megamenu {
@@ -353,9 +359,31 @@
     justify-content: center;
     > li {
       position: relative;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       vertical-align: middle;
 
+      .bt-submenu-indicator {
+        display: inline-flex;
+        margin-left: 6px;
+        flex-shrink: 0;
+        color: $color-primary;
+        fill: $color-primary;
+        svg {
+          width: 12px;
+          position: relative;
+          top: 2px;
+          transition: 0.3s ease;
+        }
+      }
+
+      &:hover {
+        .bt-submenu-indicator {
+          svg {
+            transform: rotate(-180deg);
+          }
+        }
+      }
       > a {
         display: block;
         text-decoration: none;
@@ -383,7 +411,6 @@
         }
         > a {
           position: relative;
-        
         }
 
         .bt-megamenu-dropdown {
@@ -401,17 +428,15 @@
           .elementor {
             width: 100%;
             background: #fff;
-            box-shadow: 0 10px 33px rgba(0, 0, 0, 0.08);
+
             border-radius: 0 0 8px 8px;
           }
 
-          // Content Width: Full Width (default)
           &.bt-megamenu-full-width {
             width: var(--fullwidth-mega);
             left: calc(-1 * var(--left-mega-full));
           }
 
-          // Content Width: Fit to Content
           &.bt-megamenu-fit-to-content {
             width: auto;
             min-width: 300px;
@@ -420,18 +445,15 @@
               margin: 0 auto;
             }
 
-            // Horizontal Position: Left
             &.bt-megamenu-horizontal-left {
               left: 0;
               right: auto;
             }
 
-            // Horizontal Position: Center
             &.bt-megamenu-horizontal-center {
               left: var(--left-mega-center);
             }
 
-            // Horizontal Position: Right
             &.bt-megamenu-horizontal-right {
               left: auto;
               right: 0;
@@ -454,7 +476,7 @@
         left: 0;
         min-width: 200px;
         background-color: #fff;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 33px rgba(0, 0, 0, 0.08);
         z-index: 998;
         opacity: 0;
         visibility: hidden;
@@ -484,7 +506,7 @@
             }
           }
 
-          &.current-menu-item > a { 
+          &.current-menu-item > a {
             color: $color-accent;
           }
         }
@@ -503,18 +525,218 @@
         transform: translateY(0);
       }
     }
+    .menu-item span,
+    .elementor-heading-title,
+    .elementor-image-box-title a,
+    .elementor-icon-list-text {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+    }
+    .elementor-widget-image-box {
+      position: relative;
+      .elementor-image-box-img a:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+    }
+    sup {
+      font-weight: 600;
+      line-height: 1;
+      text-transform: uppercase;
+      color: #fff;
+      background: $color-accent;
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 3px 5px;
+      transform: translate(50%, -100%);
+      &:before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        inset-inline-start: 10px;
+        border: 4px solid $color-accent;
+        border-bottom-color: transparent !important;
+        border-inline-end-color: transparent !important;
+        border-inline-end-width: 7px;
+        border-inline-start-width: 0;
+      }
+      &.red {
+        background: $color-red;
+        &:before {
+          border-color: $color-red;
+        }
+      }
+      &.orange {
+        background: $color-orange;
+        &:before {
+          border-color: $color-orange;
+        }
+      }
+      &.green {
+        background: $color-green;
+        &:before {
+          border-color: $color-green;
+        }
+      }
+    }
   }
 
-  // Mobile/Tablet responsive
-  @media (max-width: 991px) {
+  // Icon bar toggle button
+  .bt-megamenu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+    transition: all 0.3s ease;
+
+    .bt-toggle-bar {
+      width: 100%;
+      height: 3px;
+      background-color: $color-primary;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+      transform-origin: center;
+    }
+
+    &.bt-is-active {
+      .bt-toggle-bar {
+        &:nth-child(1) {
+          transform: rotate(45deg) translate(7px, 5px);
+        }
+        &:nth-child(2) {
+          opacity: 0;
+        }
+        &:nth-child(3) {
+          transform: rotate(-45deg) translate(9px, -8px);
+        }
+      }
+    }
+  }
+
+  // Mobile/Tablet responsive (1024px and below)
+  @media (max-width: 1024px) {
+    .bt-megamenu-toggle {
+      display: flex;
+      
+      &.bt-toggle-align-left {
+        margin-left: 0;
+        margin-right: auto;
+      }
+      
+      &.bt-toggle-align-center {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      &.bt-toggle-align-right {
+        margin-left: auto;
+        margin-right: 0;
+      }
+    }
+
+    .bt-megamenu-wrapper {
+      position: fixed;
+      top: calc(var(--top-mega-mobile, 0px) + var(--distance, 0px));
+      left: 0;
+      width: var(--fullwidth-mega, 100vw);
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-height: 75vh;
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+      &.bt-is-active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+    }
+
     .bt-megamenu {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: stretch;
+      width: 100%;
 
       > li {
         width: 100%;
         display: block;
+        position: relative !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
+        > a {
+          width: 100%;
+          padding: 15px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        // Toggle icon for items with children
+        .bt-toggle-icon {
+          position: absolute;
+          right: 20px;
+          top: 15px;
+          bottom: 0;
+          width: 30px;
+          height: 30px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          z-index: 1;
+
+          &::before,
+          &::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 2px;
+            background-color: $color-primary;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform-origin: center;
+          }
+
+          &::before {
+            transform: rotate(90deg);
+            opacity: 1;
+          }
+
+          &::after {
+            transform: rotate(0deg);
+            opacity: 1;
+          }
+        }
+
+        &.bt-is-active {
+          .bt-toggle-icon {
+            &::before {
+              transform: rotate(0deg);
+              opacity: 0;
+            }
+            &::after {
+              transform: rotate(0deg);
+            }
+          }
+        }
+
+        // Hide megamenu dropdown on mobile (will be shown via accordion)
         &.menu-item-has-megamenu {
           .bt-megamenu-dropdown {
             position: static;
@@ -522,26 +744,111 @@
             visibility: visible;
             transform: none;
             box-shadow: none;
-            padding: 15px 0;
-            margin-top: 10px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: none;
+            .elementor{
+              width: 100% !important;
+              > .elementor-element{
+                box-shadow: none !important;
+              }
+            }
           }
         }
 
+        // Sub-menu styling
         .sub-menu {
           position: static;
           opacity: 1;
           visibility: visible;
           transform: none;
           box-shadow: none;
-          padding-left: 20px;
-          margin-top: 5px;
+          padding: 0;
+          margin: 0;
+          display: none;
+          background-color: rgba(0, 0, 0, 0.02);
+          transition: none;
+          li {
+            // Nested sub-menu
+            .sub-menu {
+              background-color: rgba(0, 0, 0, 0.03);
+              padding-left: 20px;
+              li a {
+                padding-left: 60px;
+              }
+            }
+          }
+        }
+
+        // Hide submenu indicator on mobile (using toggle icon instead)
+        .bt-submenu-indicator {
+          display: none;
         }
       }
     }
   }
 }
-
+.megamenu_block-template{
+  .menu-item span,
+  .elementor-heading-title,
+  .elementor-image-box-title a,
+  .elementor-icon-list-text {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+  }
+  .elementor-widget-image-box {
+    position: relative;
+    .elementor-image-box-img a:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  }
+  sup {
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #fff;
+    background: $color-accent;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 3px 5px;
+    transform: translate(50%, -100%);
+    &:before {
+      content: "";
+      position: absolute;
+      top: 100%;
+      inset-inline-start: 10px;
+      border: 4px solid $color-accent;
+      border-bottom-color: transparent !important;
+      border-inline-end-color: transparent !important;
+      border-inline-end-width: 7px;
+      border-inline-start-width: 0;
+    }
+    &.red {
+      background: $color-red;
+      &:before {
+        border-color: $color-red;
+      }
+    }
+    &.orange {
+      background: $color-orange;
+      &:before {
+        border-color: $color-orange;
+      }
+    }
+    &.green {
+      background: $color-green;
+      &:before {
+        border-color: $color-green;
+      }
+    }
+  }
+}
 .bt-elwg-site-infor {
   display: flex;
   flex-wrap: wrap;

@@ -4,7 +4,10 @@ namespace SomniaElementorWidgets\Widgets\MegaMenu;
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
+use Elementor\Icons_Manager;
 
 class Widget_MegaMenu extends Widget_Base
 {
@@ -89,7 +92,112 @@ class Widget_MegaMenu extends Widget_Base
 				]
 			);
 		}
+		$this->add_control(
+			'menu_alignment',
+			[
+				'label' => esc_html__( 'Alignment', 'somnia' ),
+				'type' => Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'somnia' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'somnia' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'somnia' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'center',
+				'selectors' => [
+					'{{WRAPPER}} .bt-megamenu' => 'justify-content: {{VALUE}};',
+				],
+				'selectors_dictionary' => [
+					'left' => 'flex-start',
+					'center' => 'center',
+					'right' => 'flex-end',
+				],
+			]
+		);
 
+		$this->add_control(
+			'submenu_indicator_separator',
+			[
+				'type' => Controls_Manager::DIVIDER,
+			]
+		);
+		$this->add_control(
+			'submenu_indicator',
+			[
+				'label'   => esc_html__( 'Submenu Indicator', 'somnia' ),
+				'type'    => Controls_Manager::ICONS,
+				'default' => [
+					'value'   => 'fas fa-chevron-down',
+					'library' => 'fa-solid',
+				],
+			]
+		);
+		$this->add_control(
+			'submenu_indicator_color',
+			[
+				'label'     => esc_html__( 'Submenu Indicator Color', 'somnia' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .bt-megamenu .bt-submenu-indicator' => 'color: {{VALUE}}; fill: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'submenu_indicator_size',
+			[
+				'label'      => esc_html__( 'Submenu Indicator Size', 'somnia' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem' ],
+				'range'      => [
+					'px'  => [ 'min' => 8, 'max' => 48 ],
+					'em'  => [ 'min' => 0.5, 'max' => 3 ],
+					'rem' => [ 'min' => 0.5, 'max' => 3 ],
+				],
+				'selectors'  => [
+					'{{WRAPPER}} .bt-megamenu .bt-submenu-indicator svg' => 'width: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'toggle_menu_alignment',
+			[
+				'label' => esc_html__( 'Toggle Menu Alignment', 'somnia' ),
+				'type' => Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'somnia' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'somnia' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'somnia' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'right',
+				'selectors' => [
+					'{{WRAPPER}} .bt-megamenu-toggle' => 'margin-left: {{VALUE}}; margin-right: {{VALUE}};',
+				],
+				'selectors_dictionary' => [
+					'left' => '0; margin-right: auto;',
+					'center' => 'auto;',
+					'right' => '0; margin-left: auto;',
+				],
+			]
+		);
 		$this->end_controls_section();
 	}
 
@@ -185,7 +293,7 @@ class Widget_MegaMenu extends Widget_Base
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'padding_vertical_main_menu_item',
 			[
 				'label' => esc_html__( 'Vertical Padding', 'somnia' ),
@@ -204,11 +312,12 @@ class Widget_MegaMenu extends Widget_Base
 				],
 				'selectors' => [
 					'{{WRAPPER}} .bt-megamenu > li > a' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .bt-megamenu > li > .bt-toggle-icon' => 'top: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'padding_horizontal_main_menu_item',
 			[
 				'label' => esc_html__( 'Horizontal Padding', 'somnia' ),
@@ -227,6 +336,37 @@ class Widget_MegaMenu extends Widget_Base
 				],
 				'selectors' => [
 					'{{WRAPPER}} .bt-megamenu > li > a' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}}',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'main_menu_dropdown_distance',
+			[
+				'label' => esc_html__( 'Distance from content', 'somnia' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'range' => [
+					'px' => [
+						'min' => 0,
+						'max' => 80,
+					],
+					'em' => [
+						'min' => 0,
+						'max' => 5,
+					],
+					'rem' => [
+						'min' => 0,
+						'max' => 5,
+					],
+				],
+				'default' => [
+					'size' => 0,
+					'unit' => 'px',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .bt-megamenu > li.menu-item-has-megamenu .bt-megamenu-dropdown' => 'padding-top: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .bt-megamenu-wrapper' => '--distance: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -262,6 +402,18 @@ class Widget_MegaMenu extends Widget_Base
 			]
 		);
 
+		$this->add_control(
+			'background_sub_menu_item',
+			[
+				'label' => esc_html__( 'Background', 'somnia' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '',
+				'selectors' => [
+					'{{WRAPPER}} .sub-menu > li > a' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
 		$this->end_controls_tab();
 
 		$this->start_controls_tab(
@@ -279,6 +431,19 @@ class Widget_MegaMenu extends Widget_Base
 				'selectors' => [
 					'{{WRAPPER}} .sub-menu > li > a:hover,
 					{{WRAPPER}} .sub-menu > li > a:focus' => 'color: {{VALUE}}; fill: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'background_sub_menu_item_hover',
+			[
+				'label' => esc_html__( 'Background', 'somnia' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '',
+				'selectors' => [
+					'{{WRAPPER}} .sub-menu > li > a:hover,
+					{{WRAPPER}} .sub-menu > li > a:focus' => 'background-color: {{VALUE}};',
 				],
 			]
 		);
@@ -304,6 +469,18 @@ class Widget_MegaMenu extends Widget_Base
 			]
 		);
 
+		$this->add_control(
+			'background_sub_menu_item_active',
+			[
+				'label' => esc_html__( 'Background', 'somnia' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '',
+				'selectors' => [
+					'{{WRAPPER}} .sub-menu > li.current-menu-item > a' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
 		$this->end_controls_tab();
 
 		$this->end_controls_tabs();
@@ -323,7 +500,7 @@ class Widget_MegaMenu extends Widget_Base
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'padding_vertical_sub_menu_item',
 			[
 				'label' => esc_html__( 'Vertical Padding', 'somnia' ),
@@ -345,6 +522,105 @@ class Widget_MegaMenu extends Widget_Base
 				],
 			]
 		);
+		$this->add_responsive_control(
+			'padding_horizontal_sub_menu_item',
+			[
+				'label' => esc_html__( 'Horizontal Padding', 'somnia' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 50,
+					],
+					'em' => [
+						'max' => 5,
+					],
+					'rem' => [
+						'max' => 5,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .sub-menu > li > a' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			[
+				'name' => 'sub_menu_item_border',
+				'label' => esc_html__( 'Border', 'somnia' ),
+				'selector' => '{{WRAPPER}} .sub-menu > li > a',
+			]
+		);
+
+		$this->add_responsive_control(
+			'sub_menu_item_border_radius',
+			[
+				'label' => esc_html__( 'Border Radius', 'somnia' ),
+				'type' => Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', 'rem', '%', 'custom' ],
+				'selectors' => [
+					'{{WRAPPER}} .sub-menu > li > a' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'sub_menu_box_separator',
+			[
+				'type' => Controls_Manager::DIVIDER,
+			]
+		);
+
+		$this->add_control(
+			'sub_menu_box_heading',
+			[
+				'label' => esc_html__( 'Sub Menu Box', 'somnia' ),
+				'type' => Controls_Manager::HEADING,
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			[
+				'name' => 'sub_menu_box_shadow',
+				'selector' => '{{WRAPPER}} .bt-megamenu .sub-menu',
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			[
+				'name' => 'sub_menu_box_border',
+				'label' => esc_html__( 'Border', 'somnia' ),
+				'selector' => '{{WRAPPER}} .bt-megamenu .sub-menu',
+			]
+		);
+
+		$this->add_responsive_control(
+			'sub_menu_box_border_radius',
+			[
+				'label' => esc_html__( 'Border Radius', 'somnia' ),
+				'type' => Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', 'rem', '%', 'custom' ],
+				'selectors' => [
+					'{{WRAPPER}} .bt-megamenu .sub-menu' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'sub_menu_box_padding',
+			[
+				'label' => esc_html__( 'Padding', 'somnia' ),
+				'type' => Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', 'rem', '%', 'custom' ],
+				'selectors' => [
+					'{{WRAPPER}} .bt-megamenu .sub-menu' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
 
 		$this->end_controls_section();
 
@@ -362,20 +638,28 @@ class Widget_MegaMenu extends Widget_Base
 				'label' => esc_html__( 'Background Color', 'somnia' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .bt-megamenu-dropdown' => 'background-color: {{VALUE}}',
+					'{{WRAPPER}} .bt-megamenu-dropdown .elementor' => 'background-color: {{VALUE}} !important',
 				],
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'megamenu_padding',
 			[
 				'label' => esc_html__( 'Padding', 'somnia' ),
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', 'em', 'rem', '%', 'custom' ],
 				'selectors' => [
-					'{{WRAPPER}} .bt-megamenu-dropdown' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .bt-megamenu-dropdown .elementor' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				],
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			[
+				'name' => 'megamenu_box_shadow',
+				'selector' => '{{WRAPPER}} .bt-megamenu-dropdown .elementor',
 			]
 		);
 
@@ -391,12 +675,19 @@ class Widget_MegaMenu extends Widget_Base
 	/**
 	 * Create custom Walker class for mega menu
 	 *
+	 * @param array $settings Widget settings.
 	 * @return \Walker_Nav_Menu Custom walker instance
 	 */
-	private function create_megamenu_walker() {
-		// Custom walker to support mega menu
-		return new class extends \Walker_Nav_Menu {
-			private $parent_items = array(); // Track parent items by depth
+	private function create_megamenu_walker( $settings = array() ) {
+		$submenu_indicator = isset( $settings['submenu_indicator'] ) && ! empty( $settings['submenu_indicator']['value'] ) ? $settings['submenu_indicator'] : null;
+
+		return new class( $submenu_indicator ) extends \Walker_Nav_Menu {
+			private $parent_items = array();
+			private $submenu_indicator = null;
+
+			public function __construct( $submenu_indicator = null ) {
+				$this->submenu_indicator = $submenu_indicator;
+			}
 
 			public function start_lvl( &$output, $depth = 0, $args = null ) {
 				// Check if parent item (at depth - 1) has mega menu enabled
@@ -533,16 +824,28 @@ class Widget_MegaMenu extends Widget_Base
 				$title = apply_filters( 'the_title', $item->title, $item->ID );
 				$title = apply_filters( 'nav_menu_item_title', $title, $item, $args, $depth );
 
+				$show_indicator = $this->submenu_indicator && (
+					( $depth === 0 && $megamenu_enabled === '1' && $megamenu_block_id ) ||
+					in_array( 'menu-item-has-children', $classes, true )
+				);
+				$indicator_html = '';
+				if ( $show_indicator ) {
+					$icon_html = Icons_Manager::try_get_icon_html( $this->submenu_indicator, [ 'aria-hidden' => 'true' ] );
+					if ( $icon_html ) {
+						$indicator_html = '<span class="bt-submenu-indicator">' . $icon_html . '</span>';
+					}
+				}
+
 				$item_output = isset( $args->before ) ? $args->before : '';
 				$item_output .= '<a' . $attributes . '>';
 				$item_output .= ( isset( $args->link_before ) ? $args->link_before : '' ) . $title . ( isset( $args->link_after ) ? $args->link_after : '' );
+				$item_output .= $indicator_html;
 				$item_output .= '</a>';
 
 				// Add mega menu dropdown ONLY if enabled AND has valid block (depth 0 only)
 				if ( $depth === 0 && $megamenu_enabled === '1' && $megamenu_block_id ) {
 					$content_width_class = 'bt-megamenu-' . esc_attr( $megamenu_content_width );
 					$horizontal_position_class = '';
-					// Only add horizontal position class if content width is fit-to-content
 					if ( $megamenu_content_width === 'fit-to-content' && in_array( $megamenu_horizontal_position, array( 'left', 'center', 'right' ), true ) ) {
 						$horizontal_position_class = 'bt-megamenu-horizontal-' . esc_attr( $megamenu_horizontal_position );
 					}
@@ -588,25 +891,33 @@ class Widget_MegaMenu extends Widget_Base
 		}
 
 		$settings = $this->get_active_settings();
-		$walker = $this->create_megamenu_walker();
+		$walker = $this->create_megamenu_walker( $settings );
 		
+		$toggle_alignment = isset( $settings['toggle_menu_alignment'] ) ? $settings['toggle_menu_alignment'] : 'right';
 		?>
 			<div class="bt-elwg-megamenu--default">
-				<?php
-					wp_nav_menu(
-						array(
-							'menu' 				=> $settings['menu'],
-							'container_class' 	=> 'bt-megamenu-wrapper',
-							'menu_class' 		=> 'bt-megamenu',
-							'items_wrap'      	=> '<ul id="%1$s" class="%2$s">%3$s</ul>',
-							'fallback_cb'     	=> false,
-							'theme_location' 	=> '',
-							'walker'			=> $walker,
-							'link_before'		=> '<span>',
-							'link_after'		=> '</span>',
-						)
-					);
-				?>
+				<button class="bt-megamenu-toggle bt-toggle-align-<?php echo esc_attr( $toggle_alignment ); ?>" aria-label="<?php esc_attr_e('Toggle Menu', 'somnia'); ?>" aria-expanded="false">
+					<span class="bt-toggle-bar"></span>
+					<span class="bt-toggle-bar"></span>
+					<span class="bt-toggle-bar"></span>
+				</button>
+				<div class="bt-megamenu-wrapper">
+					<?php
+						wp_nav_menu(
+							array(
+								'menu' 				=> $settings['menu'],
+								'container_class' 	=> 'bt-megamenu-container',
+								'menu_class' 		=> 'bt-megamenu',
+								'items_wrap'      	=> '<ul id="%1$s" class="%2$s">%3$s</ul>',
+								'fallback_cb'     	=> false,
+								'theme_location' 	=> '',
+								'walker'			=> $walker,
+								'link_before'		=> '<span>',
+								'link_after'		=> '</span>',
+							)
+						);
+					?>
+				</div>
 			</div>
 		<?php
 	}

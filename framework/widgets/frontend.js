@@ -4121,37 +4121,120 @@
 	}
 
 	const MegaMenuHandler = function ($scope, $) {
+		const $megamenuWrapper = $scope.find('.bt-elwg-megamenu--default');
+		const $megamenuToggle = $megamenuWrapper.find('.bt-megamenu-toggle');
+		const $megamenuContainer = $megamenuWrapper.find('.bt-megamenu-wrapper');
+		const $megamenu = $megamenuWrapper.find('.bt-megamenu');
 		const $megamenuDropdowns = $scope.find('.bt-megamenu-dropdown');
 
-		if ($megamenuDropdowns.length === 0) {
-			return;
+		// Set menu wrapper position below toggle button
+		function setMenuWrapperPosition() {
+			if ($(window).width() <= 1024 && $megamenuToggle.length && $megamenuContainer.length) {
+				var toggleRect = $megamenuToggle[0].getBoundingClientRect();
+				$megamenuContainer.css('--top-mega-mobile', toggleRect.bottom + 'px');
+			}
 		}
 
-		// Set --fullwidth-mega, --left-mega-full (full width), --left-mega-center (fit content center)
-		function setMegaMenuDropdownVariables() {
-			var windowWidth = $(window).width();
-			$megamenuDropdowns.each(function () {
-				var $dropdown = $(this);
-				$dropdown.css('--fullwidth-mega', windowWidth + 'px');
-				var dropdownWidth = $dropdown.outerWidth();
-				var $container = $dropdown.closest('.bt-megamenu-wrapper');
-				var containerLeft = $container.length ? $container[0].getBoundingClientRect().left : 0;
-				if ($dropdown.hasClass('bt-megamenu-full-width')) {
-					var offsetParent = $dropdown[0].offsetParent;
-					var positioningContextLeft = offsetParent ? offsetParent.getBoundingClientRect().left : 0;
-					$dropdown.css('--left-mega-full', positioningContextLeft + 'px');
-				}
-				var leftCenter = (windowWidth - dropdownWidth) / 2 - containerLeft;
-				$dropdown.css('--left-mega-center', leftCenter + 'px');
+		// Icon bar toggle handler
+		if ($megamenuToggle.length) {
+			$megamenuToggle.on('click', function (e) {
+				e.preventDefault();
+				var $toggle = $(this);
+				var isExpanded = $toggle.attr('aria-expanded') === 'true';
+				
+				setMenuWrapperPosition();
+				$toggle.attr('aria-expanded', !isExpanded);
+				$toggle.toggleClass('bt-is-active', !isExpanded);
+				$megamenuContainer.toggleClass('bt-is-active', !isExpanded);
 			});
 		}
 
-		setMegaMenuDropdownVariables();
+		// Accordion toggle for menu items with children (mobile)
+		function initAccordionMenu() {
+			var $hasChildren = $megamenu.find('.menu-item-has-children, .menu-item-has-megamenu');
+			
+			$hasChildren.each(function () {
+				var $item = $(this);
+				var $toggleIcon = $item.find('> .bt-toggle-icon');
+				
+				// Create toggle icon if not exists
+				if ($toggleIcon.length === 0) {
+					$toggleIcon = $('<span class="bt-toggle-icon"></span>');
+					$item.append($toggleIcon);
+				}
 
+				// Toggle icon click handler
+				$toggleIcon.off('click.megamenu').on('click.megamenu', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					var $subMenu = $item.find('> .sub-menu');
+					var $megamenuDropdown = $item.find('> .bt-megamenu-dropdown');
+					var $target = $subMenu.length ? $subMenu : $megamenuDropdown;
+					if (!$target.length) return;
+
+					if ($item.hasClass('bt-is-active')) {
+						$item.removeClass('bt-is-active');
+						$target.slideUp(300);
+					} else {
+						// Close siblings
+						$item.siblings('.bt-is-active').removeClass('bt-is-active').find('> .sub-menu, > .bt-megamenu-dropdown').slideUp(300);
+						$item.siblings().find('.bt-is-active').removeClass('bt-is-active').closest('li').find('> .sub-menu, > .bt-megamenu-dropdown').slideUp(300);
+						
+						// Open current
+						$item.addClass('bt-is-active');
+						$target.slideDown(300);
+					}
+				});
+			});
+		}
+
+		// Set --fullwidth-mega for menu wrapper and dropdowns
+		function setMegaMenuDropdownVariables() {
+			var windowWidth = $(window).width();
+			
+			// Set fullwidth-mega for menu wrapper (mobile)
+			if ($megamenuContainer.length) {
+				$megamenuContainer.css('--fullwidth-mega', windowWidth + 'px');
+			}
+			
+			// Desktop: Set --fullwidth-mega, --left-mega-full (full width), --left-mega-center (fit content center)
+			if (windowWidth > 1024) {
+				$megamenuDropdowns.each(function () {
+					var $dropdown = $(this);
+					$dropdown.css('--fullwidth-mega', windowWidth + 'px');
+					var dropdownWidth = $dropdown.outerWidth();
+					var $container = $dropdown.closest('.bt-megamenu-wrapper');
+					var containerLeft = $container.length ? $container[0].getBoundingClientRect().left : 0;
+					if ($dropdown.hasClass('bt-megamenu-full-width')) {
+						var offsetParent = $dropdown[0].offsetParent;
+						var positioningContextLeft = offsetParent ? offsetParent.getBoundingClientRect().left : 0;
+						$dropdown.css('--left-mega-full', positioningContextLeft + 'px');
+					}
+					var leftCenter = (windowWidth - dropdownWidth) / 2 - containerLeft;
+					$dropdown.css('--left-mega-center', leftCenter + 'px');
+				});
+			}
+		}
+
+		// Initialize
+		setMegaMenuDropdownVariables();
+		setMenuWrapperPosition();
+		if ($(window).width() <= 1024) {
+			initAccordionMenu();
+		}
+
+		// Handle resize and scroll
 		var resizeTimeout;
-		$(window).on('resize', function () {
+		$(window).on('resize scroll', function () {
 			clearTimeout(resizeTimeout);
-			resizeTimeout = setTimeout(setMegaMenuDropdownVariables, 100);
+			resizeTimeout = setTimeout(function () {
+				setMegaMenuDropdownVariables();
+				setMenuWrapperPosition();
+				if ($(window).width() <= 1024) {
+					initAccordionMenu();
+				}
+			}, 100);
 		});
 	};
 
@@ -4198,8 +4281,6 @@
 		elementorFrontend.hooks.addAction('frontend/element_ready/list-text-image-hover.default', ImageListWidgetHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/flicker-collage.default', FlickerCollageHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-popup-hotspot.default', ProductPopupHotspotHandler);
-
-
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-hotspot.default', AccordionHotspotHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-megamenu.default', MegaMenuHandler);
 	});
