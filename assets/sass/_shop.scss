@@ -5455,6 +5455,7 @@
               position: absolute;
               z-index: 1;
               box-sizing: border-box;
+              pointer-events: none; /* Let clicks pass through to thumb slide */
             }
           }
         }
