@@ -4,6 +4,10 @@
  * Mega Menu - Custom Post Type & Menu Item Options
  * Create CPT for Mega Menu blocks and add menu item options
  */
+// Check if Elementor is active before running any code
+if (!defined('ELEMENTOR_VERSION') && !class_exists('\Elementor\Plugin')) {
+    return;
+}
 
 // Register Custom Post Type
 function somnia_register_megamenu_block_post_type()

@@ -68,27 +68,27 @@
 		}
 	};
 	// Helper function to generate correct URL based on widget category settings
-	const generateCategoryUrl = function($form) {
+	const generateCategoryUrl = function ($form) {
 		// Get widget category slugs from bt-widget-category-include (now contains slugs, not IDs)
 		const $widgetCategoryInclude = $form.find('.bt-widget-category-include');
 		const widgetCategorySlugs = $widgetCategoryInclude.length ? $widgetCategoryInclude.val() : '';
-		const widgetCategoryCount = widgetCategorySlugs ? widgetCategorySlugs.split(',').filter(function(slug) { return slug.trim() !== ''; }).length : 0;
-		
+		const widgetCategoryCount = widgetCategorySlugs ? widgetCategorySlugs.split(',').filter(function (slug) { return slug.trim() !== ''; }).length : 0;
+
 		// Get widget category exclude slugs (now contains slugs, not IDs)
 		const $widgetCategoryExclude = $form.find('.bt-widget-category-exclude');
 		const widgetCategoryExcludeSlugs = $widgetCategoryExclude.length ? $widgetCategoryExclude.val() : '';
-		
+
 		const widgetSingleCategoryUrl = $form.data('widget-single-category-url') || '';
 		const selectedCategoryUrl = $form.data('category-url');
 		const shopUrl = $form.attr('action') || '';
-		
+
 		// Get selected category slug to check if "All Categories" is selected
 		const $catProductInput = $form.find('input[name="product_cat"]');
 		const selectedCatSlug = $catProductInput.length ? $catProductInput.val() : '';
 
 		let url = '';
 		let isShopUrl = false; // Flag to check if URL is shop URL (not category page)
-		
+
 		// Rule: If has include, ignore exclude. Only use exclude when there's no include.
 		const hasInclude = widgetCategoryCount > 0;
 		const shouldUseExclude = !hasInclude && widgetCategoryExcludeSlugs;
@@ -158,7 +158,7 @@
 	};
 
 	// Helper function to add URL parameter
-	const addUrlParameter = function(url, paramName, paramValue) {
+	const addUrlParameter = function (url, paramName, paramValue) {
 		// Remove existing parameter if exists
 		url = url.replace(new RegExp('([?&])' + paramName + '=[^&]*'), '');
 		// Clean up trailing ? or &
@@ -169,26 +169,26 @@
 	};
 
 	/* ===== KEYWORD SUGGESTION HANDLER ===== */
-	const KeywordSuggestionHandler = function($scope, $) {
+	const KeywordSuggestionHandler = function ($scope, $) {
 		const $keywordInputs = $scope.find('.bt-keyword-suggest');
-		
+
 		if ($keywordInputs.length === 0) {
 			return;
 		}
-		
-		$keywordInputs.each(function() {
+
+		$keywordInputs.each(function () {
 			const $input = $(this);
 			const $searchWrap = $input.closest('.bt-search-wrap');
 			const $ghost = $searchWrap.find('.bt-keyword-ghost');
-			
+
 			if ($ghost.length === 0 || $searchWrap.length === 0) {
 				return;
 			}
-			
+
 			// Get word pool from data-suggest attribute on bt-search-wrap div
 			const suggestData = $searchWrap.data('suggest');
 			let wordPool = [];
-			
+
 			if (suggestData && Array.isArray(suggestData)) {
 				wordPool = suggestData;
 			} else if (typeof suggestData === 'string') {
@@ -199,44 +199,44 @@
 					console.warn('Failed to parse keyword suggestions:', e);
 				}
 			}
-			
+
 			if (wordPool.length === 0) {
 				return;
 			}
-			
+
 			// Input event handler
-			$input.on('input', function() {
+			$input.on('input', function () {
 				const value = $input.val();
 				$ghost.val('');
-				
+
 				const parts = value.split(' ');
 				const lastWordOriginal = parts[parts.length - 1];
 				const lastWord = lastWordOriginal.toLowerCase();
-				
+
 				if (!lastWord) {
 					return;
 				}
-				
+
 				// Check if input is valid case pattern (not mixed case)
 				const isAllUppercase = lastWordOriginal === lastWordOriginal.toUpperCase() && lastWordOriginal.length > 1;
 				const isAllLowercase = lastWordOriginal === lastWordOriginal.toLowerCase();
-				const isTitleCase = lastWordOriginal.length > 0 && 
-					lastWordOriginal[0] === lastWordOriginal[0].toUpperCase() && 
+				const isTitleCase = lastWordOriginal.length > 0 &&
+					lastWordOriginal[0] === lastWordOriginal[0].toUpperCase() &&
 					lastWordOriginal.slice(1) === lastWordOriginal.slice(1).toLowerCase();
-				
+
 				// Only show suggestion for valid case patterns
 				if (!isAllUppercase && !isAllLowercase && !isTitleCase) {
 					return; // Hide suggestion for mixed case
 				}
-				
-				const match = wordPool.find(function(w) {
+
+				const match = wordPool.find(function (w) {
 					return w.startsWith(lastWord) && w !== lastWord;
 				});
-				
+
 				if (match) {
 					// Preserve the case of the user's input
 					let suggestedWord = match;
-					
+
 					if (isAllUppercase) {
 						// All uppercase: convert match to uppercase
 						suggestedWord = match.toUpperCase();
@@ -245,14 +245,14 @@
 						suggestedWord = match.charAt(0).toUpperCase() + match.slice(1);
 					}
 					// Otherwise keep lowercase (isAllLowercase)
-					
+
 					parts[parts.length - 1] = suggestedWord;
 					$ghost.val(parts.join(' '));
 				}
 			});
-			
+
 			// Tab key handler to accept suggestion
-			$input.on('keydown', function(e) {
+			$input.on('keydown', function (e) {
 				if (e.key === 'Tab' && $ghost.val()) {
 					e.preventDefault();
 					$input.val($ghost.val());
@@ -306,10 +306,10 @@
 				const $searchInput = $form.find('input[name="search_keyword"]');
 				const searchKeyword = $searchInput.length ? $searchInput.val().trim() : '';
 				const shopUrl = $form.attr('action') || '';
-				
+
 				// Generate correct URL based on widget settings
 				let finalUrl = generateCategoryUrl($form);
-				
+
 				// Only add search_keyword to URL if it's not empty
 				if (searchKeyword) {
 					// Remove existing search_keyword and formsearch parameters if exists
@@ -518,7 +518,7 @@
 					$liveSearchResults.removeClass('active');
 				}
 			});
-			
+
 			// Initialize keyword suggestion if enabled
 			KeywordSuggestionHandler($searchProduct, $);
 		}
@@ -541,7 +541,7 @@
 			const customProducts = $productsDisplay.data('products');
 			let typingTimer;
 			// Get typing interval based on device - mobile needs longer delay due to slower typing speed
-			const getTypingInterval = function() {
+			const getTypingInterval = function () {
 				const windowWidth = $(window).width();
 				const isMobile = windowWidth <= 570;
 				return isMobile ? 800 : 500; // Mobile: 800ms, Desktop: 500ms
@@ -767,7 +767,7 @@
 				const searchValue = $(this).val().trim();
 				const windowWidth = $(window).width();
 				const isMobile = windowWidth <= 570;
-				
+
 				// On mobile, don't perform search while typing - only on submit
 				if (isMobile) {
 					if (searchValue.length < 2) {
@@ -776,7 +776,7 @@
 					}
 					return;
 				}
-				
+
 				// Desktop: perform search while typing
 				clearTimeout(typingTimer);
 
@@ -851,7 +851,7 @@
 				const shopUrl = $form.attr('action') || '';
 				const windowWidth = $(window).width();
 				const isMobile = windowWidth <= 570;
-				
+
 				// On mobile, perform search first before redirecting
 				if (isMobile && searchKeyword.length >= 2) {
 					// Perform search to show results
@@ -859,11 +859,11 @@
 					// Don't redirect, let user see the results
 					return false;
 				}
-				
+
 				// Desktop or empty search: redirect normally
 				// Generate correct URL based on widget settings
 				let finalUrl = generateCategoryUrl($form);
-				
+
 				// Only add search_keyword to URL if it's not empty
 				if (searchKeyword) {
 					// Remove existing search_keyword and formsearch parameters if exists
@@ -900,9 +900,9 @@
 				const keyword = $(this).data('keyword');
 				const windowWidth = $(window).width();
 				const isMobile = windowWidth <= 570;
-				
+
 				$liveSearch.val(keyword);
-				
+
 				// On mobile, perform search directly; on desktop, trigger keyup (which will perform search)
 				if (isMobile && keyword.length >= 2) {
 					performSearch();
@@ -934,7 +934,7 @@
 					}
 				}, 250); // Debounce resize events
 			});
-			
+
 			// Initialize keyword suggestion if enabled
 			KeywordSuggestionHandler($searchProduct, $);
 		}
@@ -4155,7 +4155,7 @@
 
 		// Set menu wrapper position below toggle button
 		function setMenuWrapperPosition() {
-			if ($(window).width() <= 1024 && $megamenuToggle.length && $megamenuContainer.length) {
+			if (window.innerWidth <= 1024 && $megamenuToggle.length && $megamenuContainer.length) {
 				var toggleRect = $megamenuToggle[0].getBoundingClientRect();
 				$megamenuContainer.css('--top-mega-mobile', toggleRect.bottom + 'px');
 			}
@@ -4167,7 +4167,7 @@
 				e.preventDefault();
 				var $toggle = $(this);
 				var isExpanded = $toggle.attr('aria-expanded') === 'true';
-				
+
 				setMenuWrapperPosition();
 				$toggle.attr('aria-expanded', !isExpanded);
 				$toggle.toggleClass('bt-is-active', !isExpanded);
@@ -4178,11 +4178,11 @@
 		// Accordion toggle for menu items with children (mobile)
 		function initAccordionMenu() {
 			var $hasChildren = $megamenu.find('.menu-item-has-children, .menu-item-has-megamenu');
-			
+
 			$hasChildren.each(function () {
 				var $item = $(this);
 				var $toggleIcon = $item.find('> .bt-toggle-icon');
-				
+
 				// Create toggle icon if not exists
 				if ($toggleIcon.length === 0) {
 					$toggleIcon = $('<span class="bt-toggle-icon"></span>');
@@ -4206,7 +4206,7 @@
 						// Close siblings
 						$item.siblings('.bt-is-active').removeClass('bt-is-active').find('> .sub-menu, > .bt-megamenu-dropdown').slideUp(300);
 						$item.siblings().find('.bt-is-active').removeClass('bt-is-active').closest('li').find('> .sub-menu, > .bt-megamenu-dropdown').slideUp(300);
-						
+
 						// Open current
 						$item.addClass('bt-is-active');
 						$target.slideDown(300);
@@ -4218,35 +4218,28 @@
 		// Set --fullwidth-mega for menu wrapper and dropdowns
 		function setMegaMenuDropdownVariables() {
 			var windowWidth = $(window).width();
-			
-			// Set fullwidth-mega for menu wrapper (mobile)
-			if ($megamenuContainer.length) {
-				$megamenuContainer.css('--fullwidth-mega', windowWidth + 'px');
-			}
-			
-			// Desktop: Set --fullwidth-mega, --left-mega-full (full width), --left-mega-center (fit content center)
-			if (windowWidth > 1024) {
-				$megamenuDropdowns.each(function () {
-					var $dropdown = $(this);
-					$dropdown.css('--fullwidth-mega', windowWidth + 'px');
-					var dropdownWidth = $dropdown.outerWidth();
-					var $container = $dropdown.closest('.bt-megamenu-wrapper');
-					var containerLeft = $container.length ? $container[0].getBoundingClientRect().left : 0;
-					if ($dropdown.hasClass('bt-megamenu-full-width')) {
-						var offsetParent = $dropdown[0].offsetParent;
-						var positioningContextLeft = offsetParent ? offsetParent.getBoundingClientRect().left : 0;
-						$dropdown.css('--left-mega-full', positioningContextLeft + 'px');
-					}
-					var leftCenter = (windowWidth - dropdownWidth) / 2 - containerLeft;
-					$dropdown.css('--left-mega-center', leftCenter + 'px');
-				});
-			}
+			$megamenuWrapper.css('--fullwidth-mega', windowWidth + 'px');
+
+			// Desktop: --left-mega-full, --left-mega-center per dropdown
+			$megamenuDropdowns.each(function () {
+				var $dropdown = $(this);
+				var dropdownWidth = $dropdown.outerWidth();
+				var $container = $dropdown.closest('.bt-megamenu-wrapper');
+				var containerLeft = $container.length ? $container[0].getBoundingClientRect().left : 0;
+				if ($dropdown.hasClass('bt-megamenu-full-width')) {
+					var offsetParent = $dropdown[0].offsetParent;
+					var positioningContextLeft = offsetParent ? offsetParent.getBoundingClientRect().left : 0;
+					$dropdown.css('--left-mega-full', positioningContextLeft + 'px');
+				}
+				var leftCenter = (windowWidth - dropdownWidth) / 2 - containerLeft;
+				$dropdown.css('--left-mega-center', leftCenter + 'px');
+			});
 		}
 
 		// Initialize
 		setMegaMenuDropdownVariables();
 		setMenuWrapperPosition();
-		if ($(window).width() <= 1024) {
+		if (window.innerWidth <= 1024) {
 			initAccordionMenu();
 		}
 
@@ -4260,7 +4253,7 @@
 			resizeTimeout = setTimeout(function () {
 				setMegaMenuDropdownVariables();
 				setMenuWrapperPosition();
-				if ($(window).width() <= 1024) {
+				if (window.innerWidth <= 1024) {
 					initAccordionMenu();
 				}
 			}, 100);

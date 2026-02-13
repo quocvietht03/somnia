@@ -19111,7 +19111,7 @@ nav .elementor-nav-menu .sub-arrow {
 }
 .bt-elwg-megamenu--default .bt-megamenu > li.menu-item-has-megamenu .bt-megamenu-dropdown.bt-megamenu-fit-to-content .elementor {
   width: fit-content;
-  margin: 0 auto;
+  margin: 0 auto 30px auto;
 }
 .bt-elwg-megamenu--default .bt-megamenu > li.menu-item-has-megamenu .bt-megamenu-dropdown.bt-megamenu-fit-to-content.bt-megamenu-horizontal-left {
   left: 0;
