@@ -895,7 +895,7 @@ class Widget_MegaMenu extends Widget_Base
 		
 		$toggle_alignment = isset( $settings['toggle_menu_alignment'] ) ? $settings['toggle_menu_alignment'] : 'right';
 		?>
-			<div class="bt-elwg-megamenu--default">
+			<div class="bt-elwg-megamenu--default bt-megamenu-js-pending">
 				<button class="bt-megamenu-toggle bt-toggle-align-<?php echo esc_attr( $toggle_alignment ); ?>" aria-label="<?php esc_attr_e('Toggle Menu', 'somnia'); ?>" aria-expanded="false">
 					<span class="bt-toggle-bar"></span>
 					<span class="bt-toggle-bar"></span>

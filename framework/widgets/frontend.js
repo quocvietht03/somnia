@@ -4250,6 +4250,9 @@
 			initAccordionMenu();
 		}
 
+		// JS ready: allow hover (variables are set)
+		$megamenuWrapper.removeClass('bt-megamenu-js-pending');
+
 		// Handle resize and scroll
 		var resizeTimeout;
 		$(window).on('resize scroll', function () {
