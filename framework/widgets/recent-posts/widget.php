@@ -170,14 +170,24 @@ class Widget_RecentPosts extends Widget_Base
 			]
 		);
 
-		$this->add_control(
-			'item_padding',
+		$this->add_responsive_control(
+			'item_space_between',
 			[
-				'label' => __('Item Padding', 'somnia'),
-				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => ['px', '%'],
+				'label' => esc_html__('Space Between Posts', 'somnia'),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => ['px'],
+				'range' => [
+					'px' => [
+						'min' => 0,
+						'max' => 60,
+					]
+				],
+				'default' => [
+					'size' => 16,
+					'unit' => 'px',
+				],
 				'selectors' => [
-					'{{WRAPPER}} .bt-post' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .bt-elwg-recent-posts .bt-post:not(:last-child)' => 'margin-bottom: {{SIZE}}{{UNIT}};padding-bottom:{{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -387,7 +397,7 @@ class Widget_RecentPosts extends Widget_Base
 			[
 				'name' => 'title_typography',
 				'label' => __('Typography', 'somnia'),
-				'selector' => '{{WRAPPER}} .bt-post--title a',
+				'selector' => '{{WRAPPER}} .bt-post--title',
 			]
 		);
 

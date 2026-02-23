@@ -435,7 +435,6 @@
           z-index: 999;
           opacity: 0;
           visibility: hidden;
-          transition: all 0.3s ease;
           box-sizing: border-box;
           max-height: 75vh;
           @extend .__scrollbar_style;
@@ -480,7 +479,6 @@
         &.bt-megamenu-active .bt-megamenu-dropdown {
           opacity: 1;
           visibility: visible;
-          transform: translateY(0);
         }
       }
 
@@ -495,8 +493,6 @@
         z-index: 998;
         opacity: 0;
         visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
         list-style: none;
         margin: 0;
         padding: 10px 0;
@@ -537,7 +533,6 @@
       &:hover > .sub-menu {
         opacity: 1;
         visibility: visible;
-        transform: translateY(0);
       }
     }
     .menu-item span,
