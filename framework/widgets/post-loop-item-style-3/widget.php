@@ -166,6 +166,17 @@ class Widget_PostLoopItemStyle3 extends Widget_Base
 				],
 			]
 		);
+		$this->add_responsive_control(
+			'content_padding',
+			[
+				'label' => __('Padding', 'somnia'),
+				'type' => Controls_Manager::DIMENSIONS,
+				'size_units' => ['px', '%', 'em'],
+				'selectors' => [
+					'{{WRAPPER}} .bt-post--content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
 		// Post Date
 		$this->add_control(
 			'post_date_heading',

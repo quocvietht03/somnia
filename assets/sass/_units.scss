@@ -296,13 +296,30 @@ strong {
   font-weight: 500;
 }
 blockquote {
-  font-size: 110%;
-  border-left: 8px solid $color-accent !important;
+  padding: 32px;
+  border-radius: 16px;
+  background: #FBF1ED;
+  border: none;
   margin: 32px 0;
-  padding-left: 20px;
-  &.has-text-align-right {
-    border-left: none !important;
-    border-right: 8px solid $color-accent !important;
+  &.wp-block-quote{
+    margin: 32px 0;
+    border: none;
+    padding: 32px;
+    .wp-block-image{
+      margin-bottom: 16px;
+      img{
+        border-radius: 0 !important;
+      }
+    }
+  }
+  > *{
+    margin-top: 0;
+  }
+  > *:first-child {
+    margin-top: 0;
+  }
+  > *:last-child {
+    margin-bottom: 0;
   }
 }
 .alignfull {

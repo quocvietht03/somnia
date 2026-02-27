@@ -516,7 +516,7 @@
   }
   .wp-block-image {
     img {
-      border-radius: 20px;
+      border-radius: 16px;
     }
     @media (max-width: $break-sm) {
       margin: 20px 0;
@@ -533,7 +533,10 @@
       margin: 24px 0;
     }
     img {
-      border-radius: 8px;
+      border-radius: 16px;
+      @media (max-width: $break-sm) {
+        border-radius: 8px;
+      }
     }
     .blocks-gallery-item__caption {
       border-radius: 0 0 8px 8px;

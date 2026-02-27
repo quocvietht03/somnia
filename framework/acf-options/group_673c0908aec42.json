@@ -18,7 +18,8 @@
             },
             "choices": {
                 "layout-default": "Default",
-                "layout-01": "Layout No Sidebar"
+                "layout-01": "Layout 1",
+                "layout-02": "Layout 2"
             },
             "default_value": false,
             "return_format": "value",
@@ -43,8 +44,8 @@
                 [
                     {
                         "field": "field_680864ca0aa10",
-                        "operator": "==",
-                        "value": "layout-01"
+                        "operator": "!=",
+                        "value": "layout-default"
                     }
                 ]
             ],
@@ -85,5 +86,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1769400220
+    "modified": 1771901930
 }

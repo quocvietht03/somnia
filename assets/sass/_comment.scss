@@ -76,16 +76,6 @@
       margin-left: 60px;
       > .bt-comment {
         position: relative;
-        padding-left: 20px;
-        &::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 4px;
-          height: 100%;
-          background: #e9e9e9;
-        }
       }
     }
   }
@@ -101,12 +91,22 @@
       width: 100%;
     }
   }
+  > .comment {
+    &:first-of-type {
+      > .bt-comment {
+        border-top: none;
+        padding-top: 0;
+      }
+    }
+  }
   .bt-comment {
     position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 10px 16px;
     margin-top: 24px;
+    border-top: 1px solid $color-line;
+    padding-top: 20px;
     .bt-avatar {
       width: 60px;
       height: 60px;
@@ -138,12 +138,13 @@
       line-height: 28px;
       text-transform: capitalize;
       display: block;
+      margin: 0 0 4px 0;
     }
     .bt-date {
-      font-size: 14px;
+      font-size: 16px;
       font-style: normal;
       font-weight: 400;
-      line-height: 22px;
+      line-height: 26px;
       color: $color-text;
       display: block;
     }
@@ -152,12 +153,12 @@
     width: 100%;
     .bt-text {
       width: 100%;
-      margin-top: 2px;
+      margin: 12px 0;
       font-size: 18px;
       font-style: normal;
       font-weight: 400;
       line-height: 28px;
-      color: $color-primary;
+      color: $color-text;
       > *:first-child {
         margin-top: 0;
       }
@@ -167,36 +168,28 @@
     }
     .comment-reply-link {
       font-family: $primary-font;
-      font-size: 14px;
+      font-size: 16px;
       font-style: normal;
       font-weight: 500;
       line-height: 26px;
-      text-transform: uppercase;
-      text-decoration: underline;
-      margin-top: 8px;
+      text-transform: capitalize;
       color: $color-primary;
       display: block;
-      @media (min-width: $break-sm) {
-        position: absolute;
-        top: 4px;
-        right: 0;
-        margin-top: 0px;
-      }
     }
   }
   .comment-respond {
     margin-top: 60px;
     border-radius: 8px;
-    border: 1px solid #e9e9e9;
+    border: 2px solid $color-line;
     padding: 28px;
     .comment-reply-title {
       position: relative;
       color: $color-primary;
       font-family: $secondary-font;
-      font-size: 24px;
+      font-size: 30px;
       font-style: normal;
       font-weight: 500;
-      line-height: 30px;
+      line-height: 42px;
       margin: 0 0 24px 0;
       padding-right: 120px;
       a {
@@ -261,7 +254,7 @@
           height: 15px;
           accent-color: $color-primary;
           position: relative;
-          top: 3px;
+          top: 2px;
           &:checked {
             background-color: $color-primary;
             border-color: $color-primary;
@@ -269,10 +262,10 @@
         }
         label {
           margin: 0;
-          font-size: 14px;
+          font-size: 16px;
           font-style: normal;
           font-weight: 400;
-          line-height: 22px;
+          line-height: 26px;
           color: $color-text;
           display: block;
         }
@@ -287,10 +280,10 @@
         font-style: normal;
         font-weight: 400;
         line-height: 26px;
-        color: $color-text;
+        color: $color-primary;
         border-radius: 4px;
         &::placeholder {
-          color: #a0a0a0;
+          color: $color-secondary-2;
           font-size: 16px;
           font-style: normal;
           font-weight: 400;
@@ -310,9 +303,9 @@
         line-height: 26px;
         padding: 16px;
         border-radius: 4px;
-        color: $color-text;
+        color: $color-primary;
         &::placeholder {
-          color: #a0a0a0;
+          color: $color-secondary-2;
           letter-spacing: 0;
           font-size: 16px;
           font-style: normal;
@@ -334,15 +327,12 @@
         font-size: 16px;
         font-style: normal;
         font-weight: 500;
-        line-height: 26px;
-        text-transform: uppercase;
+        line-height: 26px; /* 162.5% */
+        text-transform: capitalize;
         @media (min-width: $break-sm) {
           &:hover {
             background: $color-primary;
-            color: #fff;
-            background-image: linear-gradient(90deg, transparent 25%, rgba(233, 233, 233, 0.39) 50%, transparent 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite linear;
+            color: $color-accent;
           }
         }
       }
@@ -401,13 +391,13 @@
       }
     }
   }
-  @media(max-width:360px){
+  @media (max-width: 360px) {
     .comment-respond {
       .comment-reply-title {
         font-size: 22px;
       }
-      .comment-form{
-        input[type=submit]{
+      .comment-form {
+        input[type="submit"] {
           font-size: 14px;
           line-height: 1.3;
         }

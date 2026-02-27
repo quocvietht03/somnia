@@ -151,6 +151,9 @@
       svg {
         position: relative;
         top: 2px;
+        path{
+          fill: $color-primary;
+        }
       }
     }
   }

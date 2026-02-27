@@ -9,16 +9,17 @@
   }
   .bt-post {
     display: flex;
-    gap: 30px;
+    gap: 28px;
     color: inherit;
     align-items: center;
     &:not(:last-child) {
-      padding-bottom: 20px;
-      margin-bottom: 20px;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
       border-bottom: 1px solid $color-line;
     }
     .bt-cover-image {
-      padding-bottom: 0;
+      height: 90px;
+      padding: 0;
       border-radius: 8px;
     }
     &--thumbnail {
@@ -26,7 +27,7 @@
       display: block;
     }
     &--infor {
-      width: 100%;
+     flex:1;
     }
     &--meta {
       display: flex;
@@ -60,9 +61,13 @@
       }
     }
     &--title {
-      @extend .__heading_5_typo;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 24px;
       color: $color-primary;
       margin: 4px 0 0 0;
+      @extend .__bt-max-line-ellipsis;
       a {
         color: inherit;
         text-decoration: underline;
@@ -93,4 +98,113 @@
 .bt-block-instagram-posts {
   padding: 0;
   @extend .__instagram-posts-style;
+}
+
+// Author Post Widget Styles
+.bt-block-author-post {
+  .bt-author-profile {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .bt-author-avatar {
+    flex-shrink: 0;
+    .bt-cover-image {
+      width: 100px;
+      padding-bottom: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+
+  .bt-author-info {
+    flex: 1;
+  }
+
+  .bt-author-name {
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 30px;
+    color: $color-primary;
+    margin: 0 0 4px 0;
+  }
+
+
+  .bt-author-job {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 26px;
+    color: $color-text;
+  }
+
+  .bt-author-bio {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 26px;
+    color: $color-text;
+    margin-top: 20px;
+    p {
+      margin: 0;
+    }
+  }
+
+  .bt-author-socials {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .bt-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid $color-line;
+    color: $color-primary;
+    &:hover {
+      background: #e2e8f0;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      path {
+        stroke: $color-primary;
+      }
+    }
+
+  }
+
+  // Responsive Design
+  @media (max-width: $break-md) {
+    .bt-author-profile {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+    
+    .bt-author-avatar .bt-cover-image {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .bt-author-name {
+      font-size: 20px;
+    }
+  }
 }
