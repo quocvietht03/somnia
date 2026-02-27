@@ -2173,11 +2173,13 @@
 		if ($video.length) {
 			$item.on('mouseenter', function () {
 				$coverImage.css('opacity', '0');
+				$video.css('opacity', '1');
 				$video[0].play();
 			});
 
 			$item.on('mouseleave', function () {
 				$coverImage.css('opacity', '1');
+				$video.css('opacity', '0');
 				$video[0].pause();
 			});
 
