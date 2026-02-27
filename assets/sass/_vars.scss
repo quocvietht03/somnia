@@ -132,6 +132,24 @@ $transition: all 0.25s ease-in-out;
     line-height: 22px;
 }
 
+@media(max-width: $break-lg) {
+    .__heading_1_typo {
+        font-size: 48px;
+    }
+    .__heading_2_typo {
+        font-size: 42px;
+    }
+    .__heading_3_typo {
+        font-size: 34px;
+    }
+    .__heading_4_typo {
+        font-size: 26px;
+    }
+    .__heading_5_typo {
+        font-size: 22px;
+    }
+}
+
 @media(max-width: $break-tl) {
     .__heading_1_typo {
         font-size: 44px;
