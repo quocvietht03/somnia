@@ -2,8 +2,12 @@
 
 /**
  * Mega Menu - Custom Post Type & Menu Item Options
- * Create CPT for Mega Menu blocks (like extra_content_prod) and add menu item options
+ * Create CPT for Mega Menu blocks and add menu item options
  */
+// Check if Elementor is active before running any code
+if (!defined('ELEMENTOR_VERSION') && !class_exists('\Elementor\Plugin')) {
+    return;
+}
 
 // Register Custom Post Type
 function somnia_register_megamenu_block_post_type()
@@ -56,7 +60,6 @@ add_filter('elementor/documents/register/post_types', 'somnia_add_elementor_supp
 // Add Mega Menu options to menu item (only for main menu / depth 0)
 function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $args, $id = '')
 {
-    // Only show for main menu items (depth 0)
     if ($depth !== 0) {
         return;
     }
@@ -86,7 +89,7 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
         ? admin_url('post.php?post=' . intval($megamenu_block_id) . '&action=elementor')
         : '';
 ?>
-    <div class="somnia-megamenu-fields description-wide" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd;">
+    <div class="somnia-megamenu-fields description-wide">
         <p class="field-megamenu-enable description">
             <label for="edit-megamenu-enable-<?php echo esc_attr($item_id); ?>">
                 <input type="checkbox"
@@ -95,9 +98,10 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
                     value="1"
                     <?php checked($megamenu_enabled, '1'); ?>
                     class="somnia-megamenu-enable" />
-                <?php esc_html_e('Enable Mega Menu (only for main menu)', 'somnia'); ?>
+                <?php esc_html_e('Enable Mega Menu', 'somnia'); ?>
             </label>
         </p>
+        <div class="somnia-megamenu-dependent-fields" style="<?php echo $megamenu_enabled === '1' ? '' : 'display: none;'; ?>">
         <p class="field-megamenu-block description description-wide">
             <label for="edit-megamenu-block-<?php echo esc_attr($item_id); ?>">
                 <?php esc_html_e('Select block', 'somnia'); ?><br />
@@ -168,6 +172,7 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
                 <?php esc_html_e('Add megamenu block', 'somnia'); ?>
             </a>
         </p>
+        </div>
     </div>
 <?php
 }

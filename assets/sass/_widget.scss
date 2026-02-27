@@ -2,6 +2,36 @@
   &:not(:last-child) {
     padding-bottom: 40px;
   }
+  &:has(.widget-block.bt-block-author-post) {
+    padding: 0;
+    display: none;
+    .wp-admin &,
+    .single-post & {
+      display: block;
+      padding-bottom: 40px;
+    }
+  }
+  .bt-form-newsletter_wrapper {
+    .bt-form-newsletter {
+      position: relative;
+      .gform-body {
+        input[type="email"] {
+          border-radius: 4px;
+          border: 1px solid $color-line;
+          padding-left: 16px;
+        }
+      }
+      .gform_footer{
+        input[type="submit"]{
+          background-image: url("../images/icon-send.svg") !important;
+          background-position: center right 16px !important;
+          background-repeat: no-repeat !important;
+          background-size: 24px !important;
+          color: transparent !important;
+        }
+      }
+    }
+  }
   .wp-block-group {
     margin: 0;
     position: relative;
@@ -65,14 +95,14 @@
       &:hover {
         color: $color-primary;
         font-weight: 500;
-        a{
+        a {
           color: $color-primary;
         }
       }
-      &.current-cat{
+      &.current-cat {
         color: $color-primary;
         font-weight: 500;
-        a{
+        a {
           color: $color-primary;
         }
       }
@@ -212,6 +242,10 @@
       padding: 15px 24px;
       font-family: $primary-font;
       border-radius: 10px;
+      color: $color-primary;
+      &::placeholder {
+        color: $color-secondary-2;
+      }
     }
     &.wp-block-search__searchfield-hidden {
       .wp-block-search__input {
@@ -345,7 +379,7 @@
       padding: 5px 16px;
       transition: none;
       border-radius: 4px;
-      background: #F6F6F4;
+      background: #f6f6f4;
       &:hover {
         color: #ffffff;
         background: $color-primary;

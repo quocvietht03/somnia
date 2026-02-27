@@ -490,6 +490,39 @@
 			updateHorizontalPositionVisibility($(this));
 		});
 
+		// Toggle visibility of dependent fields based on checkbox
+		function toggleMegamenuFields($checkbox) {
+			var $container = $checkbox.closest('.somnia-megamenu-fields'),
+				$dependentFields = $container.find('.somnia-megamenu-dependent-fields');
+
+			if ($checkbox.is(':checked')) {
+				$dependentFields.slideDown(200);
+			} else {
+				$dependentFields.slideUp(200);
+			}
+		}
+
+		// Initialize visibility on page load
+		$('.somnia-megamenu-enable').each(function () {
+			toggleMegamenuFields($(this));
+		});
+
+		// Update when checkbox changes
+		$(document).on('change', '.somnia-megamenu-enable', function () {
+			toggleMegamenuFields($(this));
+		});
+
+		// Handle menu item added via AJAX (WordPress menu)
+		$(document).ajaxComplete(function (event, xhr, settings) {
+			if (settings.data && typeof settings.data === 'string' && settings.data.indexOf('action=add-menu-item') !== -1) {
+				setTimeout(function () {
+					$('.somnia-megamenu-enable').each(function () {
+						toggleMegamenuFields($(this));
+					});
+				}, 100);
+			}
+		});
+
 		// Handle "Add megamenu block" click
 		$(document).on('click', '.somnia-megamenu-add-link', function (e) {
 			e.preventDefault();

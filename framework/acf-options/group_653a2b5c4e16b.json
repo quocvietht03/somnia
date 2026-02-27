@@ -87,7 +87,9 @@
                         "facebook": "Facebook",
                         "linkedin": "Linkedin",
                         "twitter": "Twitter",
-                        "google": "Google"
+                        "google": "Google",
+                        "instagram": "Instagram",
+                        "telegram": "Telegram"
                     },
                     "default_value": false,
                     "return_format": "value",

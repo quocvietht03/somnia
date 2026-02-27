@@ -144,7 +144,7 @@ if (!function_exists('somnia_post_publish_render')) {
     }
   ?>
     <div class="bt-post--publish">
-      <?php echo '<span>'. $date .'</span>'; ?>
+      <?php echo '<span>' . $date . '</span>'; ?>
     </div>
   <?php
 
@@ -369,7 +369,7 @@ if (!function_exists('somnia_post_button_render')) {
         <span> <?php echo esc_html($text) ?> </span>
       </a>
     </div>
-    <?php }
+  <?php }
 }
 /* Author Icon */
 if (!function_exists('somnia_author_icon_render')) {
@@ -555,7 +555,7 @@ if (!function_exists('somnia_related_posts')) {
           <div class="bt-container">
             <div class="bt-related-posts--heading">
               <?php if (!empty($related_posts['heading'])): ?>
-                <h2 class="bt-head"><?php echo esc_html($related_posts['heading']); ?></h2>
+                <h4 class="bt-head"><?php echo esc_html($related_posts['heading']); ?></h4>
               <?php endif; ?>
               <?php if (!empty($related_posts['description'])): ?>
                 <p class="bt-sub"><?php echo esc_html($related_posts['description']); ?></p>
@@ -643,12 +643,12 @@ if (!function_exists('somnia_custom_comment')) {
           <?php if ($comment->comment_approved == '0') : ?>
             <em class="comment-awaiting-moderation"><?php esc_html_e('Your comment is awaiting moderation.', 'somnia'); ?></em>
           <?php endif; ?>
-        </div>
-        <div class="bt-content">
-          <div class="bt-text">
-            <?php comment_text(); ?>
+          <div class="bt-content">
+            <div class="bt-text">
+              <?php comment_text(); ?>
+            </div>
+            <?php comment_reply_link(array_merge($args, array('add_below' => $add_below, 'depth' => $depth, 'max_depth' => $args['max_depth']))); ?>
           </div>
-          <?php comment_reply_link(array_merge($args, array('add_below' => $add_below, 'depth' => $depth, 'max_depth' => $args['max_depth']))); ?>
         </div>
       </div>
   <?php
