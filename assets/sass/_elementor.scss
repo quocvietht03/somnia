@@ -423,6 +423,9 @@
         &:has([class*="bt-megamenu-horizontal-"]) {
           position: static;
         }
+        &:has([class*="bt-megamenu-horizontal-center-to-item"]) {
+          position: relative;
+        }
         .sub-menu {
           display: none;
         }
@@ -469,6 +472,11 @@
 
             &.bt-megamenu-horizontal-center {
               left: var(--left-mega-center);
+            }
+
+            &.bt-megamenu-horizontal-center-to-item {
+              left: 50%;
+              transform: translateX(-50%);
             }
 
             &.bt-megamenu-horizontal-right {

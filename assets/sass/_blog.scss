@@ -326,7 +326,7 @@
       font-size: 24px;
       font-style: normal;
       font-weight: 500;
-      line-height: 30px;
+      line-height: 32px;
       margin: 12px 0 0 0;
       @extend .__bt-max-line-ellipsis;
       a {
@@ -342,7 +342,7 @@
       }
       @media (max-width: $break-xs) {
         font-size: 20px;
-        line-height: 30px;
+        line-height: 27px;
         display: block;
         background: transparent;
       }
@@ -391,7 +391,7 @@
       font-size: 24px;
       font-style: normal;
       font-weight: 500;
-      line-height: 30px;
+      line-height: 32px;
       display: block;
       margin: 12px 0 0 0;
       @extend .__bt-max-line-ellipsis;
@@ -547,7 +547,7 @@
       font-size: 24px;
       font-style: normal;
       font-weight: 500;
-      line-height: 30px;
+      line-height: 32px;
       @extend .__bt-max-line-ellipsis;
       a {
         display: block;
@@ -564,7 +564,7 @@
       }
       @media (max-width: $break-xs) {
         font-size: 20px;
-        line-height: 30px;
+        line-height: 27px;
         display: block;
         background: transparent;
       }
@@ -848,7 +848,7 @@
           font-size: 24px;
           font-style: normal;
           font-weight: 500;
-          line-height: 30px;
+          line-height: 32px;
           margin: 12px 0 8px 0;
           @extend .__bt-max-line-ellipsis;
           a {
@@ -1241,6 +1241,11 @@
   @extend .__bt-pagination-style;
 }
 .bt-site-main {
+  &.layout-01 {
+    .bt-related-posts--heading {
+      text-align: center;
+    }
+  }
   &.layout-02 {
     .bt-post--content {
       margin-top: 0;
@@ -1362,9 +1367,6 @@
           }
         }
       }
-    }
-    .bt-related-posts--heading {
-      text-align: left;
     }
   }
 }
@@ -1822,7 +1824,7 @@
     margin-bottom: 60px;
   }
   &--heading {
-    text-align: center;
+    text-align: left;
     margin-bottom: 40px;
     @media (max-width: $break-sm) {
       margin-bottom: 30px;

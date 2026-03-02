@@ -154,6 +154,9 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
                     <option value="right" <?php selected($megamenu_horizontal_position, 'right'); ?>>
                         <?php esc_html_e('Right', 'somnia'); ?>
                     </option>
+                    <option value="center-to-item" <?php selected($megamenu_horizontal_position, 'center-to-item'); ?>>
+                        <?php esc_html_e('Center to Menu Item', 'somnia'); ?>
+                    </option>
                 </select>
             </label>
         </p>
@@ -213,7 +216,7 @@ function somnia_megamenu_save_nav_menu_item($menu_id, $menu_item_db_id, $args)
     $megamenu_horizontal_position = isset($menu_item_data['_somnia_megamenu_horizontal_position']) 
         ? sanitize_text_field($menu_item_data['_somnia_megamenu_horizontal_position']) 
         : 'default';
-    if (in_array($megamenu_horizontal_position, array('default', 'left', 'center', 'right'), true)) {
+    if (in_array($megamenu_horizontal_position, array('default', 'left', 'center', 'center-to-item', 'right'), true)) {
         update_post_meta($menu_item_db_id, '_somnia_megamenu_horizontal_position', $megamenu_horizontal_position);
     } else {
         update_post_meta($menu_item_db_id, '_somnia_megamenu_horizontal_position', 'default');
