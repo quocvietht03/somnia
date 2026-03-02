@@ -62,7 +62,7 @@ class Widget_ListFaq extends Widget_Base
             'faq_content',
             [
                 'label' => __('Content', 'somnia'),
-                'type' => Controls_Manager::TEXTAREA,
+                'type' => Controls_Manager::WYSIWYG,
                 'label_block' => true,
                 'default' => __('FAQ content', 'somnia'),
             ]
@@ -231,6 +231,42 @@ class Widget_ListFaq extends Widget_Base
                 'selector' => '{{WRAPPER}} .bt-item-title h3 ',
             ]
         );
+
+        $this->add_control(
+            'icon_style',
+            [
+                'label' => esc_html__('Icon', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'icon_color',
+            [
+                'label' => __('Icon Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#183F91',
+                'selectors' => [
+                    '{{WRAPPER}} .bt-item-title svg path' => 'fill: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'icon_hover_color',
+            [
+                'label' => __('Icon Hover/Active Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .bt-item-title:hover svg path' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .bt-item-title.active svg path' => 'fill: {{VALUE}};',
+                ],
+            ]
+        );
+
+
         $this->add_control(
             'content_style',
             [
@@ -285,14 +321,13 @@ class Widget_ListFaq extends Widget_Base
                                 <?php if (!empty($item['faq_title'])): ?>
                                     <h3> <?php echo esc_html($item['faq_title']) ?> </h3>
                                 <?php endif; ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="plus" width="18" height="18" viewBox="0 0 160 160">
-                                    <rect class="vertical-line" x="70" width="15" height="160" rx="7" ry="7" />
-                                    <rect class="horizontal-line" y="70" width="160" height="15" rx="7" ry="7" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20.031 9.53055L12.531 17.0306C12.4614 17.1003 12.3787 17.1556 12.2876 17.1933C12.1966 17.2311 12.099 17.2505 12.0004 17.2505C11.9019 17.2505 11.8043 17.2311 11.7132 17.1933C11.6222 17.1556 11.5394 17.1003 11.4698 17.0306L3.96979 9.53055C3.82906 9.38982 3.75 9.19895 3.75 8.99993C3.75 8.80091 3.82906 8.61003 3.96979 8.4693C4.11052 8.32857 4.30139 8.24951 4.50042 8.24951C4.69944 8.24951 4.89031 8.32857 5.03104 8.4693L12.0004 15.4396L18.9698 8.4693C19.0395 8.39962 19.1222 8.34435 19.2132 8.30663C19.3043 8.26892 19.4019 8.24951 19.5004 8.24951C19.599 8.24951 19.6965 8.26892 19.7876 8.30663C19.8786 8.34435 19.9614 8.39962 20.031 8.4693C20.1007 8.53899 20.156 8.62171 20.1937 8.71276C20.2314 8.8038 20.2508 8.90138 20.2508 8.99993C20.2508 9.09847 20.2314 9.19606 20.1937 9.2871C20.156 9.37815 20.1007 9.46087 20.031 9.53055Z" fill="#183F91" />
                                 </svg>
                             </div>
                             <?php if (!empty($item['faq_content'])): ?>
                                 <div class="bt-item-content">
-                                    <?php echo esc_html($item['faq_content']) ?>
+                                    <?php echo wp_kses_post($item['faq_content']) ?>
                                 </div>
                             <?php endif; ?>
                         </div>

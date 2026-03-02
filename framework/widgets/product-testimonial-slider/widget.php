@@ -994,9 +994,8 @@ class Widget_ProductTestimonialSlider extends Widget_Base
                                                     <div class="bt-product-testimonial-item--author"><?php echo esc_html($item['testimonial_author']); ?></div>
                                                 <?php endif; ?>
                                             </div>
-                                            <?php if (!empty($item['product_id'])) : 
-                                                    $product = wc_get_product($item['product_id']);
-                                                ?>
+                                            <?php 
+                                            if (!empty($item['product_id']) && ($product = wc_get_product($item['product_id']))) : ?>
                                                 <div class="bt-product-mini-item">
                                                 <a class="bt-product-mini-item--link" href="<?php echo esc_url($product->get_permalink()); ?>">
                                                     <div class="bt-product-mini-item--image">

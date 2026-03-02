@@ -2661,7 +2661,7 @@
 
     .bt-item-title {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       grid-gap: 12px;
       cursor: pointer;
       justify-content: space-between;
@@ -2681,7 +2681,6 @@
         transition: transform 0.6s ease;
         transform: rotate(0);
         flex: none;
-        top: 3px;
         position: relative;
         rect {
           transition: all 800ms;
@@ -2689,8 +2688,8 @@
           transform-origin: 50% 50%;
         }
         @media (max-width: $break-xs) {
-          width: 14px;
-          height: 14px;
+          width: 20px;
+          height: 20px;
         }
       }
 
@@ -2710,11 +2709,23 @@
     .bt-item-content {
       display: none;
       color: $color-text;
-      font-size: 18px;
+      font-size: 16px;
       font-style: normal;
       font-weight: 400;
-      line-height: 28px;
-      padding: 8px 0 0 0;
+      line-height: 26px;
+      padding: 10px 0 0 0;
+      p{
+      margin: 0 0 8px 0;
+      }
+      ul,ol{
+        margin: 0 0 8px;
+      }
+      > *:first-child{
+        margin-top: 0;
+      }
+      > *:last-child{
+        margin-bottom: 0;
+      }
       @media (max-width: $break-xs) {
         font-size: 16px;
         line-height: 1.5;
@@ -6839,8 +6850,8 @@
               opacity: 0;
               transition: none;
               &:hover {
-                border-color: $color-accent;
-                background: $color-accent;
+                border-color: $color-primary;
+                background: $color-primary;
                 color: #fff;
               }
 
@@ -6873,7 +6884,6 @@
             transition: color 0.3s ease;
 
             &:hover {
-              color: $color-accent;
               text-decoration: underline;
               text-decoration-skip-ink: none;
               text-underline-offset: 3px;
@@ -6898,6 +6908,19 @@
               }
             }
 
+            .bt-member-social {
+              transform: translateX(0);
+              opacity: 1;
+              visibility: visible;
+              a {
+                transform: translateX(0);
+                opacity: 1;
+              }
+            }
+          }
+        }
+        @media (max-width: $break-xs) {
+          .bt-member-image {
             .bt-member-social {
               transform: translateX(0);
               opacity: 1;
