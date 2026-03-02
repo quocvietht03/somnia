@@ -2165,6 +2165,37 @@
 		}
 	};
 
+<<<<<<< HEAD
+=======
+	const VideoAutoPlayHoverHandler = function ($scope) {
+		const $item = $scope.find('.bt-video-hover-enabled');
+		const $video = $scope.find('.bt-hover-video');
+		const $coverImage = $scope.find('.bt-cover-image img');
+
+		if ($video.length) {
+			$item.on('mouseenter', function () {
+				$coverImage.css('opacity', '0');
+				$video.css('opacity', '1');
+				$video[0].play();
+			});
+
+			$item.on('mouseleave', function () {
+				$coverImage.css('opacity', '1');
+				$video.css('opacity', '0');
+				$video[0].pause();
+			});
+
+			$item.on('click', function () {
+				if ($video[0].paused) {
+					$video[0].play();
+				} else {
+					$video[0].pause();
+				}
+			});
+		}
+	};
+
+>>>>>>> a6422ce1187a4315915307e7672ffe9ca7600734
 	const BannerProductSliderHandler = function ($scope) {
 		const $bannerProductSlider = $scope.find('.bt-elwg-banner-product-slider');
 
