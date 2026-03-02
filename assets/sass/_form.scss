@@ -317,9 +317,10 @@
       top: 0;
       margin: 0 !important;
       right: 0;
+      width: auto;
       &::after {
-        width: 26px;
-        height: 26px;
+        width: 16px;
+        height: 16px;
         border: 2px $color-primary solid;
         border-top: 2px transparent solid;
         top: 12px;
