@@ -2165,8 +2165,6 @@
 		}
 	};
 
-<<<<<<< HEAD
-=======
 	const VideoAutoPlayHoverHandler = function ($scope) {
 		const $item = $scope.find('.bt-video-hover-enabled');
 		const $video = $scope.find('.bt-hover-video');
@@ -2195,7 +2193,6 @@
 		}
 	};
 
->>>>>>> a6422ce1187a4315915307e7672ffe9ca7600734
 	const BannerProductSliderHandler = function ($scope) {
 		const $bannerProductSlider = $scope.find('.bt-elwg-banner-product-slider');
 
