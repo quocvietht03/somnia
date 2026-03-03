@@ -115,9 +115,9 @@ class ElementorWidgets
 			'list-text-image-hover',
 			'flicker-collage',
 			'product-banner-scroll-hotspot',
-
 			'accordion-hotspot',
-			'product-testimonial-item'
+			'product-testimonial-item',
+			'location-list'
 
 		);
 
@@ -389,6 +389,7 @@ class ElementorWidgets
 
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\AccordionHotspot\Widget_AccordionHotspot());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductTestimonialItem\Widget_ProductTestimonialItem());
+		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\LocationList\Widget_LocationList());
 
 
 		// Register widgets that require Elementor Pro

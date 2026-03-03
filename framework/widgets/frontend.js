@@ -4262,7 +4262,188 @@
 		});
 	};
 
-
+	const LocationListHandler = function ($scope, $) {
+		const $locationFinder = $scope.find('.bt-elwg-location-list--finder');
+		
+		if ($locationFinder.length === 0) return;
+		
+		const $locationItems = $locationFinder.find('.bt-location-item');
+		const $searchInput = $locationFinder.find('#location-search');
+		const $searchButton = $locationFinder.find('.bt-search-button');
+		const $mapContainer = $locationFinder.find('.bt-location-finder--map .bt-map-container');
+		const $mapInfoCard = $locationFinder.find('#map-info-card');
+		
+		// Create locations JSON data
+		let locationsData = [];
+		$locationItems.each(function(index) {
+			const $item = $(this);
+			locationsData.push({
+				index: index,
+				title: $item.find('.bt-location-title').text().trim().toLowerCase(),
+				address: $item.find('.bt-location-address').text().trim().toLowerCase(),
+				phone: $item.find('.bt-location-phone').text().trim().toLowerCase(),
+				mapAddress: $item.data('address'),
+				zoom: $item.data('zoom') || 15,
+				element: $item
+			});
+		});
+		
+		// Create all maps and hide them initially
+		function createAllMaps() {
+			$mapContainer.empty();
+			
+			locationsData.forEach(function(location, index) {
+				if (location.mapAddress) {
+					const mapSrc = 'https://maps.google.com/maps?q=' + encodeURIComponent(location.mapAddress) + 
+								  '&t=m&z=' + location.zoom + '&output=embed&iwloc=near';
+					
+					const $iframe = $('<iframe>', {
+						id: 'location-map-' + index,
+						class: 'location-map-iframe',
+						src: mapSrc,
+						loading: 'lazy',
+						title: location.mapAddress,
+						'aria-label': location.mapAddress,
+						style: index === 0 ? 'display: block;' : 'display: none;'
+					});
+					
+					$mapContainer.append($iframe);
+				}
+			});
+		}
+		
+		// Initialize maps
+		createAllMaps();
+		
+		// Location click handler
+		$locationItems.on('click', function(e) {
+			// Allow links (a tags) inside location item to work normally
+			if ($(e.target).closest('a').length) {
+				return;
+			}
+			e.preventDefault();
+			
+			const $this = $(this);
+			const locationIndex = $this.data('location-index');
+			const locationData = locationsData[locationIndex];
+			
+			if (!locationData) return;
+			
+			// Update active state
+			$locationItems.removeClass('active');
+			$this.addClass('active');
+			
+			// Show corresponding map
+			$mapContainer.find('.location-map-iframe').hide();
+			$mapContainer.find('#location-map-' + locationIndex).show();
+			
+			// Update info card
+			$mapInfoCard.find('.bt-map-info-title').text($this.find('.bt-location-title').text());
+			$mapInfoCard.find('.bt-map-info-address').text($this.find('.bt-location-address').text());
+			$mapInfoCard.find('.bt-map-info-location').text($this.find('.bt-location-address').text());
+			
+			// Scroll to map on mobile
+			if ($(window).width() <= 1024) {
+				$('html, body').animate({
+					scrollTop: $locationFinder.find('.bt-location-finder--map').offset().top - 20
+				}, 500);
+			}
+		});
+		
+		// Enhanced search functionality using JSON data
+		function performSearch() {
+			const searchTerm = $searchInput.val().toLowerCase().trim();
+			let visibleCount = 0;
+			
+			// Search through JSON data
+			locationsData.forEach(function(location) {
+				const isMatch = searchTerm === '' || 
+							   location.title.includes(searchTerm) || 
+							   location.address.includes(searchTerm) || 
+							   location.phone.includes(searchTerm);
+				
+				if (isMatch) {
+					location.element.removeClass('bt-hidden').addClass('bt-visible');
+					visibleCount++;
+				} else {
+					location.element.removeClass('bt-visible').addClass('bt-hidden');
+				}
+			});
+			
+			// Show no results message
+			let $noResults = $locationFinder.find('.bt-no-results');
+			if (visibleCount === 0 && searchTerm !== '') {
+				if ($noResults.length === 0) {
+					$noResults = $('<div class="bt-no-results">No locations found matching your search.</div>');
+					$locationFinder.find('.bt-location-list').after($noResults);
+				}
+				$noResults.addClass('show');
+			} else {
+				$noResults.removeClass('show');
+			}
+			
+			// Auto-select first visible item
+			if (searchTerm !== '' && visibleCount > 0) {
+				const $firstVisible = $locationItems.filter(':visible').first();
+				if (!$firstVisible.hasClass('active')) {
+					$firstVisible.trigger('click');
+				}
+			}
+		}
+		
+		// Search input handler with debounce
+		let searchTimeout;
+		$searchInput.on('input', function() {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(performSearch, 300);
+		});
+		
+		// Search on Enter key
+		$searchInput.on('keypress', function(e) {
+			if (e.which === 13) {
+				e.preventDefault();
+				clearTimeout(searchTimeout);
+				performSearch();
+			}
+		});
+		
+		// Search button click
+		$searchButton.on('click', function(e) {
+			e.preventDefault();
+			clearTimeout(searchTimeout);
+			performSearch();
+		});
+		
+		// Keyboard navigation
+		$searchInput.on('keydown', function(e) {
+			const $visibleItems = $locationItems.filter(':visible');
+			const $activeItem = $visibleItems.filter('.active');
+			const currentIndex = $visibleItems.index($activeItem);
+			
+			switch(e.which) {
+				case 38: // Up arrow
+					e.preventDefault();
+					if (currentIndex > 0) {
+						$visibleItems.eq(currentIndex - 1).trigger('click');
+					}
+					break;
+				case 40: // Down arrow
+					e.preventDefault();
+					if (currentIndex < $visibleItems.length - 1) {
+						$visibleItems.eq(currentIndex + 1).trigger('click');
+					} else if (currentIndex === -1 && $visibleItems.length > 0) {
+						$visibleItems.eq(0).trigger('click');
+					}
+					break;
+			}
+		});
+		
+		// Initialize: Select first item by default
+		if ($locationItems.length > 0) {
+			$locationItems.first().addClass('active');
+		}
+		
+	};
 	// Make sure you run this code under Elementor.
 	$(window).on('elementor/frontend/init', function () {
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-mobile-menu.default', SubmenuToggleHandler);
@@ -4310,6 +4491,7 @@
 
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-hotspot.default', AccordionHotspotHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-megamenu.default', MegaMenuHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-location-list.default', LocationListHandler);
 	});
 
 })(jQuery);
