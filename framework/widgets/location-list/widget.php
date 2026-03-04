@@ -228,226 +228,390 @@ class Widget_LocationList extends Widget_Base
 
     protected function register_style_section_controls()
     {
+
+        // Search Header
         $this->start_controls_section(
-            'section_style_item',
+            'section_style_search_header',
             [
-                'label' => esc_html__('General', 'somnia'),
+                'label' => esc_html__('Search Header', 'somnia'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
-        $this->add_control(
-            'location_list_border',
-            [
-                'label' => __('Border Width', 'somnia'),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => ['px'],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 100,
-                        'step' => 1,
-                    ],
-                    '%' => [
-                        'min' => 0,
-                        'max' => 100,
-                    ],
-                ],
-                'default' => [
-                    'unit' => 'px',
-                    'size' => 1,
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--item' => 'border-bottom: {{SIZE}}{{UNIT}} solid #e9e9e9;',
-                ],
-            ]
-        );
-        $this->add_control(
-            'location_list_color',
-            [
-                'label' => __('Border Color', 'somnia'),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--item' => 'border-color: {{VALUE}};',
-                ],
-            ]
-        );
-        $this->add_responsive_control(
-            'location_list_maps_height',
-            [
-                'label' => __('Maps height', 'somnia'),
-                'type' => Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 213,
-                ],
-                'range' => [
-                    'px' => [
-                        'min' => 100,
-                        'max' => 800,
-                        'step' => 1,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--maps iframe' => 'height: {{SIZE}}px;',
-                ],
-            ]
-        );
 
-        $this->end_controls_section();
-
-        $this->start_controls_section(
-            'section_style_heading',
-            [
-                'label' => esc_html__('Heading', 'somnia'),
-                'tab' => Controls_Manager::TAB_STYLE,
-            ]
-        );
         $this->add_control(
-            'location_title_style',
+            'search_title_heading',
             [
                 'label' => esc_html__('Title', 'somnia'),
                 'type' => Controls_Manager::HEADING,
             ]
         );
+
+        $this->add_control(
+            'search_title_color',
+            [
+                'label' => __('Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-title' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'search_title_typography',
+                'selector' => '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-title',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'search_title_spacing',
+            [
+                'label' => __('Bottom Spacing', 'somnia'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em'],
+                'range' => ['px' => ['min' => 0, 'max' => 50], 'em' => ['min' => 0, 'max' => 3]],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-title' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'search_subtitle_heading',
+            [
+                'label' => esc_html__('Subtitle', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'search_subtitle_color',
+            [
+                'label' => __('Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-subtitle' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'search_subtitle_typography',
+                'selector' => '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-subtitle',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Search Input
+        $this->start_controls_section(
+            'section_style_search_input',
+            [
+                'label' => esc_html__('Search Input', 'somnia'),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'input_bg_color',
+            [
+                'label' => __('Background', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-input' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'input_border_color',
+            [
+                'label' => __('Border Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-input' => 'border-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'input_focus_border_color',
+            [
+                'label' => __('Focus Border Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-input:focus' => 'border-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'input_text_color',
+            [
+                'label' => __('Text Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-input' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'input_placeholder_color',
+            [
+                'label' => __('Placeholder Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-input::placeholder' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'search_icon_color',
+            [
+                'label' => __('Search Icon Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-button svg path' => 'fill: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'input_typography',
+                'selector' => '{{WRAPPER}} .bt-elwg-location-list--finder .bt-search-input',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Location Content
+        $this->start_controls_section(
+            'section_style_location_content',
+            [
+                'label' => esc_html__('Location Content', 'somnia'),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'location_title_heading',
+            [
+                'label' => esc_html__('Title', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+            ]
+        );
+
         $this->add_control(
             'location_title_color',
             [
                 'label' => __('Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-infor .bt-location-title-wrap h2' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-location-title' => 'color: {{VALUE}};',
                 ],
             ]
         );
-        $this->add_control(
-            'location_title_hover_color',
-            [
-                'label' => __('Color Hover', 'somnia'),
-                'type' => Controls_Manager::COLOR,
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-infor:hover .bt-location-title-wrap h2' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
+
         $this->add_group_control(
             Group_Control_Typography::get_type(),
             [
                 'name' => 'location_title_typography',
-                'label' => __('Typography', 'somnia'),
-                'default' => '',
-                'selector' => '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-infor .bt-location-title-wrap h2 ',
+                'selector' => '{{WRAPPER}} .bt-elwg-location-list--finder .bt-location-title',
             ]
         );
+
+        $this->add_control(
+            'location_address_heading',
+            [
+                'label' => esc_html__('Address & Phone', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
         $this->add_control(
             'location_address_color',
             [
                 'label' => __('Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-infor .bt-location-title-wrap span' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-location-address' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-location-phone' => 'color: {{VALUE}};',
                 ],
             ]
         );
+
+        $this->add_control(
+            'location_phone_hover_color',
+            [
+                'label' => __('Phone Hover Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-location-phone:hover' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
         $this->add_group_control(
             Group_Control_Typography::get_type(),
             [
                 'name' => 'location_address_typography',
-                'label' => __('Typography', 'somnia'),
-                'default' => '',
-                'selector' => '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-infor .bt-location-title-wrap span',
+                'selector' => '{{WRAPPER}} .bt-elwg-location-list--finder .bt-location-address, {{WRAPPER}} .bt-elwg-location-list--finder .bt-location-phone',
             ]
         );
-        $this->start_controls_tabs('button_style_tabs');
 
-        $this->start_controls_tab(
-            'style_normal',
+        $this->end_controls_section();
+
+        // Status
+        $this->start_controls_section(
+            'section_style_status',
             [
-                'label' => __('Normal', 'somnia'),
+                'label' => esc_html__('Status', 'somnia'),
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
 
         $this->add_control(
-            'button_text_color',
+            'status_open_heading',
+            [
+                'label' => esc_html__('Open Indicator', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+            ]
+        );
+
+        $this->add_control(
+            'status_open_color',
             [
                 'label' => __('Text Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-button a' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-status-indicator.open' => 'color: {{VALUE}};',
                 ],
             ]
         );
 
         $this->add_control(
-            'button_bg_color',
+            'status_open_dot_color',
             [
-                'label' => __('Background Color', 'somnia'),
+                'label' => __('Dot Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-button a' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-status-indicator.open:before' => 'background: {{VALUE}};',
                 ],
-            ]
-        );
-        $this->add_control(
-            'button_border_color',
-            [
-                'label' => __('border Color', 'somnia'),
-                'type' => Controls_Manager::COLOR,
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-button a' => 'border-color: {{VALUE}};',
-                ],
-            ]
-        );
-        $this->end_controls_tab();
-
-        $this->start_controls_tab(
-            'style_hover',
-            [
-                'label' => __('Hover', 'somnia'),
             ]
         );
 
         $this->add_control(
-            'button_text_color_hover',
+            'status_close_heading',
+            [
+                'label' => esc_html__('Close Indicator', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'status_close_color',
             [
                 'label' => __('Text Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-button a:hover' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-status-indicator.close' => 'color: {{VALUE}};',
                 ],
             ]
         );
 
         $this->add_control(
-            'button_bg_color_hover',
+            'status_close_dot_color',
             [
-                'label' => __('Background Color', 'somnia'),
+                'label' => __('Dot Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-button a:hover' => 'background-color: {{VALUE}}; border-color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-status-indicator.close:before' => 'background: {{VALUE}};',
                 ],
             ]
         );
-        $this->add_control(
-            'button_border_color_hover',
-            [
-                'label' => __('border Color', 'somnia'),
-                'type' => Controls_Manager::COLOR,
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .bt-elwg-location-list--default .bt-location-list--heading-button a:hover' => 'border-color: {{VALUE}};',
-                ],
-            ]
-        );
-        $this->end_controls_tab();
 
-        $this->end_controls_tabs();
+        $this->add_control(
+            'status_text_heading',
+            [
+                'label' => esc_html__('Status Text (e.g. Closing time)', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'status_text_color',
+            [
+                'label' => __('Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-status-text' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'status_typography',
+                'selector' => '{{WRAPPER}} .bt-elwg-location-list--finder .bt-location-status .bt-status-indicator, {{WRAPPER}} .bt-elwg-location-list--finder .bt-status-text',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Direction Button
+        $this->start_controls_section(
+            'section_style_direction_button',
+            [
+                'label' => esc_html__('Direction Link', 'somnia'),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'direction_link_color',
+            [
+                'label' => __('Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-direction-link' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-direction-link svg path' => 'fill: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'direction_link_hover_color',
+            [
+                'label' => __('Hover Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-direction-link:hover' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .bt-elwg-location-list--finder .bt-direction-link:hover svg path' => 'fill: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'direction_link_typography',
+                'selector' => '{{WRAPPER}} .bt-elwg-location-list--finder .bt-direction-link',
+            ]
+        );
+
         $this->end_controls_section();
     }
 

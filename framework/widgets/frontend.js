@@ -1156,6 +1156,7 @@
 			// Initialize the testimonial content slider
 			const testimonialContentSwiper = new Swiper($testimonialContent[0], {
 				slidesPerView: 1,
+				spaceBetween: 10,
 				loop: true,
 				speed: sliderSpeed,
 				autoplay: autoplay ? {

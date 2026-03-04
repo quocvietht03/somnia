@@ -1418,24 +1418,25 @@
 
 	/* Helper function to open mini cart sidebar */
 	function SomniaOpenMiniCart() {
-		if ($('.bt-mini-cart-sidebar').length > 0) {
-			const $sidebar = $('.bt-mini-cart-sidebar');
-			$sidebar.addClass('active');
-			const scrollbarWidth = window.innerWidth - $(window).width();
-			$('body').css({
-				'overflow': 'hidden',
-				'padding-right': scrollbarWidth + 'px'
-			});
-			// Update bottom cart padding
-			setTimeout(function () {
-				const $bottomCart = $sidebar.find('.bt-bottom-mini-cart');
-				const $sidebarBody = $sidebar.find('.bt-mini-cart-sidebar-body');
-				if ($bottomCart.length && $sidebarBody.length) {
-					const height = $bottomCart.outerHeight(true);
-					$sidebarBody.css('--padding-bottom', height + 'px');
-				}
-			}, 100);
+		const $sidebar = $('.bt-mini-cart-sidebar');
+		if ($sidebar.length === 0 || $sidebar.hasClass('active')) {
+			return;
 		}
+		$sidebar.addClass('active');
+		const scrollbarWidth = window.innerWidth - $(window).width();
+		$('body').css({
+			'overflow': 'hidden',
+			'padding-right': scrollbarWidth + 'px'
+		});
+		// Update bottom cart padding
+		setTimeout(function () {
+			const $bottomCart = $sidebar.find('.bt-bottom-mini-cart');
+			const $sidebarBody = $sidebar.find('.bt-mini-cart-sidebar-body');
+			if ($bottomCart.length && $sidebarBody.length) {
+				const height = $bottomCart.outerHeight(true);
+				$sidebarBody.css('--padding-bottom', height + 'px');
+			}
+		}, 100);
 	}
 	function SomniashowToast(idproduct, tools = 'wishlist', status = 'add') {
 		// ajax load product toast
