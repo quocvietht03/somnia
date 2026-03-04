@@ -438,6 +438,17 @@ class Widget_ProductTestimonial extends Widget_Base
                 ],
             ]
         );
+        $this->add_control(
+            'image_border_radius',
+            [
+                'label' => __('Image Border Radius', 'somnia'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-testimonial--images .bt-image-cover' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
         $this->end_controls_section();
         // Content Style Section
         $this->start_controls_section(
