@@ -1766,13 +1766,14 @@
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 0 5px;
             font-size: 16px;
             font-style: normal;
             font-weight: 400;
             line-height: 24px;
             color: $color-text;
             border: none;
+            flex-wrap: wrap;
             &::before,
             &::after {
               display: none;
@@ -5478,8 +5479,8 @@
                 height: 60px !important;
               }
               .bt-product-content {
-                width: calc(100% - 68px);
-                gap: 4px;
+                flex: 1;
+                gap: 0;
               }
               h4 {
                 font-size: 14px;
@@ -5614,8 +5615,8 @@
               width: 25px;
               height: 25px;
               border-radius: 50%;
-              background-color: transparent;
-              border: 8px solid #ffffff;
+              background-color: $color-primary;
+              border: 8px solid $color-accent;
               cursor: pointer;
               margin: 0.5rem;
               -webkit-transition: all 0.3s ease;
@@ -5626,7 +5627,7 @@
 
               &::after,
               &::before {
-                border: solid 1px #ffffff;
+                border: solid 1px $color-accent;
                 border-radius: 50%;
                 position: absolute;
                 content: "";
@@ -5688,7 +5689,7 @@
             .bt-hotspot-product-info {
               position: absolute;
               background: #fff;
-              border-radius: 0;
+              border-radius: 12px;
               box-shadow: 0px 10px 25px 0px rgba(43, 52, 74, 0.12);
               opacity: 0;
               visibility: hidden;
@@ -5698,23 +5699,17 @@
               z-index: 2;
               display: flex;
               align-items: center;
-              gap: 15px;
+              gap: 12px;
               &.bt-quick-view {
                 .btn {
                   display: block;
                 }
-                h4 {
-                  line-height: 20px;
-                }
-                .bt-product-content {
-                  gap: 4px;
-                }
               }
               .bt-product-content {
-                width: calc(100% - 95px);
+                flex: 1;
                 display: flex;
                 flex-direction: column;
-                gap: 5px;
+                gap: 4px;
               }
               .bt-hotspot-product-thumbnail {
                 display: block;
@@ -5723,17 +5718,18 @@
                   height: 80px;
                   object-fit: cover;
                   display: block;
+                  border-radius: 8px;
                 }
               }
               h4 {
                 color: $color-primary;
                 font-size: 16px;
                 font-style: normal;
-                font-weight: 400;
-                line-height: 24px;
+                font-weight: 500;
+                line-height: 22px;
                 margin: 0;
                 display: -webkit-box;
-                -webkit-line-clamp: 2;
+                -webkit-line-clamp: 1;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
               }
@@ -5755,7 +5751,7 @@
                 .woocommerce-Price-amount {
                   font-size: 16px;
                   font-style: normal;
-                  font-weight: 400;
+                  font-weight: 500;
                   line-height: 1.62;
                   color: $color-primary;
                 }
@@ -5771,18 +5767,18 @@
                     font-style: normal;
                     font-weight: 400;
                     line-height: 1.57;
-                    color: $color-text;
+                    color: $color-secondary-2;
                   }
                 }
               }
               .btn {
                 display: none;
                 color: $color-primary;
-                font-size: 12px;
+                font-size: 14px;
                 font-style: normal;
                 font-weight: 500;
                 line-height: 22px;
-                text-transform: uppercase;
+                text-transform: capitalize;
                 margin: 0;
                 padding: 0;
                 text-decoration: underline;
@@ -5852,10 +5848,14 @@
         position: relative;
         overflow: hidden;
         margin: 0;
-        padding: 20px 15px 20px 75px;
+        padding: 20px 30px 20px 75px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        @media (max-width: 1580px) and (min-width: 1367px) {
+          --slider-offset-width: 100px;
+          padding-right: 0;
+        }
         .bt-hotspot-slider {
           overflow: hidden;
           &--sub-heading {
@@ -5864,7 +5864,7 @@
             font-weight: 500;
             line-height: 26px; /* 162.5% */
             text-transform: uppercase;
-            color: $color-secondary;
+            color: $color-secondary-2;
             margin: 0 0 8px 0;
             @media (max-width: $break-sm) {
               font-size: 14px;
@@ -5873,14 +5873,16 @@
           }
           &--heading {
             color: $color-primary;
-            font-size: 44px;
+            font-size: 40px;
             font-style: normal;
             font-weight: 500;
-            line-height: 50px;
-            margin: 0;
+            line-height: 48px; /* 120% */
+            text-transform: capitalize;
+            margin: 0 0 12px 0;
             @media (max-width: $break-sm) {
               font-size: 35px;
               line-height: 40px;
+              margin-bottom: 8px;
             }
           }
           &--description {
@@ -5888,18 +5890,18 @@
             font-style: normal;
             font-weight: 400;
             line-height: 28px; /* 162.5% */
-            color: $color-primary;
-            margin: 8px 0 0 0;
+            color: $color-text;
+            margin: 0;
             @media (max-width: $break-sm) {
-              font-size: 14px;
-              line-height: 20px;
+              font-size: 16px;
+              line-height: 22px;
             }
           }
           &--inner {
             width: 100%;
             height: auto;
             position: relative;
-            margin-top: 48px;
+            margin-top: 40px;
             overflow: visible;
             @media (max-width: $break-lg) {
               margin-top: 30px;
@@ -5918,47 +5920,35 @@
                   display: none;
                 }
               }
-            }
-            &:not(.bt-slider-style-rectangle) {
-              .bt-slider-item {
+              @media (max-width: 1730px) and (min-width: 1580px) {
                 .woocommerce-loop-product {
-                  &__thumbnail {
-                    .bt-product-images-wrapper {
-                      .woocommerce-product-gallery__image {
-                        padding-bottom: 100%;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            &.bt-slider-style-1 {
-              .bt-slider-item {
-                .woocommerce-loop-product {
-                  background: #fff;
-                  padding: 12px;
-                  &__title {
-                    -webkit-line-clamp: 1;
+                  &__infor {
+                    gap: 7px;
                   }
                 }
               }
             }
           }
           .bt-button-wrapper {
-            margin-top: 32px;
+            margin-top: 40px;
             .bt-button-add-set-to-cart {
               display: inline-flex;
               align-items: center;
-              padding: 16px 24px;
+              padding: 16px 32px;
               font-size: 16px;
               font-style: normal;
               font-weight: 500;
-              line-height: 26px;
-              text-transform: uppercase;
-              background: $color-primary;
-              color: #fff;
+              line-height: 26px; /* 162.5% */
+              text-transform: capitalize;
+              border-radius: 12px;
+              background: $color-accent;
+              color: $color-primary;
+              position: relative;
               svg {
                 margin-right: 12px;
+              }
+              .bt-btn-price {
+                margin-left: 4px;
               }
               &.loading {
                 color: transparent !important;
@@ -5974,7 +5964,7 @@
                   width: 16px;
                   height: 16px;
                   z-index: 9999;
-                  background-image: url("../images/loading-white.svg");
+                  background-image: url("../images/loading.svg");
                   background-repeat: no-repeat;
                   background-size: cover;
                   animation-name: effectSpin;
@@ -5983,63 +5973,6 @@
                   animation-timing-function: linear;
                 }
               }
-            }
-          }
-        }
-        .bt-add-to-cart-wrapper {
-          margin-top: 40px;
-          @media (max-width: $break-lg) {
-            margin-top: 30px;
-          }
-          .bt-add-to-cart-btn {
-            color: #fff;
-            text-align: center;
-            font-size: 16px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 26px;
-            text-transform: uppercase;
-            position: relative;
-            min-width: 240px;
-            &:hover {
-              background-color: $color-primary;
-            }
-            &.loading {
-              color: transparent !important;
-              opacity: 0.5;
-              > * {
-                color: transparent !important;
-              }
-              &::after {
-                content: "" !important;
-                position: absolute;
-                top: 37%;
-                left: 48%;
-                width: 16px;
-                height: 16px;
-                z-index: 9999;
-                background-image: url("../images/loading-white.svg");
-                background-repeat: no-repeat;
-                background-size: cover;
-                animation-name: effectSpin;
-                animation-duration: 1s;
-                animation-iteration-count: infinite;
-                animation-timing-function: linear;
-              }
-            }
-            .bt-btn-regular-price {
-              color: rgba(255, 255, 255, 0.6);
-              font-family: Outfit;
-              font-size: 14px;
-              font-style: normal;
-              font-weight: 400;
-              line-height: 22px;
-              text-decoration-line: line-through;
-              margin-left: 2px;
-            }
-            @media (max-width: 499.98px) {
-              width: 100%;
-              padding: 12px;
             }
           }
         }
@@ -6384,7 +6317,7 @@
         &.bt-pagination-yes {
           bottom: 80px;
         }
-        .bt-nav.bt-button-next{
+        .bt-nav.bt-button-next {
           right: 0;
         }
       }
@@ -6403,8 +6336,8 @@
         display: flex;
         gap: 16px;
         align-items: center;
-        .bt-product-thumbnail{
-          img{
+        .bt-product-thumbnail {
+          img {
             width: 60px;
             height: 60px;
             border-radius: 4px;
@@ -6412,9 +6345,9 @@
             display: block;
           }
         }
-        .bt-product-content{
+        .bt-product-content {
           flex: 1;
-          .bt-product-title{
+          .bt-product-title {
             font-size: 16px;
             font-style: normal;
             font-weight: 500;
@@ -6422,15 +6355,15 @@
             color: #fff;
             margin: 0;
             @extend .__bt-max-line-ellipsis;
-            a{
+            a {
               color: #fff;
             }
           }
         }
         @media (max-width: $break-xs) {
           padding: 10px;
-          .bt-product-thumbnail{
-            img{
+          .bt-product-thumbnail {
+            img {
               width: 45px;
               height: 45px;
             }
@@ -6517,7 +6450,7 @@
         }
       }
       @media (max-width: $break-tl) {
-        .bt-swiper-navigation{
+        .bt-swiper-navigation {
           width: 110px;
         }
         &--content {
@@ -6541,7 +6474,7 @@
         }
       }
       @media (max-width: $break-sm) {
-        .bt-swiper-navigation{
+        .bt-swiper-navigation {
           width: 82px;
         }
         &--content {

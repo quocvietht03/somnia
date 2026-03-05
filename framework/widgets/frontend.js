@@ -2450,13 +2450,16 @@
 				});
 			});
 		}
-		// Function to update variation_id in data-ids for a given product
-		function updateHotspotProductVariationId(productItem, variationId, $container) {
-
+		// Function to update price product
+		function updateHotspotProductPrice(productItem, variationId, $container) {
+			
 			const $productItem = productItem;
 			const $productId = $productItem.data('product-id');
-
 			const $product_currencySymbol = $productItem.data('product-currency');
+			const $product_html_price_default = $productItem.attr('data-product-html-price-default');
+			if ($product_html_price_default) {
+				$productItem.find(".woocommerce-loop-product__infor .price").html($product_html_price_default);
+			}
 			const $variationForm = $productItem.find('.variations_form');
 			if (typeof variationId === 'undefined' || !variationId || typeof variationId === 'object') {
 				variationId = parseInt($variationForm.find('input.variation_id').val(), 10) || 0;
@@ -2540,7 +2543,7 @@
 						} else {
 							// Simple product - get price from data attribute
 							if ($productItemId.length) {
-								const simplePrice = $productItemId.data('product-single-price');
+								const simplePrice = $productItemId.attr('data-product-default-price');
 								if (simplePrice) {
 									totalPrice += parseFloat(simplePrice);
 								}
@@ -2566,10 +2569,12 @@
 				$addSetToCartBtn.find('.bt-btn-price').html(' - ' + $product_currencySymbol + totalPrice);
 			}
 		}
+		window.updateHotspotProductPrice = updateHotspotProductPrice;
+		
 
 		// Initial update on load
 		$productItems.each(function () {
-			updateHotspotProductVariationId($(this), null, $container);
+			updateHotspotProductPrice($(this), null, $container);
 		});
 		// Update on variation change
 		$variationForm.find('select').on('change', function () {
@@ -2585,7 +2590,7 @@
 						$ItemProduct.removeClass('out-of-stock');
 						$ItemProduct.attr('data-in-stock', '1');
 					}
-					updateHotspotProductVariationId($ItemProduct, variationId, $container);
+					updateHotspotProductPrice($ItemProduct, variationId, $container);
 					var variations = $form.data('product_variations');
 					if (variations) {
 						var variation = variations.find(function (v) {
@@ -2603,6 +2608,53 @@
 				}
 
 			});
+		});
+		/* Function to update price product in quickview */
+		$productItems.on('click', '.bt-loop-add-to-cart-btn', function (e) {
+			e.preventDefault();
+			// Find the nearest .elementor-widget-bt-product-tooltip-hotspot and get data-id
+			var widgetId = $(this).closest('.elementor-widget-bt-product-tooltip-hotspot').data('id');
+			var defaultAttributesData = $(this).closest('.bt-hotspot-product-list__item').attr('data-product-default-attributes');
+			var $quickviewWrap = $('.bt-popup-quick-view .bt-quick-view-load');
+			if ($quickviewWrap.length && widgetId) {
+				setTimeout(function () {
+					var $productContainer = $quickviewWrap.find('.product');
+					if ($productContainer.length) {
+						$productContainer.attr('data-widget-id', widgetId);
+					// Get data from data-product-default-attributes (even if updated to a different variable)
+					// Then add the active class again for buttons in .bt-attributes-wrap of $productContainer
+					
+
+					if (defaultAttributesData) {
+						try {
+							var attributes = JSON.parse(defaultAttributesData);
+							
+							// Clean attributes by removing 'attribute_' prefix if present
+							var cleanAttributes = {};
+							$.each(attributes, function(attributeName, attributeValue) {
+								var cleanName = attributeName.replace(/^attribute_/, '');
+								cleanAttributes[cleanName] = attributeValue;
+							});
+						
+							var $attributesWrap = $productContainer.find('.bt-attributes-wrap');
+							if ($attributesWrap.length && typeof cleanAttributes === 'object' && cleanAttributes !== null) {
+								// Loop through each attribute to re-add active class for the corresponding option
+								$.each(cleanAttributes, function(attributeName, attributeValue) {
+									var $group = $attributesWrap.find('[data-attribute-name="' + attributeName + '"]');
+									$group.find('.bt-item-value').removeClass('active');
+									var $optionBtn = $group.find('[data-value="' + attributeValue + '"]');
+									if ($optionBtn.length) {
+										$optionBtn.addClass('active').attr('aria-checked', 'true');
+									}
+								});
+							}
+						} catch(e) {
+							console.error('Cannot parse data-product-default-attributes', e);
+						}
+					}
+					}
+				}, 300);
+			}
 		});
 		/* ajax add to cart */
 		$container.find('.bt-button-add-set-to-cart').on('click', function (e) {
@@ -2682,6 +2734,7 @@
 			}
 		});
 	}
+
 	// Product list hotspot
 	const ProductListHotspotHandler = function ($scope) {
 		const $hotspotProductNormal = $scope.find('.bt-elwg-product-list-hotspot--default');
@@ -2988,7 +3041,7 @@
 					disableOnInteraction: false
 				} : false,
 				breakpoints: {
-					1560: {
+					1581: {
 						slidesPerView: 3,
 						spaceBetween: $sliderSettings.spaceBetween.desktop
 					},
@@ -4265,18 +4318,18 @@
 
 	const LocationListHandler = function ($scope, $) {
 		const $locationFinder = $scope.find('.bt-elwg-location-list--finder');
-		
+
 		if ($locationFinder.length === 0) return;
-		
+
 		const $locationItems = $locationFinder.find('.bt-location-item');
 		const $searchInput = $locationFinder.find('#location-search');
 		const $searchButton = $locationFinder.find('.bt-search-button');
 		const $mapContainer = $locationFinder.find('.bt-location-finder--map .bt-map-container');
 		const $mapInfoCard = $locationFinder.find('#map-info-card');
-		
+
 		// Create locations JSON data
 		let locationsData = [];
-		$locationItems.each(function(index) {
+		$locationItems.each(function (index) {
 			const $item = $(this);
 			locationsData.push({
 				index: index,
@@ -4288,16 +4341,16 @@
 				element: $item
 			});
 		});
-		
+
 		// Create all maps and hide them initially
 		function createAllMaps() {
 			$mapContainer.empty();
-			
-			locationsData.forEach(function(location, index) {
+
+			locationsData.forEach(function (location, index) {
 				if (location.mapAddress) {
-					const mapSrc = 'https://maps.google.com/maps?q=' + encodeURIComponent(location.mapAddress) + 
-								  '&t=m&z=' + location.zoom + '&output=embed&iwloc=near';
-					
+					const mapSrc = 'https://maps.google.com/maps?q=' + encodeURIComponent(location.mapAddress) +
+						'&t=m&z=' + location.zoom + '&output=embed&iwloc=near';
+
 					const $iframe = $('<iframe>', {
 						id: 'location-map-' + index,
 						class: 'location-map-iframe',
@@ -4307,42 +4360,42 @@
 						'aria-label': location.mapAddress,
 						style: index === 0 ? 'display: block;' : 'display: none;'
 					});
-					
+
 					$mapContainer.append($iframe);
 				}
 			});
 		}
-		
+
 		// Initialize maps
 		createAllMaps();
-		
+
 		// Location click handler
-		$locationItems.on('click', function(e) {
+		$locationItems.on('click', function (e) {
 			// Allow links (a tags) inside location item to work normally
 			if ($(e.target).closest('a').length) {
 				return;
 			}
 			e.preventDefault();
-			
+
 			const $this = $(this);
 			const locationIndex = $this.data('location-index');
 			const locationData = locationsData[locationIndex];
-			
+
 			if (!locationData) return;
-			
+
 			// Update active state
 			$locationItems.removeClass('active');
 			$this.addClass('active');
-			
+
 			// Show corresponding map
 			$mapContainer.find('.location-map-iframe').hide();
 			$mapContainer.find('#location-map-' + locationIndex).show();
-			
+
 			// Update info card
 			$mapInfoCard.find('.bt-map-info-title').text($this.find('.bt-location-title').text());
 			$mapInfoCard.find('.bt-map-info-address').text($this.find('.bt-location-address').text());
 			$mapInfoCard.find('.bt-map-info-location').text($this.find('.bt-location-address').text());
-			
+
 			// Scroll to map on mobile
 			if ($(window).width() <= 1024) {
 				$('html, body').animate({
@@ -4350,19 +4403,19 @@
 				}, 500);
 			}
 		});
-		
+
 		// Enhanced search functionality using JSON data
 		function performSearch() {
 			const searchTerm = $searchInput.val().toLowerCase().trim();
 			let visibleCount = 0;
-			
+
 			// Search through JSON data
-			locationsData.forEach(function(location) {
-				const isMatch = searchTerm === '' || 
-							   location.title.includes(searchTerm) || 
-							   location.address.includes(searchTerm) || 
-							   location.phone.includes(searchTerm);
-				
+			locationsData.forEach(function (location) {
+				const isMatch = searchTerm === '' ||
+					location.title.includes(searchTerm) ||
+					location.address.includes(searchTerm) ||
+					location.phone.includes(searchTerm);
+
 				if (isMatch) {
 					location.element.removeClass('bt-hidden').addClass('bt-visible');
 					visibleCount++;
@@ -4370,7 +4423,7 @@
 					location.element.removeClass('bt-visible').addClass('bt-hidden');
 				}
 			});
-			
+
 			// Show no results message
 			let $noResults = $locationFinder.find('.bt-no-results');
 			if (visibleCount === 0 && searchTerm !== '') {
@@ -4382,7 +4435,7 @@
 			} else {
 				$noResults.removeClass('show');
 			}
-			
+
 			// Auto-select first visible item
 			if (searchTerm !== '' && visibleCount > 0) {
 				const $firstVisible = $locationItems.filter(':visible').first();
@@ -4391,37 +4444,37 @@
 				}
 			}
 		}
-		
+
 		// Search input handler with debounce
 		let searchTimeout;
-		$searchInput.on('input', function() {
+		$searchInput.on('input', function () {
 			clearTimeout(searchTimeout);
 			searchTimeout = setTimeout(performSearch, 300);
 		});
-		
+
 		// Search on Enter key
-		$searchInput.on('keypress', function(e) {
+		$searchInput.on('keypress', function (e) {
 			if (e.which === 13) {
 				e.preventDefault();
 				clearTimeout(searchTimeout);
 				performSearch();
 			}
 		});
-		
+
 		// Search button click
-		$searchButton.on('click', function(e) {
+		$searchButton.on('click', function (e) {
 			e.preventDefault();
 			clearTimeout(searchTimeout);
 			performSearch();
 		});
-		
+
 		// Keyboard navigation
-		$searchInput.on('keydown', function(e) {
+		$searchInput.on('keydown', function (e) {
 			const $visibleItems = $locationItems.filter(':visible');
 			const $activeItem = $visibleItems.filter('.active');
 			const currentIndex = $visibleItems.index($activeItem);
-			
-			switch(e.which) {
+
+			switch (e.which) {
 				case 38: // Up arrow
 					e.preventDefault();
 					if (currentIndex > 0) {
@@ -4438,12 +4491,12 @@
 					break;
 			}
 		});
-		
+
 		// Initialize: Select first item by default
 		if ($locationItems.length > 0) {
 			$locationItems.first().addClass('active');
 		}
-		
+
 	};
 	// Make sure you run this code under Elementor.
 	$(window).on('elementor/frontend/init', function () {

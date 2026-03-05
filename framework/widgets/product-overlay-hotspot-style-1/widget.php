@@ -498,7 +498,7 @@ class Widget_ProductOverlayHotspotStyle1 extends Widget_Base
                                     ?>
                                                 <li class="bt-hotspot-product-list__item bt-product-item<?php echo esc_attr($out_of_stock_class); ?>"
                                                     data-product-currency="<?php echo esc_attr($product_currencySymbol); ?>"
-                                                    data-product-single-price="<?php echo esc_attr($product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price()); ?>"
+                                                    data-product-default-price="<?php echo esc_attr($product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price()); ?>"
                                                     data-product-id="<?php echo esc_attr($product_id); ?>"
                                                     data-in-stock="<?php echo esc_attr($is_in_stock ? '1' : '0'); ?>">
                                                     <a class="bt-product-thumbnail" href="<?php echo esc_url($product->get_permalink()); ?>">
