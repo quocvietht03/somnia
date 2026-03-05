@@ -105,7 +105,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
 		);
 
         $this->add_control(
-            'enable_video_hover',
+            'enable_video',
             [
                 'label' => __('Enable Video on Hover', 'somnia'),
                 'type' => Controls_Manager::SWITCHER,
@@ -113,6 +113,20 @@ class Widget_ProductSpotlightItem extends Widget_Base
                 'label_off' => __('No', 'somnia'),
                 'return_value' => 'yes',
                 'default' => 'no',
+            ]
+        );
+        $this->add_control(
+            'image_overlay',
+            [
+                'label' => __('Enable Image Overlay', 'somnia'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'somnia'),
+                'label_off' => __('No', 'somnia'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+				'condition' => [
+                    'enable_video' => 'yes',
+                ],
             ]
         );
         $this->add_control(
@@ -126,7 +140,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
                     'file' => __('Media File', 'somnia'),
                 ],
                 'condition' => [
-                    'enable_video_hover' => 'yes',
+                    'enable_video' => 'yes',
                 ],
             ]
         );
@@ -140,7 +154,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
                 'description' => __('Enter video URL (Mp4)', 'somnia'),
                 'condition' => [
                     'video_type' => ['url'],
-                    'enable_video_hover' => 'yes',
+                    'enable_video' => 'yes',
                 ],
                 'label_block' => true,
             ]
@@ -154,7 +168,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
                 'media_type' => 'video',
                 'condition' => [
                     'video_type' => 'file',
-                    'enable_video_hover' => 'yes',
+                    'enable_video' => 'yes',
                 ],
             ]
         );
@@ -319,7 +333,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
 
 		?>
 		<div class="bt-elwg-product-spotlight-item">
-            <div class="bt-product-spotlight-item <?php echo esc_attr($settings['enable_video_hover'] === 'yes' ? 'bt-video-hover-enabled' : ''); ?>">
+            <div class="bt-product-spotlight-item <?php echo esc_attr($settings['image_overlay'] === 'yes' ? 'bt-video-hover-enabled' : ''); ?>">
                 <div class="bt-cover-image">
                     <?php
                         if (!empty($settings['featured_image']['id'])) {
@@ -333,7 +347,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
                         }
                     ?>
 
-                    <?php if ($settings['enable_video_hover'] === 'yes') :
+                    <?php if ($settings['enable_video'] === 'yes') :
                         if ($settings['video_type'] === 'url') {
                             $video_url = $settings['video_url'];
                         } else {
@@ -341,7 +355,7 @@ class Widget_ProductSpotlightItem extends Widget_Base
                         }
                         if (!empty($video_url)) {
                             ?>
-                            <video class="bt-hover-video" playsinline muted loop>
+                            <video class="bt-hover-video" playsinline muted loop autoplay>
                                 <source src="<?php echo esc_url($video_url); ?>" type="video/mp4">
                             </video>
                             <?php
@@ -349,8 +363,10 @@ class Widget_ProductSpotlightItem extends Widget_Base
                         ?>
                     <?php endif; ?>
                 </div>
-                <?php if (!empty($settings['product_id'])) : 
-                    $product = wc_get_product($settings['product_id']);
+                <?php 
+                if ( ! empty( $settings['product_id'] ) ) {
+                    $product = wc_get_product( $settings['product_id'] );
+                    if ( $product ) : 
                     ?>
                     <div class="bt-product-mini-item">
                         <a class="bt-product-mini-item--link" href="<?php echo esc_url($product->get_permalink()); ?>">
@@ -376,7 +392,8 @@ class Widget_ProductSpotlightItem extends Widget_Base
                             </div>
                         </a>
                     </div>
-                <?php endif; ?>
+                <?php endif; 
+				} ?>
             </div>
         </div>
 		<?php

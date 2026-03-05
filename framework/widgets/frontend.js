@@ -4541,6 +4541,7 @@
 		elementorFrontend.hooks.addAction('frontend/element_ready/list-text-image-hover.default', ImageListWidgetHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/flicker-collage.default', FlickerCollageHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-popup-hotspot.default', ProductPopupHotspotHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-spotlight-item.default', VideoAutoPlayHoverHandler);
 
 
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-hotspot.default', AccordionHotspotHandler);

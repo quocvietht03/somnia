@@ -17148,6 +17148,16 @@
         }
       }
     }
+    &.bt-video-hover-enabled {
+      .bt-cover-image{
+        img{
+          opacity: 1;
+        }
+        video{
+          opacity: 0;
+        }
+      }
+    }
   }
 }
 
