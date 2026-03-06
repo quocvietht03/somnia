@@ -3058,8 +3058,12 @@
 						slidesPerView: 3,
 						spaceBetween: $sliderSettings.spaceBetween.desktop
 					},
-					1025: {
+					1200: {
 						slidesPerView: 2,
+						spaceBetween: $sliderSettings.spaceBetween.desktop
+					},
+					1025: {
+						slidesPerView: 1,
 						spaceBetween: $sliderSettings.spaceBetween.desktop
 					},
 					767: {

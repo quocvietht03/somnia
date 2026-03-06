@@ -5852,8 +5852,12 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        @media (max-width: 1580px) and (min-width: 1367px) {
+        @media (max-width: 1580px) and (min-width: $break-lg) {
           --slider-offset-width: 100px;
+          padding-right: 0;
+        }
+        @media (max-width: $break-lg) and (min-width: $break-md) {
+          --slider-offset-width: 200px;
           padding-right: 0;
         }
         .bt-hotspot-slider {
