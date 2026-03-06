@@ -1128,7 +1128,6 @@
 		}
 	}
 	function SomniaFreeShippingMessage() {
-		console.log("trong");
 		$.ajax({
 			url: AJ_Options.ajax_url,
 			type: 'POST',
@@ -2615,45 +2614,59 @@
 			// Find the nearest .elementor-widget-bt-product-tooltip-hotspot and get data-id
 			var widgetId = $(this).closest('.elementor-widget-bt-product-tooltip-hotspot').data('id');
 			var defaultAttributesData = $(this).closest('.bt-hotspot-product-list__item').attr('data-product-default-attributes');
-			var $quickviewWrap = $('.bt-popup-quick-view .bt-quick-view-load');
-			if ($quickviewWrap.length && widgetId) {
-				setTimeout(function () {
+			
+			// Store data for use when quick view is loaded
+			if (widgetId && defaultAttributesData) {
+				window.pendingQuickViewData = {
+					widgetId: widgetId,
+					defaultAttributesData: defaultAttributesData
+				};
+			}
+		});
+
+		// Listen for quick view loaded event
+		$(document).on('somniaQuickViewLoaded', function() {
+			if (window.pendingQuickViewData) {
+				var widgetId = window.pendingQuickViewData.widgetId;
+				var defaultAttributesData = window.pendingQuickViewData.defaultAttributesData;
+				var $quickviewWrap = $('.bt-popup-quick-view .bt-quick-view-load');
+				
+				if ($quickviewWrap.length && widgetId) {
 					var $productContainer = $quickviewWrap.find('.product');
 					if ($productContainer.length) {
 						$productContainer.attr('data-widget-id', widgetId);
-					// Get data from data-product-default-attributes (even if updated to a different variable)
-					// Then add the active class again for buttons in .bt-attributes-wrap of $productContainer
-					
-
-					if (defaultAttributesData) {
-						try {
-							var attributes = JSON.parse(defaultAttributesData);
-							
-							// Clean attributes by removing 'attribute_' prefix if present
-							var cleanAttributes = {};
-							$.each(attributes, function(attributeName, attributeValue) {
-								var cleanName = attributeName.replace(/^attribute_/, '');
-								cleanAttributes[cleanName] = attributeValue;
-							});
-						
-							var $attributesWrap = $productContainer.find('.bt-attributes-wrap');
-							if ($attributesWrap.length && typeof cleanAttributes === 'object' && cleanAttributes !== null) {
-								// Loop through each attribute to re-add active class for the corresponding option
-								$.each(cleanAttributes, function(attributeName, attributeValue) {
-									var $group = $attributesWrap.find('[data-attribute-name="' + attributeName + '"]');
-									$group.find('.bt-item-value').removeClass('active');
-									var $optionBtn = $group.find('[data-value="' + attributeValue + '"]');
-									if ($optionBtn.length) {
-										$optionBtn.addClass('active').attr('aria-checked', 'true');
-									}
+						if (defaultAttributesData) {
+							try {
+								var attributes = JSON.parse(defaultAttributesData);
+								
+								// Clean attributes by removing 'attribute_' prefix if present
+								var cleanAttributes = {};
+								$.each(attributes, function(attributeName, attributeValue) {
+									var cleanName = attributeName.replace(/^attribute_/, '');
+									cleanAttributes[cleanName] = attributeValue;
 								});
+							
+								var $attributesWrap = $productContainer.find('.bt-attributes-wrap');
+								if ($attributesWrap.length && typeof cleanAttributes === 'object' && cleanAttributes !== null) {
+									// Loop through each attribute to re-add active class for the corresponding option
+									$.each(cleanAttributes, function(attributeName, attributeValue) {
+										var $group = $attributesWrap.find('[data-attribute-name="' + attributeName + '"]');
+										$group.find('.bt-item-value').removeClass('active');
+										var $optionBtn = $group.find('[data-value="' + attributeValue + '"]');
+										if ($optionBtn.length) {
+											$optionBtn.addClass('active').attr('aria-checked', 'true');
+										}
+									});
+								}
+							} catch(e) {
+								console.error('Cannot parse data-product-default-attributes', e);
 							}
-						} catch(e) {
-							console.error('Cannot parse data-product-default-attributes', e);
 						}
 					}
-					}
-				}, 300);
+				}
+				
+				// Clear pending data after processing
+				window.pendingQuickViewData = null;
 			}
 		});
 		/* ajax add to cart */

@@ -1378,7 +1378,10 @@
 						$('.bt-product-quick-view-btn, .bt-loop-add-to-cart-btn').removeClass('loading');
 						if (response.success) {
 							showQuickViewPopup();
-							$('.bt-popup-quick-view .bt-quick-view-load').html(response.data['product']).fadeIn('slow');
+							$('.bt-popup-quick-view .bt-quick-view-load').html(response.data['product']).fadeIn('slow', function() {
+								// Trigger custom event when quick view content is fully loaded and visible
+								$(document).trigger('somniaQuickViewLoaded');
+							});
 							SomniaLoadShopQuickView();
 							SomniaProductButtonStatus();
 							SomniaLoadDefaultActiveVariations('.bt-popup-quick-view');
