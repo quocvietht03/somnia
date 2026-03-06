@@ -416,7 +416,7 @@
 									.html("Add to cart" + formattedPrice);
 							}
 							// Update price data attribute for hotspot widget
-							// Check if this is within a quickview and has widget-id
+
 							var $quickviewProduct = $(this).closest('.bt-quickview-wrap').find('.product');
 							if ($quickviewProduct.length && $quickviewProduct.data('widget-id')) {
 								var widgetId = $quickviewProduct.data('widget-id');
@@ -452,6 +452,15 @@
 											if (!isCurrentEmpty) {
 												$widgetProductItem.attr('data-product-default-attributes', JSON.stringify(variation.attributes));
 											}
+											let attributePairs = [];
+											for (let key in variation.attributes) {
+												if (variation.attributes.hasOwnProperty(key)) {
+													// Remove 'attribute_pa_' prefix from key
+													let cleanKey = key.replace('attribute_pa_', '');
+													attributePairs.push(cleanKey + ': <span>' + variation.attributes[key] + '</span>');
+												}
+											}
+											$widgetProductItem.find('.product-default-attributes').html(attributePairs.join(' / '));
 										}
 										// Call updateHotspotProductPrice function if available
 										if (typeof updateHotspotProductPrice === 'function') {

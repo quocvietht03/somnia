@@ -1224,7 +1224,7 @@ class Widget_ProductTooltipHotspot extends Widget_Base
                                                     data-product-default-attributes="<?php echo esc_attr(json_encode($default_attributes)); ?>"
                                                     >
                                                     <?php
-                                                    wc_get_template_part('content', 'product');
+                                                    wc_get_template('content-product.php', array('attributes_default' => $default_attributes));
                                                     ?>
                                                 </li>
                                     <?php

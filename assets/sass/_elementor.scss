@@ -5924,6 +5924,16 @@
                   display: none;
                 }
               }
+              .product-default-attributes{
+                text-transform: capitalize;
+                font-size: 16px;
+                line-height: 22px;
+                font-weight: 400;
+                color: $color-text;
+                span{
+                  font-weight: 500;
+                }
+              }
               @media (max-width: 1730px) and (min-width: 1580px) {
                 .woocommerce-loop-product {
                   &__infor {

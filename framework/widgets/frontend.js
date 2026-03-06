@@ -2651,7 +2651,7 @@
 									// Loop through each attribute to re-add active class for the corresponding option
 									$.each(cleanAttributes, function(attributeName, attributeValue) {
 										var $group = $attributesWrap.find('[data-attribute-name="' + attributeName + '"]');
-										$group.find('.bt-item-value').removeClass('active');
+										$group.find('.bt-js-item').removeClass('active');
 										var $optionBtn = $group.find('[data-value="' + attributeValue + '"]');
 										if ($optionBtn.length) {
 											$optionBtn.addClass('active').attr('aria-checked', 'true');
