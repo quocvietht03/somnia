@@ -5654,7 +5654,7 @@
               @media (max-width: $break-xs) {
                 width: 18px;
                 height: 18px;
-                border: 6px solid #ffffff;
+                border: 6px solid $color-accent;
               }
             }
             &.bt-hotspot-point-style-number {
@@ -5945,6 +5945,9 @@
           }
           .bt-button-wrapper {
             margin-top: 40px;
+            @media (max-width: $break-sm) {
+              margin-top: 30px;
+            }
             .bt-button-add-set-to-cart {
               display: inline-flex;
               align-items: center;

@@ -2451,7 +2451,7 @@
 		}
 		// Function to update price product
 		function updateHotspotProductPrice(productItem, variationId, $container) {
-			
+
 			const $productItem = productItem;
 			const $productId = $productItem.data('product-id');
 			const $product_currencySymbol = $productItem.data('product-currency');
@@ -2569,7 +2569,7 @@
 			}
 		}
 		window.updateHotspotProductPrice = updateHotspotProductPrice;
-		
+
 
 		// Initial update on load
 		$productItems.each(function () {
@@ -2614,7 +2614,7 @@
 			// Find the nearest .elementor-widget-bt-product-tooltip-hotspot and get data-id
 			var widgetId = $(this).closest('.elementor-widget-bt-product-tooltip-hotspot').data('id');
 			var defaultAttributesData = $(this).closest('.bt-hotspot-product-list__item').attr('data-product-default-attributes');
-			
+
 			// Store data for use when quick view is loaded
 			if (widgetId && defaultAttributesData) {
 				window.pendingQuickViewData = {
@@ -2625,12 +2625,12 @@
 		});
 
 		// Listen for quick view loaded event
-		$(document).on('somniaQuickViewLoaded', function() {
+		$(document).on('somniaQuickViewLoaded', function () {
 			if (window.pendingQuickViewData) {
 				var widgetId = window.pendingQuickViewData.widgetId;
 				var defaultAttributesData = window.pendingQuickViewData.defaultAttributesData;
 				var $quickviewWrap = $('.bt-popup-quick-view .bt-quick-view-load');
-				
+
 				if ($quickviewWrap.length && widgetId) {
 					var $productContainer = $quickviewWrap.find('.product');
 					if ($productContainer.length) {
@@ -2638,33 +2638,39 @@
 						if (defaultAttributesData) {
 							try {
 								var attributes = JSON.parse(defaultAttributesData);
-								
+
 								// Clean attributes by removing 'attribute_' prefix if present
 								var cleanAttributes = {};
-								$.each(attributes, function(attributeName, attributeValue) {
+								$.each(attributes, function (attributeName, attributeValue) {
 									var cleanName = attributeName.replace(/^attribute_/, '');
 									cleanAttributes[cleanName] = attributeValue;
 								});
-							
+
 								var $attributesWrap = $productContainer.find('.bt-attributes-wrap');
+								var tableAttributes = $productContainer.find('table.variations');
 								if ($attributesWrap.length && typeof cleanAttributes === 'object' && cleanAttributes !== null) {
 									// Loop through each attribute to re-add active class for the corresponding option
-									$.each(cleanAttributes, function(attributeName, attributeValue) {
+									$.each(cleanAttributes, function (attributeName, attributeValue) {
 										var $group = $attributesWrap.find('[data-attribute-name="' + attributeName + '"]');
 										$group.find('.bt-js-item').removeClass('active');
 										var $optionBtn = $group.find('[data-value="' + attributeValue + '"]');
 										if ($optionBtn.length) {
 											$optionBtn.addClass('active').attr('aria-checked', 'true');
 										}
+										// WooCommerce uses select[name^="attribute_"]
+										var $select = tableAttributes.find('select[name="attribute_' + attributeName + '"]');
+										if ($select.length) {
+											$select.val(attributeValue).trigger('change'); // set value and trigger events
+										}
 									});
 								}
-							} catch(e) {
+							} catch (e) {
 								console.error('Cannot parse data-product-default-attributes', e);
 							}
 						}
 					}
 				}
-				
+
 				// Clear pending data after processing
 				window.pendingQuickViewData = null;
 			}
