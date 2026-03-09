@@ -4639,7 +4639,8 @@
 
 			// Add AJAX data
 			formData.append('action', 'bt_login_user');
-
+			formData.append('current_url', window.location.href);
+			
 			// Disable submit button and show loading
 			$submitBtn.prop('disabled', true).addClass('bt-loading');
 			$loginMessagesContainer.empty().removeClass('bt-success bt-error');

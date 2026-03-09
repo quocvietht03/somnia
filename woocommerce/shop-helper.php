@@ -6136,9 +6136,21 @@ if (!function_exists('somnia_ajax_login_user')) {
             wp_send_json_error(['message' => $user->get_error_message()]);
         }
 
+        // Get current page URL for redirect
+        $redirect_url = '';
+        if (isset($_POST['current_url']) && !empty($_POST['current_url'])) {
+            $redirect_url = esc_url_raw($_POST['current_url']);
+        } else {
+            // Fallback to referer or current page
+            $redirect_url = wp_get_referer();
+            if (!$redirect_url) {
+                $redirect_url = home_url($_SERVER['REQUEST_URI']);
+            }
+        }
+
         wp_send_json_success([
             'message' => esc_html__('Login successful! Redirecting...', 'somnia'),
-            'redirect_url' => class_exists('Woocommerce') ? wc_get_page_permalink('myaccount') : admin_url(),
+            'redirect_url' => $redirect_url,
         ]);
     }
     add_action('wp_ajax_bt_login_user', 'somnia_ajax_login_user');
@@ -6218,9 +6230,21 @@ if (!function_exists('somnia_ajax_register_user')) {
         wp_set_current_user($user_id);
         wp_set_auth_cookie($user_id, true);
 
+        // Get current page URL for redirect
+        $redirect_url = '';
+        if (isset($_POST['current_url']) && !empty($_POST['current_url'])) {
+            $redirect_url = esc_url_raw($_POST['current_url']);
+        } else {
+            // Fallback to referer or current page
+            $redirect_url = wp_get_referer();
+            if (!$redirect_url) {
+                $redirect_url = home_url($_SERVER['REQUEST_URI']);
+            }
+        }
+
         wp_send_json_success([
             'message' => esc_html__('Account created successfully! Redirecting...', 'somnia'),
-            'redirect_url' => class_exists('Woocommerce') ? wc_get_page_permalink('myaccount') : admin_url(),
+            'redirect_url' => $redirect_url,
         ]);
     }
     add_action('wp_ajax_bt_register_user', 'somnia_ajax_register_user');

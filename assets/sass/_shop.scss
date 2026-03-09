@@ -1722,14 +1722,14 @@
           padding: 9px 46px;
           font-size: 16px;
           line-height: 1.5;
-          color: #fff;
+          color: $color-primary;
           background-color: $color-accent;
           font-weight: 500;
           white-space: nowrap;
           border-radius: 4px;
           @media (min-width: $break-sm) {
             &:hover {
-              color: #fff;
+              color: $color-accent;
               background-color: $color-primary;
             }
           }
@@ -3541,7 +3541,7 @@
             @media (min-width: $break-sm) {
               &:hover {
                 background-color: $color-accent;
-                color: #fff;
+                color: $color-primary;
               }
             }
           }
@@ -5960,11 +5960,8 @@
           }
           @media (min-width: $break-sm) {
             &:hover:not(.disabled) {
-              background-color: $color-accent;
-              color: $color-primary;
-              background-image: linear-gradient(90deg, transparent 25%, rgba(233, 233, 233, 0.39) 50%, transparent 75%);
-              background-size: 200% 100%;
-              animation: shimmer 1.5s infinite linear;
+              background-color: $color-primary;
+              color: $color-accent;
             }
           }
           @media (max-width: $break-xs), (min-width: 768px) and (max-width: $break-md) {
@@ -8376,7 +8373,7 @@
       padding: 13px 40px;
       font-size: 16px;
       line-height: 1.5;
-      color: #fff;
+      color: $color-primary;
       border-radius: 8px;
       background-color: $color-accent;
       font-weight: 500;
@@ -8385,7 +8382,7 @@
       @media (min-width: $break-sm) {
         &:hover {
           background-color: $color-accent;
-          color: #fff;
+          color: $color-primary;
         }
       }
     }
@@ -9247,12 +9244,11 @@
       }
       .button {
         background-color: $color-accent;
+        color: $color-primary;
         @media (min-width: $break-sm) {
           &:hover {
             background: $color-primary;
-            background-image: linear-gradient(90deg, transparent 25%, rgba(233, 233, 233, 0.39) 50%, transparent 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite linear;
+            color: $color-accent;
           }
         }
       }
@@ -10063,7 +10059,7 @@
         }
         .bt-button {
           padding: 12px 30px;
-          color: #ffffff;
+          color: $color-primary;
           background-color: $color-accent;
           border-radius: 4px;
           font-size: 16px;
@@ -10076,6 +10072,7 @@
           @media (min-width: $break-sm) {
             &:hover {
               background-color: $color-primary;
+              color: $color-accent;
             }
           }
         }
@@ -10220,7 +10217,7 @@
     }
     .button {
       padding: 12px 30px;
-      color: #ffffff !important;
+      color: $color-primary !important;
       background-color: $color-accent;
       border-radius: 4px;
       font-size: 16px;
@@ -10232,9 +10229,7 @@
       @media (min-width: $break-sm) {
         &:hover {
           background-color: $color-primary !important;
-          background-image: linear-gradient(90deg, transparent 25%, rgba(233, 233, 233, 0.39) 50%, transparent 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.5s infinite linear;
+          color: $color-accent !important;
         }
       }
     }
@@ -10280,7 +10275,7 @@
         border-radius: 15px;
       }
       &.is-active a {
-        color: #ffffff;
+        color: $color-primary;
         background: $color-accent;
       }
     }
@@ -10296,7 +10291,7 @@
       margin: 0 30px;
       .woocommerce-button {
         background: $color-accent;
-        color: #fff;
+        color: $color-primary;
       }
     }
     fieldset {

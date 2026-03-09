@@ -324,13 +324,13 @@ class Widget_AccountLogin extends Widget_Base
 								<form class="bt-login-form" method="post" data-widget-id="<?php echo esc_attr($widget_id); ?>">
 								<div class="bt-form-group">
 									<label for="bt-username-<?php echo esc_attr($widget_id); ?>"><?php esc_html_e('Username or email address', 'somnia'); ?><span class="required">*</span></label>
-									<input type="text" placeholder="<?php esc_html_e('Username or email address', 'somnia'); ?>" id="bt-username-<?php echo esc_attr($widget_id); ?>" name="username" class="bt-form-control" required>
+									<input type="text" id="bt-username-<?php echo esc_attr($widget_id); ?>" name="username" class="bt-form-control" required>
 								</div>
 								
 								<div class="bt-form-group">
 									<label for="bt-password-<?php echo esc_attr($widget_id); ?>"><?php esc_html_e('Password', 'somnia'); ?><span class="required">*</span></label>
 									<div class="bt-password-wrapper">
-										<input type="password" placeholder="<?php esc_html_e('Password', 'somnia'); ?>" id="bt-password-<?php echo esc_attr($widget_id); ?>" name="password" class="bt-form-control" required>
+										<input type="password" id="bt-password-<?php echo esc_attr($widget_id); ?>" name="password" class="bt-form-control" required>
 										<button type="button" class="bt-toggle-password" aria-label="<?php esc_attr_e('Show password', 'somnia'); ?>">
 											<svg class="bt-eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 												<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
