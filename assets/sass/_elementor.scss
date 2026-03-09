@@ -379,7 +379,6 @@
       vertical-align: middle;
 
       .bt-submenu-indicator {
-        display: inline-flex;
         margin-left: 6px;
         flex-shrink: 0;
         color: $color-primary;
@@ -400,7 +399,8 @@
         }
       }
       > a {
-        display: block;
+        display: inline-flex;
+        align-items: center;
         text-decoration: none;
         transition: all 0.3s ease;
         font-size: 16px;
@@ -549,8 +549,7 @@
     .elementor-image-box-title a,
     .elementor-icon-list-text {
       position: relative;
-      display: inline-flex;
-      flex-direction: column;
+      display: inline-block;
     }
     .elementor-widget-image-box {
       position: relative;
