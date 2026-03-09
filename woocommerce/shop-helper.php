@@ -6106,3 +6106,124 @@ if (!function_exists('somnia_track_order_callback')) {
     add_action('wp_ajax_somnia_track_order', 'somnia_track_order_callback');
     add_action('wp_ajax_nopriv_somnia_track_order', 'somnia_track_order_callback');
 }
+
+// AJAX Login functionality
+if (!function_exists('somnia_ajax_login_user')) {
+    function somnia_ajax_login_user()
+    {
+        // Verify nonce (from wp_nonce_field in the form)
+        if (!isset($_POST['bt_login_nonce']) || !wp_verify_nonce($_POST['bt_login_nonce'], 'bt_login_nonce')) {
+            wp_send_json_error(['message' => esc_html__('Security check failed.', 'somnia')]);
+        }
+
+        $username = sanitize_text_field($_POST['username']);
+        $password = $_POST['password'];
+        $remember = isset($_POST['remember']) ? true : false;
+
+        if (empty($username) || empty($password)) {
+            wp_send_json_error(['message' => esc_html__('Please fill in all required fields.', 'somnia')]);
+        }
+
+        $creds = [
+            'user_login'    => $username,
+            'user_password' => $password,
+            'remember'      => $remember,
+        ];
+
+        $user = wp_signon($creds, false);
+
+        if (is_wp_error($user)) {
+            wp_send_json_error(['message' => $user->get_error_message()]);
+        }
+
+        wp_send_json_success([
+            'message' => esc_html__('Login successful! Redirecting...', 'somnia'),
+            'redirect_url' => class_exists('Woocommerce') ? wc_get_page_permalink('myaccount') : admin_url(),
+        ]);
+    }
+    add_action('wp_ajax_bt_login_user', 'somnia_ajax_login_user');
+    add_action('wp_ajax_nopriv_bt_login_user', 'somnia_ajax_login_user');
+}
+
+// AJAX Register functionality
+if (!function_exists('somnia_ajax_register_user')) {
+    function somnia_ajax_register_user()
+    {
+        // Verify nonce
+        if (!isset($_POST['bt_register_nonce']) || !wp_verify_nonce($_POST['bt_register_nonce'], 'bt_register_nonce')) {
+            wp_send_json_error(['message' => esc_html__('Security check failed.', 'somnia')]);
+        }
+
+        $username = sanitize_text_field($_POST['username']);
+        $email = sanitize_email($_POST['email']);
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
+        $agree_terms = isset($_POST['agree_terms']) ? true : false;
+
+        // Validation
+        if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+            wp_send_json_error(['message' => esc_html__('Please fill in all required fields.', 'somnia')]);
+        }
+
+        // Validate email format
+        if (!is_email($email)) {
+            wp_send_json_error(['message' => esc_html__('Please enter a valid email address.', 'somnia')]);
+        }
+
+        // Validate username format
+        if (!validate_username($username)) {
+            wp_send_json_error(['message' => esc_html__('Username contains invalid characters. Only letters, numbers, and underscores are allowed.', 'somnia')]);
+        }
+
+        // Check username length
+        if (strlen($username) < 3) {
+            wp_send_json_error(['message' => esc_html__('Username must be at least 3 characters long.', 'somnia')]);
+        }
+
+        if (strlen($username) > 60) {
+            wp_send_json_error(['message' => esc_html__('Username must be less than 60 characters long.', 'somnia')]);
+        }
+
+        // Check password strength
+        if (strlen($password) < 6) {
+            wp_send_json_error(['message' => esc_html__('Password must be at least 6 characters long.', 'somnia')]);
+        }
+
+        if ($password !== $confirm_password) {
+            wp_send_json_error(['message' => esc_html__('Passwords do not match. Please make sure both password fields are identical.', 'somnia')]);
+        }
+
+        if (!$agree_terms) {
+            wp_send_json_error(['message' => esc_html__('You must agree to the Terms of Use to create an account.', 'somnia')]);
+        }
+
+        // Check if username already exists
+        if (username_exists($username)) {
+            wp_send_json_error(['message' => sprintf(esc_html__('Username "%s" is already taken. Please choose a different username.', 'somnia'), $username)]);
+        }
+
+        // Check if email already exists
+        if (email_exists($email)) {
+            wp_send_json_error(['message' => esc_html__('An account with this email address already exists. Please use a different email or try logging in.', 'somnia')]);
+        }
+
+        // Create user
+        $user_id = wp_create_user($username, $password, $email);
+
+        if (is_wp_error($user_id)) {
+            wp_send_json_error(['message' => $user_id->get_error_message()]);
+        }
+
+        // Log the user in automatically
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id, true);
+
+        wp_send_json_success([
+            'message' => esc_html__('Account created successfully! Redirecting...', 'somnia'),
+            'redirect_url' => class_exists('Woocommerce') ? wc_get_page_permalink('myaccount') : admin_url(),
+        ]);
+    }
+    add_action('wp_ajax_bt_register_user', 'somnia_ajax_register_user');
+    add_action('wp_ajax_nopriv_bt_register_user', 'somnia_ajax_register_user');
+}
+

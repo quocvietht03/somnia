@@ -4521,6 +4521,240 @@
 		}
 
 	};
+
+	// Account Login Handler
+	const AccountLoginHandler = function ($scope, $) {
+		const $loginPopup = $scope.find('.bt-js-open-popup-link');
+		const $loginForm = $scope.find('.bt-login-form');
+		const $registerForm = $scope.find('.bt-register-form');
+		const $togglePassword = $scope.find('.bt-toggle-password');
+		const $passwordInput = $scope.find('input[type="password"]');
+		const $loginMessagesContainer = $scope.find('.bt-login-messages');
+		const $registerMessagesContainer = $scope.find('.bt-register-messages');
+		const $tabBtns = $scope.find('.bt-tab-btn');
+		const $tabContents = $scope.find('.bt-tab-content');
+
+
+		// Initialize magnificPopup for login popup
+		if ($loginPopup.length > 0) {
+			$loginPopup.magnificPopup({
+				type: 'inline',
+				midClick: true,
+				mainClass: 'mfp-fade mfp-login-popup',
+				removalDelay: 300,
+				callbacks: {
+					open: function () {
+						// Focus on username field when popup opens
+						setTimeout(function () {
+							const $activeTab = $scope.find('.bt-tab-content.active');
+							$activeTab.find('input[name="username"]').focus();
+						}, 100);
+					},
+					close: function () {
+						// Clear forms and messages when popup closes
+						if ($loginForm.length) $loginForm[0].reset();
+						if ($registerForm.length) $registerForm[0].reset();
+						$loginMessagesContainer.empty().removeClass('bt-success bt-error');
+						$registerMessagesContainer.empty().removeClass('bt-success bt-error');
+
+						// Reset to login tab
+						$tabBtns.removeClass('active');
+						$tabBtns.filter('[data-tab="login"]').addClass('active');
+						$tabContents.removeClass('active');
+						$tabContents.filter('[data-tab="login"]').addClass('active');
+					}
+				}
+			});
+		}
+
+		// Handle tab switching
+		$tabBtns.on('click', function (e) {
+			e.preventDefault();
+			const targetTab = $(this).data('tab');
+
+			// Update tab buttons
+			$tabBtns.removeClass('active');
+			$(this).addClass('active');
+
+			// Update tab content
+			$tabContents.removeClass('active');
+			$tabContents.filter('[data-tab="' + targetTab + '"]').addClass('active');
+
+			// Clear messages
+			$loginMessagesContainer.empty().removeClass('bt-success bt-error');
+			$registerMessagesContainer.empty().removeClass('bt-success bt-error');
+
+			// Focus on first input
+			setTimeout(function () {
+				const $activeContent = $tabContents.filter('.active');
+				$activeContent.find('input[name="username"]').focus();
+			}, 100);
+		});
+
+		// Handle switch to register link
+		$scope.find('.bt-switch-to-register').on('click', function (e) {
+			e.preventDefault();
+			$tabBtns.filter('[data-tab="register"]').trigger('click');
+		});
+
+		// Handle switch to login link
+		$scope.find('.bt-switch-to-login').on('click', function (e) {
+			e.preventDefault();
+			$tabBtns.filter('[data-tab="login"]').trigger('click');
+		});
+
+		// Toggle password visibility
+		$togglePassword.on('click', function (e) {
+			e.preventDefault();
+			const $btn = $(this);
+			const $eyeIcon = $btn.find('.bt-eye-icon');
+			const $eyeOffIcon = $btn.find('.bt-eye-off-icon');
+			const $targetInput = $btn.siblings('input[type="password"], input[type="text"]');
+
+			if ($targetInput.attr('type') === 'password') {
+				$targetInput.attr('type', 'text');
+				$eyeIcon.hide();
+				$eyeOffIcon.show();
+				$btn.attr('aria-label', $btn.attr('aria-label').replace('Show', 'Hide'));
+			} else {
+				$targetInput.attr('type', 'password');
+				$eyeIcon.show();
+				$eyeOffIcon.hide();
+				$btn.attr('aria-label', $btn.attr('aria-label').replace('Hide', 'Show'));
+			}
+		});
+
+		// Handle login form submission
+		$loginForm.on('submit', function (e) {
+			e.preventDefault();
+
+			// Check if AJ_Options is defined
+			if (typeof AJ_Options === 'undefined') {
+				$loginMessagesContainer.addClass('bt-error').html('<p>Login system is not properly loaded. Please refresh the page.</p>');
+				return;
+			}
+
+			const $submitBtn = $(this).find('.bt-login-btn');
+			const formData = new FormData(this);
+
+			// Add AJAX data
+			formData.append('action', 'bt_login_user');
+
+			// Disable submit button and show loading
+			$submitBtn.prop('disabled', true).addClass('bt-loading');
+			$loginMessagesContainer.empty().removeClass('bt-success bt-error');
+
+			// Send AJAX request
+			$.ajax({
+				url: AJ_Options.ajax_url,
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					if (response.success) {
+						// Redirect after successful login
+						if (response.data.redirect_url) {
+							window.location.href = response.data.redirect_url;
+						} else {
+							window.location.reload();
+						}
+					} else {
+						// Show specific error message from server
+						var errorMessage = response.data && response.data.message ? response.data.message : 'Login failed. Please try again.';
+						$loginMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+						$submitBtn.prop('disabled', false).removeClass('bt-loading');
+					}
+				},
+				error: function (xhr, status, error) {
+					// More detailed error handling
+					var errorMessage = 'Login failed. ';
+
+					if (xhr.status === 0) {
+						errorMessage += 'Please check your internet connection.';
+					} else if (xhr.status === 404) {
+						errorMessage += 'Login service not found.';
+					} else if (xhr.status === 500) {
+						errorMessage += 'Server error. Please try again later.';
+					} else if (status === 'timeout') {
+						errorMessage += 'Request timed out. Please try again.';
+					} else {
+						errorMessage += 'Please try again or contact support if the problem persists.';
+					}
+
+					$loginMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+					$submitBtn.prop('disabled', false).removeClass('bt-loading');
+				}
+			});
+		});
+
+		// Handle register form submission
+		$registerForm.on('submit', function (e) {
+			e.preventDefault();
+
+			// Check if AJ_Options is defined
+			if (typeof AJ_Options === 'undefined') {
+				$registerMessagesContainer.addClass('bt-error').html('<p>Registration system is not properly loaded. Please refresh the page.</p>');
+				return;
+			}
+
+			const $submitBtn = $(this).find('.bt-register-btn');
+			const originalText = $submitBtn.text();
+			const formData = new FormData(this);
+
+			// Add AJAX data
+			formData.append('action', 'bt_register_user');
+
+			// Disable submit button and show loading
+			$submitBtn.prop('disabled', true).addClass('bt-loading');
+			$registerMessagesContainer.empty().removeClass('bt-success bt-error');
+
+			// Send AJAX request
+			$.ajax({
+				url: AJ_Options.ajax_url,
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					if (response.success) {
+						if (response.data.redirect_url) {
+							window.location.href = response.data.redirect_url;
+						} else {
+							window.location.reload();
+						}
+					} else {
+						// Show specific error message from server
+						var errorMessage = response.data && response.data.message ? response.data.message : 'Registration failed. Please try again.';
+						$registerMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+						$submitBtn.prop('disabled', false).removeClass('bt-loading');
+					}
+				},
+				error: function (xhr, status, error) {
+					// More detailed error handling
+					var errorMessage = 'Registration failed. ';
+
+					if (xhr.status === 0) {
+						errorMessage += 'Please check your internet connection.';
+					} else if (xhr.status === 404) {
+						errorMessage += 'Registration service not found.';
+					} else if (xhr.status === 500) {
+						errorMessage += 'Server error. Please try again later.';
+					} else if (status === 'timeout') {
+						errorMessage += 'Request timed out. Please try again.';
+					} else {
+						errorMessage += 'Please try again or contact support if the problem persists.';
+					}
+
+					$registerMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+					$submitBtn.prop('disabled', false).removeClass('bt-loading');
+				}
+			});
+		});
+
+
+	};
+
 	// Make sure you run this code under Elementor.
 	$(window).on('elementor/frontend/init', function () {
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-mobile-menu.default', SubmenuToggleHandler);
@@ -4570,6 +4804,7 @@
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-hotspot.default', AccordionHotspotHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-megamenu.default', MegaMenuHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-location-list.default', LocationListHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-account-login.default', AccountLoginHandler);
 	});
 
 })(jQuery);
