@@ -47,7 +47,6 @@ class ElementorWidgets
 
 		$this->widgets = array(
 			'site-information',
-			'site-information-style-1',
 			'site-social',
 			'site-copyright',
 			'site-notification',
@@ -64,8 +63,6 @@ class ElementorWidgets
 			'post-grid',
 			'product-loop-item',
 			'product-spotlight-item',
-			'product-loop-item-style-1',
-			'product-loop-item-style-2',
 			'product-category-item',
 			'product-wishlist',
 			'product-compare',
@@ -77,7 +74,6 @@ class ElementorWidgets
 			'search-product',
 			'search-product-style-1',
 			'brand-slider',
-			'product-item',
 			'product-showcase',
 			'product-showcase-style-1',
 			'product-showcase-style-2',
@@ -86,10 +82,7 @@ class ElementorWidgets
 			'mini-wishlist',
 			'mini-compare',
 			'product-tooltip-hotspot',
-			'product-list-hotspot',
 			'product-overlay-hotspot',
-			'product-overlay-hotspot-style-1',
-			'product-slider-bottom-hotspot',
 			'product-popup-hotspot',
 			'product-testimonial',
 			'product-testimonial-slider',
@@ -101,9 +94,6 @@ class ElementorWidgets
 			'our-store',
 			'currency-switcher',
 			'language-switcher',
-			'accordion-with-product-slider',
-			'title-nav-with-slider',
-			'collection-banner',
 			'site-icon-payment',
 			'text-slider',
 			'store-locations-slider',
@@ -312,7 +302,6 @@ class ElementorWidgets
 
 		// Register Widgets
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\SiteInformation\Widget_SiteInformation());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\SiteInformationStyle1\Widget_SiteInformationStyle1());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\SiteNotification\Widget_SiteNotification());
 
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\SiteSocial\Widget_SiteSocial());
@@ -332,17 +321,12 @@ class ElementorWidgets
 
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductLoopItem\Widget_ProductLoopItem());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductSpotlightItem\Widget_ProductSpotlightItem());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductLoopItemStyle1\Widget_ProductLoopItemStyle1());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductLoopItemStyle2\Widget_ProductLoopItemStyle2());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductCategoryItem\Widget_ProductCategoryItem());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductWishlist\Widget_ProductWishlist());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductCompare\Widget_ProductCompare());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\AccountLogin\Widget_AccountLogin());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\SearchProduct\Widget_SearchProduct());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\SearchProductStyle1\Widget_SearchProductStyle1());
-
-
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductItem\Widget_ProductItem());
 
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\HighlightedHeading\Widget_HighlightedHeading());
 
@@ -353,8 +337,6 @@ class ElementorWidgets
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\MiniWishlist\Widget_MiniWishlist());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\MiniCompare\Widget_MiniCompare());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductTooltipHotspot\Widget_ProductTooltipHotspot());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductListHotspot\Widget_ProductListHotspot());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductSliderBottomHotspot\Widget_ProductSliderBottomHotspot());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductPopupHotspot\Widget_ProductPopupHotspot());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductTestimonial\Widget_ProductTestimonial());
 
@@ -364,11 +346,7 @@ class ElementorWidgets
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\OurStore\Widget_OurStore());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\CurrencySwitcher\Widget_CurrencySwitcher());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\LanguageSwitcher\Widget_LanguageSwitcher());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\AccordionWithProductSlider\Widget_AccordionWithProductSlider());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\TitleNavWithSlider\Widget_TitleNavWithSlider());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\CollectionBanner\Widget_CollectionBanner());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductOverlayHotspot\Widget_ProductOverlayHotspot());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductOverlayHotspotStyle1\Widget_ProductOverlayHotspotStyle1());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\IconPayment\Widget_IconPayment());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\TextSlider\Somnia_TextSlider());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductShowcase\Widget_ProductShowcase());

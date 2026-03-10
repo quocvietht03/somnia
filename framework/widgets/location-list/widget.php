@@ -660,7 +660,7 @@ class Widget_LocationList extends Widget_Base
                     <!-- Location List -->
                     <div class="bt-location-list">
                         <?php foreach ($settings['list'] as $index => $item) : ?>
-                            <div class="bt-location-item <?php echo $index === 0 ? 'active' : ''; ?>"
+                            <div class="bt-location-item <?php echo esc_attr($index === 0 ? 'active' : ''); ?>"
                                 data-location-index="<?php echo esc_attr($index); ?>"
                                 data-address="<?php echo esc_attr($item['location_address']); ?>"
                                 data-zoom="<?php echo esc_attr($item['location_maps_zoom']['size']); ?>">
@@ -682,8 +682,8 @@ class Widget_LocationList extends Widget_Base
                                 <div class="bt-location-status-wrapper">
                                     <div class="bt-location-status">
                                         <?php $is_open = !empty($item['location_status_open']) && $item['location_status_open'] === 'yes'; ?>
-                                        <span class="bt-status-indicator <?php echo $is_open ? 'open' : 'close'; ?>">
-                                            <?php echo $is_open ? esc_html__('Open', 'somnia') : esc_html__('Close', 'somnia'); ?>
+                                        <span class="bt-status-indicator <?php echo esc_attr($is_open ? 'open' : 'close'); ?>">
+                                            <?php echo esc_html($is_open ? __('Open', 'somnia') : __('Close', 'somnia')); ?>
                                         </span>
                                         <?php if (!empty($item['location_closes_until'])) : ?>
                                             <span class="bt-status-text"><?php echo esc_html($item['location_closes_until']); ?></span>

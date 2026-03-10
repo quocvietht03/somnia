@@ -2317,7 +2317,7 @@ function somnia_products_quick_view()
 
     ?>
     <div class="bt-quickview-title">
-        <h2><?php echo ($source === 'add-to-cart') ? esc_html__('Select options', 'somnia') : esc_html__('Quick View', 'somnia'); ?></h2>
+        <h2><?php echo esc_html($source === 'add-to-cart' ? __('Select options', 'somnia') : __('Quick View', 'somnia')); ?></h2>
         <div class="bt-quick-view-close"></div>
     </div>
     <div class="bt-quickview-wrap woocommerce">
@@ -4479,9 +4479,17 @@ function somnia_render_product_info_toggle()
 /**
  * Remove reviews tab from product tabs
  * This allows reviews to be rendered separately
+ *
+ * @param array $tabs Product tabs
+ * @return array
  */
 function somnia_remove_reviews_from_tabs($tabs)
 {
+    // Bypass removal when we're fetching full tabs for somnia_render_product_reviews
+    if (!empty($GLOBALS['somnia_fetching_reviews_tab'])) {
+        return $tabs;
+    }
+
     if (is_product() && isset($tabs['reviews'])) {
         unset($tabs['reviews']);
     }
@@ -4509,11 +4517,10 @@ function somnia_render_product_reviews()
         return;
     }
 
-    // Get product tabs to access reviews tab data (before filter removes it)
-    // We need to get original tabs, so we temporarily remove our filter
-    remove_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
+    // Fetch full tabs (including reviews) by temporarily bypassing our removal filter
+    $GLOBALS['somnia_fetching_reviews_tab'] = true;
     $product_tabs = apply_filters('woocommerce_product_tabs', array());
-    add_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
+    unset($GLOBALS['somnia_fetching_reviews_tab']);
 
     // Check if reviews tab exists
     if (!isset($product_tabs['reviews'])) {
@@ -5248,13 +5255,12 @@ function somnia_single_product_sticky_bar()
     $price_html = $product->get_price_html();
     $product_id = $product->get_id();
 
-    $btn_label_add = esc_html__('Add to cart', 'somnia');
-    $btn_label_select = esc_html__('Select options', 'somnia');
+    $btn_label_add   = __('Add to cart', 'somnia');
+    $btn_label_select = __('Select options', 'somnia');
 
-    $sticky_bar_attrs = 'id="bt-single-product-sticky-bar" aria-hidden="true"';
+    $variation_names = array();
+    $variation_prices = array();
     if ($is_variable) {
-        $variation_names = array();
-        $variation_prices = array();
         foreach ($product->get_available_variations() as $var) {
             $vid = (int) $var['variation_id'];
             $labels = array();
@@ -5275,8 +5281,6 @@ function somnia_single_product_sticky_bar()
             $variation_names[$vid] = implode(' / ', $labels);
             $variation_prices[$vid] = isset($var['price_html']) ? $var['price_html'] : '';
         }
-        $sticky_bar_attrs .= ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '"';
-        $sticky_bar_attrs .= ' data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
     }
     $default_variation_name = '';
     if ($is_variable) {
@@ -5286,7 +5290,11 @@ function somnia_single_product_sticky_bar()
         }
     }
 ?>
-    <div class="bt-single-product-sticky-bar" <?php echo $sticky_bar_attrs; ?>>
+    <div class="bt-single-product-sticky-bar" id="bt-single-product-sticky-bar" aria-hidden="true"<?php
+                    if ($is_variable) {
+                        echo ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '" data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
+                    }
+                    ?>>
         <div class="bt-single-product-sticky-bar__inner">
             <div class="bt-single-product-sticky-bar__product">
                 <div class="bt-single-product-sticky-bar__thumb">
@@ -5295,7 +5303,7 @@ function somnia_single_product_sticky_bar()
                 <div class="bt-single-product-sticky-bar__info">
                     <h3 class="bt-single-product-sticky-bar__title"><?php echo esc_html($title); ?></h3>
                     <?php if ($price_html) { ?>
-                        <div class="bt-single-product-sticky-bar__price<?php echo $is_variable ? ' bt-product-type-variable' : ''; ?>"><?php echo $price_html; ?></div>
+                        <div class="bt-single-product-sticky-bar__price<?php echo esc_attr($is_variable ? ' bt-product-type-variable' : ''); ?>"><?php echo wp_kses_post($price_html); ?></div>
                     <?php } ?>
                     <?php if ($is_variable) { ?>
                         <div class="bt-single-product-sticky-bar__variation">
@@ -5306,9 +5314,9 @@ function somnia_single_product_sticky_bar()
             </div>
             <div class="bt-single-product-sticky-bar__action">
                 <?php if ($is_simple) { ?>
-                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="simple"><?php echo $btn_label_add; ?></a>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="simple"><?php echo esc_html($btn_label_add); ?></a>
                 <?php } else { ?>
-                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo $btn_label_select; ?></a>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo esc_html($btn_label_select); ?></a>
                 <?php } ?>
             </div>
         </div>
@@ -6144,7 +6152,7 @@ if (!function_exists('somnia_ajax_login_user')) {
             // Fallback to referer or current page
             $redirect_url = wp_get_referer();
             if (!$redirect_url) {
-                $redirect_url = home_url($_SERVER['REQUEST_URI']);
+                $redirect_url = home_url('/');
             }
         }
 
@@ -6238,7 +6246,7 @@ if (!function_exists('somnia_ajax_register_user')) {
             // Fallback to referer or current page
             $redirect_url = wp_get_referer();
             if (!$redirect_url) {
-                $redirect_url = home_url($_SERVER['REQUEST_URI']);
+                $redirect_url = home_url('/');
             }
         }
 

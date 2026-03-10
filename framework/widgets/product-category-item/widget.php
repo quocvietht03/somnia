@@ -408,7 +408,11 @@ class Widget_ProductCategoryItem extends Widget_Base
                             if ($settings['show_count'] === 'yes'):
 
                                 if( !empty($settings['count_unit'])) {
-                                    $count_text = sprintf( _n( '%s ' . $settings['count_unit'], '%s ' . $settings['count_unit'] . 's', $cat_count, 'somnia' ), number_format_i18n( $cat_count ) );
+                                    if ($cat_count == 1) {
+                                        $count_text = sprintf('%s ' . $settings['count_unit'], number_format_i18n($cat_count));
+                                    } else {
+                                        $count_text = sprintf('%s ' . $settings['count_unit'] . 's', number_format_i18n($cat_count));
+                                    }
                                 } else {
                                     $count_text = sprintf( _n( '%s item', '%s items', $cat_count, 'somnia' ), number_format_i18n( $cat_count ) );
                                 }
