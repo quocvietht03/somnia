@@ -1180,6 +1180,7 @@ class Widget_ProductTooltipHotspot extends Widget_Base
                                                 $out_of_stock_class = !$is_in_stock ? ' out-of-stock' : '';
                                                 $default_price = 0;
                                                 $html_price_default = '';
+                                                $default_attributes = [];
                                                 if ($product->is_type('variable')) {
                                                     // Get default attributes for variable product
                                                     $default_attributes = $product->get_default_attributes();

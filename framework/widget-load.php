@@ -77,7 +77,6 @@ class ElementorWidgets
 			'product-showcase',
 			'product-showcase-style-1',
 			'product-showcase-style-2',
-			'product-showcase-vertical',
 			'heading-animation',
 			'mini-wishlist',
 			'mini-compare',
@@ -86,25 +85,15 @@ class ElementorWidgets
 			'product-popup-hotspot',
 			'product-testimonial',
 			'product-testimonial-slider',
-			'the-story',
 			'testimonial-slider',
-			'testimonials-staggered-slider',
 			'countdown',
 			'our-teams',
 			'our-store',
 			'currency-switcher',
 			'language-switcher',
 			'site-icon-payment',
-			'text-slider',
-			'store-locations-slider',
-			'product-nav-image',
 			'vertical-banner-slider',
-			'offers-slider',
-			'bundle-save',
 			'order-tracking',
-			'list-text-image-hover',
-			'flicker-collage',
-			'product-banner-scroll-hotspot',
 			'accordion-hotspot',
 			'product-testimonial-item',
 			'location-list'
@@ -190,13 +179,9 @@ class ElementorWidgets
 		return array(
 			'instagram-posts',
 			'banner-product-slider',
-			'offers-slider',
 			'brand-slider',
 			'testimonial-slider',
 			'product-testimonial-slider',
-			'the-story',
-			'testimonials-staggered-slider',
-			'store-locations-slider',
 		);
 	}
 
@@ -348,23 +333,13 @@ class ElementorWidgets
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\LanguageSwitcher\Widget_LanguageSwitcher());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductOverlayHotspot\Widget_ProductOverlayHotspot());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\IconPayment\Widget_IconPayment());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\TextSlider\Somnia_TextSlider());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductShowcase\Widget_ProductShowcase());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductShowcaseStyle1\Widget_ProductShowcaseStyle1());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductShowcaseStyle2\Widget_ProductShowcaseStyle2());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductShowcaseVertical\Widget_ProductShowcaseVertical());
 
 
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductNavImage\Widget_ProductNavImage());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\VerticalBannerSlider\Somnia_VerticalBannerSlider());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\BundleSave\Widget_BundleSave());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\OrderTracking\Widget_OrderTracking());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ListTextImageHover\Widget_ListTextImageHover());
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\FlickerCollage\Widget_FlickerCollage());
-
-		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductBannerScrollHotspot\Widget_ProductBannerScrollHotspot());
-
-
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\AccordionHotspot\Widget_AccordionHotspot());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\ProductTestimonialItem\Widget_ProductTestimonialItem());
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type(new Widgets\LocationList\Widget_LocationList());
@@ -383,11 +358,6 @@ class ElementorWidgets
 		);
 
 		$this->register_widget_with_pro_check(
-			'SomniaElementorWidgets\Widgets\OffersSlider\Widget_OffersSlider',
-			'bt-offers-slider',
-			__('Offers Slider', 'somnia')
-		);
-		$this->register_widget_with_pro_check(
 			'SomniaElementorWidgets\Widgets\BrandSlider\Widget_BrandSlider',
 			'bt-brand-slider',
 			__('Brand Slider', 'somnia')
@@ -399,27 +369,11 @@ class ElementorWidgets
 		);
 
 		$this->register_widget_with_pro_check(
-			'SomniaElementorWidgets\Widgets\TheStory\Widget_TheStory',
-			'bt-the-story',
-			__('The Story', 'somnia')
-		);
-
-		$this->register_widget_with_pro_check(
 			'SomniaElementorWidgets\Widgets\TestimonialSlider\Widget_TestimonialSlider',
 			'bt-testimonial-slider',
 			__('Testimonial Slider', 'somnia')
 		);
 
-		$this->register_widget_with_pro_check(
-			'SomniaElementorWidgets\Widgets\TestimonialsStaggeredSlider\Widget_TestimonialsStaggeredSlider',
-			'bt-testimonials-staggered-slider',
-			__('Testimonials Staggered Slider', 'somnia')
-		);
-		$this->register_widget_with_pro_check(
-			'SomniaElementorWidgets\Widgets\StoreLocationsSlider\Widget_StoreLocationsSlider',
-			'bt-store-locations-slider',
-			__('Store Locations Slider', 'somnia')
-		);
 	}
 
 	/**
