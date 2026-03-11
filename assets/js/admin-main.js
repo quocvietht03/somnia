@@ -2,6 +2,46 @@
 	"use strict";
 	// Product Extra Content - Admin Functions
 	function somniaExtraContentHandlers() {
+		// Edit / Create Elementor links - toggle based on section selection
+		function updateGlobalEditElementorLink() {
+			var $editLink = $('#somnia_global_edit_elementor');
+			var $createLink = $('#somnia_global_create_elementor');
+			var $select = $('#somnia_global_extra_content_section_id');
+			var baseUrl = $editLink.data('base-url');
+			var sectionId = ($select.val() || '').toString().trim();
+			if (sectionId && baseUrl) {
+				$editLink.attr('href', baseUrl + '?post=' + sectionId + '&action=elementor');
+				$editLink.show();
+				$createLink.hide();
+			} else {
+				$editLink.hide();
+				$createLink.show();
+			}
+		}
+
+		// Extra Content mode select - show/hide sections
+		function toggleExtraContentSections() {
+			var mode = $('#somnia_extra_content_mode').val();
+			var $globalWrap = $('.somnia-global-extra-section-wrap');
+			var $statusRow = $('.somnia-extra-status-row');
+			if (mode === 'global') {
+				$globalWrap.slideDown(150, updateGlobalEditElementorLink);
+				$statusRow.slideUp(150);
+			} else if (mode === 'current') {
+				$globalWrap.slideUp(150);
+				$statusRow.slideDown(150);
+			} else {
+				$globalWrap.slideUp(150);
+				$statusRow.slideUp(150);
+			}
+			updateGlobalEditElementorLink();
+		}
+		$(document).on('change', '#somnia_extra_content_mode', toggleExtraContentSections);
+		toggleExtraContentSections();
+
+		$(document).on('change', '#somnia_global_extra_content_section_id', updateGlobalEditElementorLink);
+		updateGlobalEditElementorLink();
+
 		// Create Extra Content
 		$(document).on('click', '.somnia-create-extra-content', function (e) {
 			e.preventDefault();
@@ -35,7 +75,6 @@
 				},
 				success: function (response) {
 					if (response.success) {
-						// Update UI
 						var newHTML = '<p class="somnia-extra-status">' +
 							'<span class="dashicons dashicons-yes-alt"></span>' +
 							'Extra Content Created' +
@@ -57,8 +96,7 @@
 							'Delete Extra Content' +
 							'</button>' +
 							'</p>';
-
-						$box.html(newHTML);
+						$box.find('.somnia-extra-status-row').html(newHTML);
 
 						// Update hidden field
 						$('#somnia_extra_content_post_id').val(response.data.extra_content_id);
@@ -125,7 +163,6 @@
 				},
 				success: function (response) {
 					if (response.success) {
-						// Update UI
 						var newHTML = '<p class="somnia-extra-status">' +
 							'<span class="dashicons dashicons-info"></span>' +
 							'No Extra Content Yet' +
@@ -138,8 +175,7 @@
 							'Create Extra Content' +
 							'</button>' +
 							'</p>';
-
-						$box.html(newHTML);
+						$box.find('.somnia-extra-status-row').html(newHTML);
 
 						// Update hidden field
 						$('#somnia_extra_content_post_id').val('');
@@ -490,19 +526,26 @@
 			updateHorizontalPositionVisibility($(this));
 		});
 
-		// Toggle visibility of dependent fields based on checkbox
+		// Toggle visibility of dependent fields and bar label based on checkbox
 		function toggleMegamenuFields($checkbox) {
 			var $container = $checkbox.closest('.somnia-megamenu-fields'),
-				$dependentFields = $container.find('.somnia-megamenu-dependent-fields');
+				$dependentFields = $container.find('.somnia-megamenu-dependent-fields'),
+				$menuItem = $container.closest('.menu-item'),
+				$itemTitle = $menuItem.find('.menu-item-bar .item-title');
 
 			if ($checkbox.is(':checked')) {
 				$dependentFields.slideDown(200);
+				// Add badge on menu item bar if not exists
+				if (!$itemTitle.find('.somnia-megamenu-badge').length) {
+					$itemTitle.append('<span class="somnia-megamenu-badge">Mega Menu</span>');
+				}
 			} else {
 				$dependentFields.slideUp(200);
+				$itemTitle.find('.somnia-megamenu-badge').remove();
 			}
 		}
 
-		// Initialize visibility on page load
+		// Initialize visibility and bar label on page load
 		$('.somnia-megamenu-enable').each(function () {
 			toggleMegamenuFields($(this));
 		});

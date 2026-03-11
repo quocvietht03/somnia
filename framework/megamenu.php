@@ -166,13 +166,13 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
                 data-base-edit-url="<?php echo esc_attr(admin_url('post.php?post=%id%&action=elementor')); ?>"
                 target="_blank"
                 style="<?php echo esc_attr($has_selected_block ? '' : 'display: none;'); ?>">
-                <?php esc_html_e('Edit megamenu block', 'somnia'); ?>
+                <?php esc_html_e('Edit megamenu', 'somnia'); ?>
             </a>
             <span class="meta-sep" style="<?php echo esc_attr($has_selected_block ? '' : 'display: none;'); ?>"> | </span>
             <a href="#"
                 class="somnia-megamenu-add-link"
                 data-item-id="<?php echo esc_attr($item_id); ?>">
-                <?php esc_html_e('Add megamenu block', 'somnia'); ?>
+                <?php esc_html_e('Add megamenu', 'somnia'); ?>
             </a>
         </p>
         </div>

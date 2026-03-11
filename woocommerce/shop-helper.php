@@ -697,11 +697,14 @@ function somnia_woocommerce_related_products_args($args)
     if (function_exists('get_field')) {
         $related_posts = get_field('product_related_posts', 'options');
         $args['posts_per_page'] = !empty($related_posts['number_posts']) ? $related_posts['number_posts'] : 4;
+        $args['columns'] = !empty($related_posts['number_posts']) ? $related_posts['number_posts'] : 4;
+        if($args['columns'] > 4){
+            $args['columns'] = 4;
+        }
     } else {
         $args['posts_per_page'] = 4;
+        $args['columns'] = 4;
     }
-
-    $args['columns'] = 4;
     return $args;
 }
 

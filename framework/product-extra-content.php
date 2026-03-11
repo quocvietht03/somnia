@@ -98,6 +98,38 @@ function somnia_reorder_extra_content_meta_box() {
 }
 add_action('add_meta_boxes', 'somnia_reorder_extra_content_meta_box', 100);
 
+/**
+ * Get Elementor Section templates for select dropdown
+ * @return array [ ID => title ]
+ */
+function somnia_get_elementor_sections()
+{
+    if (!post_type_exists('elementor_library')) {
+        return array();
+    }
+
+    $sections = get_posts(array(
+        'post_type'      => 'elementor_library',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+        'tax_query'      => array(
+            array(
+                'taxonomy' => 'elementor_library_type',
+                'field'    => 'slug',
+                'terms'    => 'section',
+            ),
+        ),
+    ));
+
+    $result = array('' => __('— Select Section —', 'somnia'));
+    foreach ($sections as $section) {
+        $result[$section->ID] = $section->post_title;
+    }
+    return $result;
+}
+
 // Meta Box callback display
 function somnia_extra_content_meta_box_callback($post)
 {
@@ -105,9 +137,70 @@ function somnia_extra_content_meta_box_callback($post)
 
     // Get linked Extra Content post ID
     $extra_content_id = get_post_meta($post->ID, '_extra_content_post_id', true);
+    $global_extra_section_id = get_post_meta($post->ID, '_global_extra_content_section_id', true);
+    $elementor_sections = somnia_get_elementor_sections();
+
+    // Mode: none | global | current
+    $extra_mode = get_post_meta($post->ID, '_extra_content_mode', true);
+    if (!in_array($extra_mode, array('none', 'global', 'current'), true)) {
+        $extra_mode = (get_post_meta($post->ID, '_global_extra_content_enabled', true) === 'yes') ? 'global' : ($extra_content_id ? 'current' : 'none');
+    }
 
 ?>
     <div class="somnia-extra-content-box">
+        <p class="somnia-extra-mode-wrap">
+            <select id="somnia_extra_content_mode" name="somnia_extra_content_mode" class="somnia-extra-mode-select">
+                <option value="none" <?php selected($extra_mode, 'none'); ?>><?php _e('No Extra Content', 'somnia'); ?></option>
+                <option value="global" <?php selected($extra_mode, 'global'); ?>><?php _e('Use Global', 'somnia'); ?></option>
+                <option value="current" <?php selected($extra_mode, 'current'); ?>><?php _e('Use for current product only', 'somnia'); ?></option>
+            </select>
+        </p>
+        <div class="somnia-global-extra-section-wrap" style="<?php echo $extra_mode === 'global' ? '' : 'display:none;'; ?>">
+            <div class="somnia-global-extra-section-inner">
+                <label for="somnia_global_extra_content_section_id"><?php _e('Elementor Section', 'somnia'); ?></label>
+                <div class="somnia-global-extra-section-row">
+                    <select id="somnia_global_extra_content_section_id" name="somnia_global_extra_content_section_id">
+                        <?php foreach ($elementor_sections as $sid => $title): ?>
+                            <option value="<?php echo esc_attr($sid); ?>" <?php selected($global_extra_section_id, $sid); ?>>
+                                <?php echo esc_html($title); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php
+                    $edit_base = admin_url('post.php');
+                    $create_section_url = admin_url('edit.php?post_type=elementor_library&elementor_library_type=section');
+                    $default_sid = $global_extra_section_id ? (int) $global_extra_section_id : 0;
+                    $default_edit_url = $default_sid ? add_query_arg(array('post' => $default_sid, 'action' => 'elementor'), $edit_base) : '#';
+                    ?>
+                    <a href="<?php echo esc_url($default_edit_url); ?>"
+                        id="somnia_global_edit_elementor"
+                        class="button button-small somnia-edit-elementor-link"
+                        target="_blank"
+                        data-base-url="<?php echo esc_attr($edit_base); ?>"
+                        <?php echo !$default_sid ? ' style="display:none;"' : ''; ?>>
+                        <span class="dashicons dashicons-edit"></span>
+                        <?php _e('Edit in Elementor', 'somnia'); ?>
+                    </a>
+                    <a href="<?php echo esc_url($create_section_url); ?>"
+                        id="somnia_global_create_elementor"
+                        class="button button-small somnia-create-elementor-link"
+                        target="_blank"
+                        <?php echo $default_sid ? ' style="display:none;"' : ''; ?>>
+                        <span class="dashicons dashicons-plus-alt"></span>
+                        <?php _e('Create Elementor Section', 'somnia'); ?>
+                    </a>
+                </div>
+                <p class="somnia-elementor-section-note">
+                    <?php
+                    printf(
+                        __('To create a section: go to %s, click "Add New Section", design your content, then save. Refresh this page to see the new section in the dropdown.', 'somnia'),
+                        '<strong>Templates &rarr; Saved Templates &rarr; Section</strong>'
+                    );
+                    ?>
+                </p>
+            </div>
+        </div>
+        <div class="somnia-extra-status-row" style="<?php echo $extra_mode === 'current' ? '' : 'display:none;'; ?>">
         <?php if ($extra_content_id && get_post_status($extra_content_id) !== false):
             $edit_link = admin_url('post.php?post=' . $extra_content_id . '&action=elementor');
         ?>
@@ -150,6 +243,7 @@ function somnia_extra_content_meta_box_callback($post)
                 </button>
             </p>
         <?php endif; ?>
+        </div>
 
         <input type="hidden"
             id="somnia_extra_content_post_id"
@@ -160,6 +254,17 @@ function somnia_extra_content_meta_box_callback($post)
             <span class="spinner is-active"></span>
             <p><?php _e('Processing...', 'somnia'); ?></p>
         </div>
+
+        <p class="somnia-extra-hook-note">
+            <span class="dashicons dashicons-info"></span>
+            <?php
+            printf(
+                __('Extra Content is added via hook %s or %s (depending on the layout type you select in the Advanced tab)', 'somnia'),
+                '<code>woocommerce_after_single_product_summary</code>',
+                '<code>somnia_woocommerce_single_product_after_summary</code>'
+            );
+            ?>
+        </p>
     </div>
     <?php
 }
@@ -188,6 +293,16 @@ function somnia_save_extra_content_meta($post_id)
     // Save extra content post ID if exists
     if (isset($_POST['somnia_extra_content_post_id'])) {
         update_post_meta($post_id, '_extra_content_post_id', sanitize_text_field($_POST['somnia_extra_content_post_id']));
+    }
+
+    // Save Extra Content mode
+    if (isset($_POST['somnia_extra_content_mode']) && in_array($_POST['somnia_extra_content_mode'], array('none', 'global', 'current'), true)) {
+        update_post_meta($post_id, '_extra_content_mode', $_POST['somnia_extra_content_mode']);
+    }
+
+    if (isset($_POST['somnia_global_extra_content_section_id'])) {
+        $section_id = absint($_POST['somnia_global_extra_content_section_id']);
+        update_post_meta($post_id, '_global_extra_content_section_id', $section_id);
     }
 }
 add_action('save_post_product', 'somnia_save_extra_content_meta');
@@ -356,7 +471,8 @@ add_action('manage_product_posts_custom_column', 'somnia_extra_content_column_co
 /**
  * Helper function: Display Extra Content in single product
  * Use in template to simplify code
- * 
+ * Priority: Global Extra Content (if enabled) > Product-specific Extra Content
+ *
  * @param int $product_id Product ID (optional, defaults to current post ID)
  * @return void
  */
@@ -367,16 +483,33 @@ function somnia_display_product_extra_content($product_id = null)
     }
 
     $extra_content_id = get_post_meta($product_id, '_extra_content_post_id', true);
+    $extra_mode = get_post_meta($product_id, '_extra_content_mode', true);
+    if (!in_array($extra_mode, array('global', 'current'), true)) {
+        $extra_mode = (get_post_meta($product_id, '_global_extra_content_enabled', true) === 'yes') ? 'global' : ($extra_content_id ? 'current' : 'none');
+    }
 
+    // Global Extra Content: Elementor section
+    $global_section_id = absint(get_post_meta($product_id, '_global_extra_content_section_id', true));
+    if ($extra_mode === 'global' && $global_section_id && get_post_status($global_section_id) === 'publish') {
+        if (class_exists('\Elementor\Plugin')) {
+            echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display($global_section_id);
+        } else {
+            echo do_shortcode('[elementor-template id="' . $global_section_id . '"]');
+        }
+        return;
+    }
+
+    // Product-specific Extra Content
+    if ($extra_mode !== 'current') {
+        return;
+    }
     if (!$extra_content_id || get_post_status($extra_content_id) !== 'publish') {
         return;
     }
 
-    // Check if Elementor is active
     if (class_exists('\Elementor\Plugin')) {
-        echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display($extra_content_id);  
+        echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display($extra_content_id);
     } else {
-        // Fallback if Elementor is not available
         $extra_post = get_post($extra_content_id);
         if ($extra_post) {
             echo apply_filters('the_content', $extra_post->post_content);
@@ -395,9 +528,18 @@ function somnia_output_product_extra_content()
         return;
     }
 
-    $extra_content_id = get_post_meta(get_the_ID(), '_extra_content_post_id', true);
+    $product_id = get_the_ID();
+    $extra_mode = get_post_meta($product_id, '_extra_content_mode', true);
+    if (!in_array($extra_mode, array('global', 'current'), true)) {
+        $extra_mode = (get_post_meta($product_id, '_global_extra_content_enabled', true) === 'yes') ? 'global' : 'none';
+    }
+    $global_section_id = absint(get_post_meta($product_id, '_global_extra_content_section_id', true));
+    $extra_content_id = get_post_meta($product_id, '_extra_content_post_id', true);
 
-    if (!$extra_content_id || get_post_status($extra_content_id) !== 'publish') {
+    $has_global = $extra_mode === 'global' && $global_section_id && get_post_status($global_section_id) === 'publish';
+    $has_product = $extra_mode === 'current' && $extra_content_id && get_post_status($extra_content_id) === 'publish';
+
+    if (!$has_global && !$has_product) {
         return;
     }
 
