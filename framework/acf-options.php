@@ -4,8 +4,8 @@
 function somnia_add_theme_options_page() {
     if( function_exists('acf_add_options_page') ) {
         $option_page = acf_add_options_page(array(
-            'page_title'    => esc_html__('Theme Options', 'somnia'),
-            'menu_title'    => esc_html__('Theme Options', 'somnia'),
+            'page_title'    => esc_html__('Somnia Theme Options', 'somnia'),
+            'menu_title'    => esc_html__('Somnia Options', 'somnia'),
             'menu_slug'     => 'theme-options-page',
             'capability'    => 'edit_posts',
             'redirect'      => false
