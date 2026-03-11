@@ -440,14 +440,14 @@
           opacity: 0;
           visibility: hidden;
           box-sizing: border-box;
-          max-height: 75vh;
-          @extend .__scrollbar_style;
           // Elementor content inside mega menu
           .elementor {
             width: 100%;
             background: #fff;
-
-            border-radius: 0 0 8px 8px;
+            > .elementor-element {
+              max-height: 75vh;
+              @extend .__scrollbar_style;
+            }
           }
 
           &.bt-megamenu-full-width {
