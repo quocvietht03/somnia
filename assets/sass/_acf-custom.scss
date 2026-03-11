@@ -1,0 +1,61 @@
+.toplevel_page_theme-options-page {
+    .acf-settings-wrap h1 {
+        display: none;
+        box-shadow: none;
+    }
+    .acf-postbox {
+        border: none;
+        .postbox-header {
+            background-color: #00263E;
+            border: none;
+            h2 {
+                font-size: 24px !important;
+                color: #ffffff;
+                padding: 24px !important;
+            }
+            .handle-actions > *:not(.acf-js-tooltip) {
+                display: none;
+            }
+            .acf-hndle-cog {
+                color: #ffffff;
+            }
+        }
+        .acf-tab-wrap.-left .acf-tab-group li {
+            &.active a {
+                background-color: #FFCE52;
+            }
+            a {
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 24px;
+                color: #183F91;
+                background: transparent;
+            }
+        } 
+    }
+    
+    .acf-field-group > .acf-label {
+        background-color: #f1f1f1;
+        margin: 0;
+        padding: 8px 16px;
+        border-width: 1px 1px 0 1px;
+        border-style: solid;
+        border-color: #ccd0d4;
+        label {
+            font-size: 15px;
+            margin: 0;
+        }
+    }
+    .acf-editor-wrap iframe {
+        height: 240px !important;
+    }
+    .acf-field-gallery[data-name="payment_icons"],
+    .acf-field-gallery[data-name="list_safe"] {
+        .acf-gallery {
+            height: 188px !important;
+        }
+        .acf-gallery-attachment {
+            width: 64px;
+        }
+    }
+}
