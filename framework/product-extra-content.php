@@ -150,9 +150,9 @@ function somnia_extra_content_meta_box_callback($post)
     <div class="somnia-extra-content-box">
         <p class="somnia-extra-mode-wrap">
             <select id="somnia_extra_content_mode" name="somnia_extra_content_mode" class="somnia-extra-mode-select">
-                <option value="none" <?php selected($extra_mode, 'none'); ?>><?php _e('No Extra Content', 'somnia'); ?></option>
-                <option value="global" <?php selected($extra_mode, 'global'); ?>><?php _e('Use Global', 'somnia'); ?></option>
-                <option value="current" <?php selected($extra_mode, 'current'); ?>><?php _e('Use for current product only', 'somnia'); ?></option>
+                <option value="none" <?php selected($extra_mode, 'none'); ?>><?php _e('- None -', 'somnia'); ?></option>
+                <option value="global" <?php selected($extra_mode, 'global'); ?>><?php _e('Use Global Content', 'somnia'); ?></option>
+                <option value="current" <?php selected($extra_mode, 'current'); ?>><?php _e('Use Product-Specific Content', 'somnia'); ?></option>
             </select>
         </p>
         <div class="somnia-global-extra-section-wrap" style="<?php echo $extra_mode === 'global' ? '' : 'display:none;'; ?>">
