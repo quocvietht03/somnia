@@ -66,6 +66,28 @@ class Widget_ProductTestimonial extends Widget_Base
                 'label' => __('Testimonial', 'somnia'),
             ]
         );
+        $this->add_control(
+            'testimonial_heading',
+            [
+                'label' => __('Heading', 'somnia'),
+                'type' => Controls_Manager::TEXT,
+                'default' => __('Hear from Our Happy Customers', 'somnia'),
+                'placeholder' => __('Enter heading text', 'somnia'),
+                'label_block' => true,
+            ]
+        );
+
+        $this->add_control(
+            'testimonial_description',
+            [
+                'label' => __('Description', 'somnia'),
+                'type' => Controls_Manager::TEXTAREA,
+                'default' => __('Discover why our customers love their sleep experiences with us!', 'somnia'),
+                'placeholder' => __('Enter description text', 'somnia'),
+                'rows' => 3,
+                'label_block' => true,
+            ]
+        );
 
         $repeater = new Repeater();
         $repeater->add_control(
@@ -348,6 +370,16 @@ class Widget_ProductTestimonial extends Widget_Base
                 'type' => Controls_Manager::SWITCHER,
                 'label_on' => __('Yes', 'somnia'),
                 'label_off' => __('No', 'somnia'),
+                'default' => 'no',
+            ]
+        );
+        $this->add_control(
+            'slider_arrows',
+            [
+                'label' => __('Show Arrows', 'somnia'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'somnia'),
+                'label_off' => __('No', 'somnia'),
                 'default' => 'yes',
             ]
         );
@@ -406,6 +438,17 @@ class Widget_ProductTestimonial extends Widget_Base
                 ],
             ]
         );
+        $this->add_control(
+            'image_border_radius',
+            [
+                'label' => __('Image Border Radius', 'somnia'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%'],
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-testimonial--images .bt-image-cover' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
         $this->end_controls_section();
         // Content Style Section
         $this->start_controls_section(
@@ -437,7 +480,53 @@ class Widget_ProductTestimonial extends Widget_Base
                 ],
             ]
         );
+        
+        $this->add_control(
+            'heading_vs_description_heading',
+            [
+                'label' => __('Heading vs Description', 'somnia'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
 
+        $this->add_control(
+            'heading_color',
+            [
+                'label' => __('Heading Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-testimonial--heading' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'heading_typography',
+                'selector' => '{{WRAPPER}} .bt-product-testimonial--heading',
+            ]
+        );
+
+        $this->add_control(
+            'description_color',
+            [
+                'label' => __('Description Color', 'somnia'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bt-product-testimonial--description' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'description_typography',
+                'selector' => '{{WRAPPER}} .bt-product-testimonial--description',
+            ]
+        );
         $this->add_control(
             'text_heading',
             [
@@ -516,7 +605,6 @@ class Widget_ProductTestimonial extends Widget_Base
             [
                 'label' => __('Author Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '#0C2C48',
                 'selectors' => [
                     '{{WRAPPER}} .bt-product-testimonial--author' => 'color: {{VALUE}};',
                 ],
@@ -545,7 +633,6 @@ class Widget_ProductTestimonial extends Widget_Base
             [
                 'label' => __('Star Color', 'somnia'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '#5A86A9',
                 'selectors' => [
                     '{{WRAPPER}} .bt-product-testimonial--rating .star.filled svg path' => 'fill: {{VALUE}};',
                 ],
@@ -587,57 +674,6 @@ class Widget_ProductTestimonial extends Widget_Base
             ]
         );
         $this->end_controls_section();
-
-        // Pagination Style Section
-        $this->start_controls_section(
-            'section_pagination_style',
-            [
-                'label' => __('Pagination', 'somnia'),
-                'tab' => Controls_Manager::TAB_STYLE,
-                'condition' => [
-                    'slider_pagination' => 'yes',
-                ],
-            ]
-        );
-        $this->add_responsive_control(
-            'pagination_spacing',
-            [
-                'label' => __('Pagination Spacing', 'somnia'),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => ['px'],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 100,
-                        'step' => 1,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bt-swiper-pagination' => 'margin-top: {{SIZE}}{{UNIT}};',
-                ],
-            ]
-        );
-        $this->add_control(
-            'pagination_color',
-            [
-                'label' => __('Pagination Color', 'somnia'),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .bt-swiper-pagination .swiper-pagination-bullet' => 'background: {{VALUE}};',
-                ],
-            ]
-        );
-        $this->add_control(
-            'pagination_active_color',
-            [
-                'label' => __('Pagination Active Color', 'somnia'),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .bt-swiper-pagination .swiper-pagination-bullet-active' => 'background: {{VALUE}};',
-                ],
-            ]
-        );
-        $this->end_controls_section();
     }
 
     protected function register_controls()
@@ -650,7 +686,7 @@ class Widget_ProductTestimonial extends Widget_Base
         if (!class_exists('WooCommerce')) {
             return;
         }
-        
+
         $settings = $this->get_settings_for_display();
         $image_position = isset($settings['image_position']) ? $settings['image_position'] : 'row-reverse';
         $slider_settings = [
@@ -678,18 +714,34 @@ class Widget_ProductTestimonial extends Widget_Base
             </style>
         <?php } ?>
 
-        <?php 
-            $is_responsive_content = $settings['responsive_overlay_content'] === 'yes' ? 'bt-responsive-overlay-content' : '';
+        <?php
+        $is_responsive_content = $settings['responsive_overlay_content'] === 'yes' ? 'bt-responsive-overlay-content' : '';
         ?>
         <div class="bt-elwg-product-testimonial--default" data-slider-settings='<?php echo json_encode($slider_settings); ?>'>
             <div class="bt-product-testimonial <?php echo esc_attr($is_responsive_content); ?>">
                 <div class="bt-product-testimonial--content">
+                    <svg class="bt-product-testimonial--icon-mask" xmlns="http://www.w3.org/2000/svg" width="196" height="196" viewBox="0 0 196 196" fill="none">
+                        <g opacity="0.1">
+                            <path d="M88.8125 55.125V122.5C88.8024 132.244 84.9272 141.585 78.0375 148.475C71.1477 155.365 61.8061 159.24 52.0625 159.25C50.438 159.25 48.8801 158.605 47.7315 157.456C46.5828 156.307 45.9375 154.749 45.9375 153.125C45.9375 151.501 46.5828 149.943 47.7315 148.794C48.8801 147.645 50.438 147 52.0625 147C58.5603 147 64.792 144.419 69.3866 139.824C73.9813 135.229 76.5625 128.998 76.5625 122.5V116.375H30.625C27.3761 116.375 24.2603 115.084 21.9629 112.787C19.6656 110.49 18.375 107.374 18.375 104.125V55.125C18.375 51.8761 19.6656 48.7603 21.9629 46.4629C24.2603 44.1656 27.3761 42.875 30.625 42.875H76.5625C79.8114 42.875 82.9272 44.1656 85.2246 46.4629C87.5219 48.7603 88.8125 51.8761 88.8125 55.125ZM165.375 42.875H119.438C116.189 42.875 113.073 44.1656 110.775 46.4629C108.478 48.7603 107.188 51.8761 107.188 55.125V104.125C107.188 107.374 108.478 110.49 110.775 112.787C113.073 115.084 116.189 116.375 119.438 116.375H165.375V122.5C165.375 128.998 162.794 135.229 158.199 139.824C153.604 144.419 147.373 147 140.875 147C139.251 147 137.693 147.645 136.544 148.794C135.395 149.943 134.75 151.501 134.75 153.125C134.75 154.749 135.395 156.307 136.544 157.456C137.693 158.605 139.251 159.25 140.875 159.25C150.619 159.24 159.96 155.365 166.85 148.475C173.74 141.585 177.615 132.244 177.625 122.5V55.125C177.625 51.8761 176.334 48.7603 174.037 46.4629C171.74 44.1656 168.624 42.875 165.375 42.875Z" fill="#FFCE52" />
+                        </g>
+                    </svg>
+                    <?php if (!empty($settings['testimonial_heading'])) : ?>
+                        <h3 class="bt-product-testimonial--heading"><?php echo esc_html($settings['testimonial_heading']); ?></h3>
+                    <?php endif; ?>
+                    <?php if (!empty($settings['testimonial_description'])) : ?>
+                        <div class="bt-product-testimonial--description"><?php echo esc_html($settings['testimonial_description']); ?></div>
+                    <?php endif; ?>
+
                     <div class="swiper js-testimonial-content">
                         <div class="swiper-wrapper">
                             <?php if (!empty($settings['testimonial_items'])) : ?>
                                 <?php foreach ($settings['testimonial_items'] as $item) : ?>
                                     <div class="swiper-slide">
                                         <div class="bt-product-testimonial--item">
+
+                                            <?php if (!empty($item['testimonial_text'])) : ?>
+                                                <div class="bt-product-testimonial--text"><?php echo esc_html($item['testimonial_text']); ?></div>
+                                            <?php endif; ?>
                                             <?php if (!empty($item['testimonial_rating'])) : ?>
                                                 <div class="bt-product-testimonial--rating">
                                                     <?php for ($i = 1; $i <= 5; $i++) : ?>
@@ -706,9 +758,6 @@ class Widget_ProductTestimonial extends Widget_Base
                                                     <?php endfor; ?>
                                                 </div>
                                             <?php endif; ?>
-                                            <?php if (!empty($item['testimonial_text'])) : ?>
-                                                <div class="bt-product-testimonial--text"><?php echo esc_html($item['testimonial_text']); ?></div>
-                                            <?php endif; ?>
                                             <?php if (!empty($item['testimonial_author'])) : ?>
                                                 <div class="bt-product-testimonial--author"><?php echo esc_html($item['testimonial_author']); ?></div>
                                             <?php endif; ?>
@@ -721,7 +770,20 @@ class Widget_ProductTestimonial extends Widget_Base
                         <?php if ($settings['slider_pagination'] === 'yes') : ?>
                             <div class="bt-swiper-pagination"></div>
                         <?php endif; ?>
-
+                        <?php if ($settings['slider_arrows'] === 'yes') : ?>
+                            <div class="bt-swiper-navigation <?php echo esc_attr($settings['slider_pagination'] === 'yes' ? 'bt-pagination-yes' : ''); ?>">
+                                <div class="bt-nav bt-button-prev">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="currentColor">
+                                        <path d="M23.2968 28.4547C23.4013 28.5592 23.4843 28.6833 23.5408 28.8199C23.5974 28.9564 23.6265 29.1028 23.6265 29.2506C23.6265 29.3984 23.5974 29.5448 23.5408 29.6814C23.4843 29.818 23.4013 29.942 23.2968 30.0466C23.1923 30.1511 23.0682 30.234 22.9316 30.2906C22.7951 30.3471 22.6487 30.3763 22.5009 30.3763C22.3531 30.3763 22.2067 30.3471 22.0701 30.2906C21.9336 30.234 21.8095 30.1511 21.7049 30.0466L10.4549 18.7966C10.3503 18.6921 10.2674 18.568 10.2108 18.4314C10.1541 18.2949 10.125 18.1485 10.125 18.0006C10.125 17.8528 10.1541 17.7064 10.2108 17.5698C10.2674 17.4332 10.3503 17.3092 10.4549 17.2047L21.7049 5.95469C21.916 5.74359 22.2024 5.625 22.5009 5.625C22.7994 5.625 23.0857 5.74359 23.2968 5.95469C23.5079 6.16578 23.6265 6.45209 23.6265 6.75063C23.6265 7.04916 23.5079 7.33547 23.2968 7.54656L12.8414 18.0006L23.2968 28.4547Z" />
+                                    </svg>
+                                </div>
+                                <div class="bt-nav bt-button-next">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="currentColor">
+                                        <path d="M25.5466 18.7966L14.2966 30.0466C14.192 30.1511 14.068 30.234 13.9314 30.2906C13.7948 30.3471 13.6484 30.3763 13.5006 30.3763C13.3528 30.3763 13.2064 30.3471 13.0699 30.2906C12.9333 30.234 12.8092 30.1511 12.7047 30.0466C12.6002 29.942 12.5173 29.818 12.4607 29.6814C12.4041 29.5448 12.375 29.3984 12.375 29.2506C12.375 29.1028 12.4041 28.9564 12.4607 28.8199C12.5173 28.6833 12.6002 28.5592 12.7047 28.4547L23.1602 18.0006L12.7047 7.54656C12.4936 7.33547 12.375 7.04916 12.375 6.75063C12.375 6.45209 12.4936 6.16578 12.7047 5.95469C12.9158 5.74359 13.2021 5.625 13.5006 5.625C13.7992 5.625 14.0855 5.74359 14.2966 5.95469L25.5466 17.2047C25.6512 17.3092 25.7341 17.4332 25.7908 17.5698C25.8474 17.7064 25.8765 17.8528 25.8765 18.0006C25.8765 18.1485 25.8474 18.2949 25.7908 18.4314C25.7341 18.568 25.6512 18.6921 25.5466 18.7966Z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="swiper bt-product-testimonial--images js-testimonial-images">
@@ -744,9 +806,9 @@ class Widget_ProductTestimonial extends Widget_Base
                                     </div>
                                     <?php if (!empty($item['id_product'])) :
                                         $product = wc_get_product($item['id_product']);
-                                        if ($product) : 
+                                        if ($product) :
                                             $is_variable = $product->is_type('variable') ? 'bt-product-variable' : '';
-                                            ?>
+                                    ?>
                                             <div class="bt-product-item-minimal active <?php echo esc_attr($is_variable); ?>"
                                                 data-product-id="<?php echo esc_attr($item['id_product']); ?>">
                                                 <div class="bt-product-thumbnail">
@@ -762,19 +824,6 @@ class Widget_ProductTestimonial extends Widget_Base
                                                 </div>
                                                 <div class="bt-product-content">
                                                     <h4 class="bt-product-title"><a href="<?php echo esc_url($product->get_permalink()); ?>" class="bt-product-link"><?php echo esc_html($product->get_name()); ?></a></h4>
-                                                    <div class="bt-product-price">
-                                                        <?php 
-                                                            $price_html  = $product->get_price_html();
-                                                            echo wp_kses_post($price_html); 
-                                                        ?>
-                                                    </div>
-                                                    <div class="bt-product-add-to-cart">
-                                                        <?php if ($product->is_type('simple') && $product->is_purchasable() && $product->is_in_stock()) : ?>
-                                                            <a href="?add-to-cart=<?php echo esc_attr($product->get_id()); ?>" aria-describedby="woocommerce_loop_add_to_cart_link_describedby_<?php echo esc_attr($product->get_id()); ?>" data-quantity="1" class="bt-button product_type_simple add_to_cart_button ajax_add_to_cart bt-button-hover" data-product_id="<?php echo esc_attr($product->get_id()); ?>" data-product_sku="" rel="nofollow"><?php echo esc_html__('Add to cart', 'somnia') ?></a>
-                                                        <?php else : ?>
-                                                            <a href="<?php echo esc_url($product->get_permalink()); ?>" class="bt-button bt-view-product"><?php echo esc_html__('View Product', 'somnia'); ?></a>
-                                                        <?php endif; ?>
-                                                    </div>
                                                 </div>
                                             </div>
                                         <?php endif; ?>

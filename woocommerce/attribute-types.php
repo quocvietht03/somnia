@@ -246,7 +246,7 @@ function somnia_add_term_metafield_fields($term, $taxonomy = '')
 					</div>
 					<input type="hidden" name="somnia_term_image" id="somnia_term_image" value="<?php echo esc_attr($image_id); ?>" />
 					<button type="button" class="button somnia-upload-image-button"><?php esc_html_e('Select Image', 'somnia'); ?></button>
-					<button type="button" class="button somnia-remove-image-button" style="<?php echo $image_id ? '' : 'display:none;'; ?>"><?php esc_html_e('Remove Image', 'somnia'); ?></button>
+					<button type="button" class="button somnia-remove-image-button" style="<?php echo esc_attr($image_id ? '' : 'display:none;'); ?>"><?php esc_html_e('Remove Image', 'somnia'); ?></button>
 					<p class="description"><?php esc_html_e('Select an image for this term.', 'somnia'); ?></p>
 				</div>
 			</td>
@@ -377,7 +377,7 @@ function somnia_save_term_metafields($term_id, $tt_id = '', $taxonomy = '')
 	}
 	
 	// Verify this is a POST request
-	if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+	if ('POST' !== filter_input(INPUT_SERVER, 'REQUEST_METHOD')) {
 		return;
 	}
 
@@ -911,7 +911,7 @@ if (!function_exists('somnia_woocommerce_custom_attributes')) {
 					?>
 					<div class="bt-attributes--value bt-value-select">
 						<div class="bt-select-box">
-							<div class="bt-select-display" tabindex="0"><?php echo $selected_display_name ? esc_html($selected_display_name) : esc_html__('Choose an option', 'somnia'); ?></div>
+							<div class="bt-select-display" tabindex="0"><?php echo esc_html($selected_display_name ? $selected_display_name : __('Choose an option', 'somnia')); ?></div>
 							<div class="bt-select-options">
 								<?php
 								foreach ($ordered_options as $option) :

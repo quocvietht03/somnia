@@ -34,12 +34,57 @@ class Widget_PostLoopItemStyle3 extends Widget_Base
 		return ['somnia'];
 	}
 
+	private function get_supported_posts() {
+		$posts = get_posts([
+			'post_type'      => 'post',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+		]);
+
+		$options = [];
+		foreach ( $posts as $post ) {
+			$options[ $post->ID ] = $post->post_title;
+		}
+
+		return $options;
+	}
+
 	protected function register_layout_section_controls()
 	{
 		$this->start_controls_section(
 			'section_content',
 			[
 				'label' => __('Content', 'somnia'),
+			]
+		);
+
+		$this->add_control(
+			'enable_manual_post',
+			[
+				'label'        => esc_html__( 'Manual Post', 'somnia' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Enable', 'somnia' ),
+				'label_off'    => esc_html__( 'Auto', 'somnia' ),
+				'return_value' => 'yes',
+				'default'      => '',
+			]
+		);
+
+		$options = $this->get_supported_posts();
+		$this->add_control(
+			'post_id',
+			[
+				'label'       => esc_html__( 'Select Post', 'somnia' ),
+				'type'        => Controls_Manager::SELECT2,
+				'options'     => $options,
+				'multiple'    => false,
+				'label_block' => true,
+				'condition'   => [
+					'enable_manual_post' => 'yes',
+				],
+				'default'     => ! empty( $options ) ? array_key_first( $options ) : '',
 			]
 		);
 
@@ -454,12 +499,31 @@ class Widget_PostLoopItemStyle3 extends Widget_Base
 
 	protected function render()
 	{
-		$settings = $this->get_settings_for_display();
-?>
+		$settings      = $this->get_settings_for_display();
+		$template_args = [ 'image-size' => $settings['thumbnail_size'] ];
+		?>
 		<div class="bt-elwg-post-loop-item--style3">
-			<?php get_template_part('framework/templates/post', 'index', array('image-size' => $settings['thumbnail_size'])); ?>
+			<?php
+			if ( $settings['enable_manual_post'] === 'yes' && ! empty( $settings['post_id'] ) ) {
+				$post_id = (int) $settings['post_id'];
+				$query   = new \WP_Query([
+					'post_type'      => 'post',
+					'p'              => $post_id,
+					'posts_per_page' => 1,
+				]);
+				if ( $query->have_posts() ) {
+					while ( $query->have_posts() ) {
+						$query->the_post();
+						get_template_part( 'framework/templates/post', 'index', $template_args );
+					}
+					wp_reset_postdata();
+				}
+			} else {
+				get_template_part( 'framework/templates/post', 'index', $template_args );
+			}
+			?>
 		</div>
-<?php
+		<?php
 	}
 
 	protected function content_template() {}

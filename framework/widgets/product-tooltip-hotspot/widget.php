@@ -385,22 +385,6 @@ class Widget_ProductTooltipHotspot extends Widget_Base
                 'separator' => 'before',
             ]
         );
-        $this->add_control(
-            'slider_layout',
-            [
-                'label' => __('Layout', 'somnia'),
-                'type' => Controls_Manager::SELECT,
-                'default' => 'default',
-                'options' => [
-                    'default' => __('Default', 'somnia'),
-                    'style-1' => __('Style 1', 'somnia'),
-                    'style-rectangle' => __('Style Rectangle', 'somnia'),
-                ],
-                'condition' => [
-                    'show_slider' => 'yes',
-                ],
-            ]
-        );
         $this->add_responsive_control(
             'slider_max_width',
             [
@@ -1003,7 +987,7 @@ class Widget_ProductTooltipHotspot extends Widget_Base
         if (!class_exists('WooCommerce')) {
             return;
         }
-        
+
         $settings = $this->get_settings_for_display();
         if (empty($settings['hotspot_image']['url'])) {
             return;
@@ -1027,7 +1011,7 @@ class Widget_ProductTooltipHotspot extends Widget_Base
                     'variation_id' => $variation_id,
                 ];
             }
-        }   
+        }
         if ($settings['hotspot_full_width'] === 'yes' && isset($settings['hotspot_container_width']['size'])) {
             $hotspot_container_width = $settings['hotspot_container_width']['size'];
 ?>
@@ -1095,17 +1079,17 @@ class Widget_ProductTooltipHotspot extends Widget_Base
                                             </a>
                                             <div class="bt-product-content">
                                                 <h4><a href="<?php echo esc_url($product->get_permalink()); ?>"><?php echo esc_html($product->get_name()); ?></a></h4>
-                                                <?php 
-                                                    $price_class = $product->is_type( 'variable' ) ? 'bt-product-variable' : '';
-                                                    $price_html  = $product->get_price_html();  
+                                                <?php
+                                                $price_class = $product->is_type('variable') ? 'bt-product-variable' : '';
+                                                $price_html  = $product->get_price_html();
                                                 ?>
-                                                <p class="bt-price <?php echo esc_attr( $price_class ); ?>">
-                                                    <?php echo wp_kses_post( $price_html ); ?>
+                                                <p class="bt-price <?php echo esc_attr($price_class); ?>">
+                                                    <?php echo wp_kses_post($price_html); ?>
                                                 </p>
                                                 <?php if ($show_quickview) : ?>
-                                                <a class="btn bt-product-quick-view-btn" href="#" data-id="<?php echo esc_attr($item['id_product']); ?>">
-                                                    <?php esc_html_e('Quick View', 'somnia'); ?>
-                                                </a>
+                                                    <a class="btn bt-product-quick-view-btn" href="#" data-id="<?php echo esc_attr($item['id_product']); ?>">
+                                                        <?php esc_html_e('Quick View', 'somnia'); ?>
+                                                    </a>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -1146,12 +1130,6 @@ class Widget_ProductTooltipHotspot extends Widget_Base
                         $classes = ['bt-hotspot-slider--inner', 'swiper'];
                         if ($settings['slider_dots_only_mobile'] === 'yes') {
                             $classes[] = 'bt-only-dot-mobile';
-                        }
-                        if ($settings['slider_layout'] === 'style-1') {
-                            $classes[] = 'bt-slider-style-1';
-                        }
-                        if ($settings['slider_layout'] === 'style-rectangle') {
-                            $classes[] = 'bt-slider-style-rectangle';
                         }
                         ?>
                         <div class="bt-hotspot-slider bt-slider-offset-sides-<?php echo esc_attr($settings['slider_offset_sides']); ?>" data-slider-settings='<?php echo json_encode($slider_settings); ?>'>
@@ -1200,14 +1178,54 @@ class Widget_ProductTooltipHotspot extends Widget_Base
                                                 $product_currencySymbol = get_woocommerce_currency_symbol($order_currency);
                                                 $is_in_stock = $product->is_in_stock();
                                                 $out_of_stock_class = !$is_in_stock ? ' out-of-stock' : '';
+                                                $default_price = 0;
+                                                $html_price_default = '';
+                                                $default_attributes = [];
+                                                if ($product->is_type('variable')) {
+                                                    // Get default attributes for variable product
+                                                    $default_attributes = $product->get_default_attributes();
+                                                    if (!empty($default_attributes)) {
+                                                        // Get available variations
+                                                        $available_variations = $product->get_available_variations();
+                                                        foreach ($available_variations as $variation_data) {
+                                                            $variation = wc_get_product($variation_data['variation_id']);
+                                                            if ($variation) {
+                                                                $variation_attributes = $variation->get_attributes();
+                                                                $is_default = true;
+
+                                                                // Check if this variation matches default attributes
+                                                                foreach ($default_attributes as $attribute_name => $default_value) {
+                                                                    $variation_value = isset($variation_attributes[$attribute_name]) ? $variation_attributes[$attribute_name] : '';
+                                                                    if ($variation_value !== $default_value) {
+                                                                        $is_default = false;
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                if ($is_default) {
+                                                                    $default_price = $variation->get_sale_price() ? $variation->get_sale_price() : $variation->get_regular_price();
+                                                                    $html_price_default = $variation->get_price_html();
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    // If no default variation found, price remains 0
+                                                } else {
+                                                    // For simple products, use original logic
+                                                    $default_price = $product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price();
+                                                }
                                     ?>
                                                 <li class="bt-slider-item bt-hotspot-product-list__item swiper-slide<?php echo esc_attr($out_of_stock_class); ?>"
                                                     data-product-currency="<?php echo esc_attr($product_currencySymbol); ?>"
-                                                    data-product-single-price="<?php echo esc_attr($product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price()); ?>"
+                                                    data-product-default-price="<?php echo esc_attr($default_price); ?>"
                                                     data-product-id="<?php echo esc_attr($product_id); ?>"
-                                                    data-in-stock="<?php echo esc_attr($is_in_stock ? '1' : '0'); ?>">
+                                                    data-in-stock="<?php echo esc_attr($is_in_stock ? '1' : '0'); ?>"
+                                                    data-product-html-price-default="<?php echo esc_attr($html_price_default); ?>"
+                                                    data-product-default-attributes="<?php echo esc_attr(json_encode($default_attributes)); ?>"
+                                                    >
                                                     <?php
-                                                    wc_get_template_part('content', 'product');
+                                                    wc_get_template('content-product.php', array('attributes_default' => $default_attributes));
                                                     ?>
                                                 </li>
                                     <?php

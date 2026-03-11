@@ -101,7 +101,7 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
                 <?php esc_html_e('Enable Mega Menu', 'somnia'); ?>
             </label>
         </p>
-        <div class="somnia-megamenu-dependent-fields" style="<?php echo $megamenu_enabled === '1' ? '' : 'display: none;'; ?>">
+        <div class="somnia-megamenu-dependent-fields" style="<?php echo esc_attr($megamenu_enabled === '1' ? '' : 'display: none;'); ?>">
         <p class="field-megamenu-block description description-wide">
             <label for="edit-megamenu-block-<?php echo esc_attr($item_id); ?>">
                 <?php esc_html_e('Select block', 'somnia'); ?><br />
@@ -136,7 +136,7 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
             </label>
         </p>
         <p class="field-megamenu-horizontal-position description description-wide somnia-megamenu-horizontal-position-field"
-            style="<?php echo $megamenu_content_width === 'fit-to-content' ? '' : 'display: none;'; ?>">
+            style="<?php echo esc_attr($megamenu_content_width === 'fit-to-content' ? '' : 'display: none;'); ?>">
             <label for="edit-megamenu-horizontal-position-<?php echo esc_attr($item_id); ?>">
                 <?php esc_html_e('Content Horizontal Position', 'somnia'); ?><br />
                 <select id="edit-megamenu-horizontal-position-<?php echo esc_attr($item_id); ?>"
@@ -154,6 +154,9 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
                     <option value="right" <?php selected($megamenu_horizontal_position, 'right'); ?>>
                         <?php esc_html_e('Right', 'somnia'); ?>
                     </option>
+                    <option value="center-to-item" <?php selected($megamenu_horizontal_position, 'center-to-item'); ?>>
+                        <?php esc_html_e('Center to Menu Item', 'somnia'); ?>
+                    </option>
                 </select>
             </label>
         </p>
@@ -162,10 +165,10 @@ function somnia_megamenu_nav_menu_item_custom_fields($item_id, $item, $depth, $a
                 class="somnia-megamenu-edit-link"
                 data-base-edit-url="<?php echo esc_attr(admin_url('post.php?post=%id%&action=elementor')); ?>"
                 target="_blank"
-                style="<?php echo $has_selected_block ? '' : 'display: none;'; ?>">
+                style="<?php echo esc_attr($has_selected_block ? '' : 'display: none;'); ?>">
                 <?php esc_html_e('Edit megamenu block', 'somnia'); ?>
             </a>
-            <span class="meta-sep" style="<?php echo $has_selected_block ? '' : 'display: none;'; ?>"> | </span>
+            <span class="meta-sep" style="<?php echo esc_attr($has_selected_block ? '' : 'display: none;'); ?>"> | </span>
             <a href="#"
                 class="somnia-megamenu-add-link"
                 data-item-id="<?php echo esc_attr($item_id); ?>">
@@ -213,7 +216,7 @@ function somnia_megamenu_save_nav_menu_item($menu_id, $menu_item_db_id, $args)
     $megamenu_horizontal_position = isset($menu_item_data['_somnia_megamenu_horizontal_position']) 
         ? sanitize_text_field($menu_item_data['_somnia_megamenu_horizontal_position']) 
         : 'default';
-    if (in_array($megamenu_horizontal_position, array('default', 'left', 'center', 'right'), true)) {
+    if (in_array($megamenu_horizontal_position, array('default', 'left', 'center', 'center-to-item', 'right'), true)) {
         update_post_meta($menu_item_db_id, '_somnia_megamenu_horizontal_position', $megamenu_horizontal_position);
     } else {
         update_post_meta($menu_item_db_id, '_somnia_megamenu_horizontal_position', 'default');

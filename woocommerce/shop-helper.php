@@ -2317,7 +2317,7 @@ function somnia_products_quick_view()
 
     ?>
     <div class="bt-quickview-title">
-        <h2><?php echo ($source === 'add-to-cart') ? esc_html__('Select options', 'somnia') : esc_html__('Quick View', 'somnia'); ?></h2>
+        <h2><?php echo esc_html($source === 'add-to-cart' ? __('Select options', 'somnia') : __('Quick View', 'somnia')); ?></h2>
         <div class="bt-quick-view-close"></div>
     </div>
     <div class="bt-quickview-wrap woocommerce">
@@ -4479,9 +4479,17 @@ function somnia_render_product_info_toggle()
 /**
  * Remove reviews tab from product tabs
  * This allows reviews to be rendered separately
+ *
+ * @param array $tabs Product tabs
+ * @return array
  */
 function somnia_remove_reviews_from_tabs($tabs)
 {
+    // Bypass removal when we're fetching full tabs for somnia_render_product_reviews
+    if (!empty($GLOBALS['somnia_fetching_reviews_tab'])) {
+        return $tabs;
+    }
+
     if (is_product() && isset($tabs['reviews'])) {
         unset($tabs['reviews']);
     }
@@ -4509,11 +4517,10 @@ function somnia_render_product_reviews()
         return;
     }
 
-    // Get product tabs to access reviews tab data (before filter removes it)
-    // We need to get original tabs, so we temporarily remove our filter
-    remove_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
+    // Fetch full tabs (including reviews) by temporarily bypassing our removal filter
+    $GLOBALS['somnia_fetching_reviews_tab'] = true;
     $product_tabs = apply_filters('woocommerce_product_tabs', array());
-    add_filter('woocommerce_product_tabs', 'somnia_remove_reviews_from_tabs', 98);
+    unset($GLOBALS['somnia_fetching_reviews_tab']);
 
     // Check if reviews tab exists
     if (!isset($product_tabs['reviews'])) {
@@ -5248,13 +5255,12 @@ function somnia_single_product_sticky_bar()
     $price_html = $product->get_price_html();
     $product_id = $product->get_id();
 
-    $btn_label_add = esc_html__('Add to cart', 'somnia');
-    $btn_label_select = esc_html__('Select options', 'somnia');
+    $btn_label_add   = __('Add to cart', 'somnia');
+    $btn_label_select = __('Select options', 'somnia');
 
-    $sticky_bar_attrs = 'id="bt-single-product-sticky-bar" aria-hidden="true"';
+    $variation_names = array();
+    $variation_prices = array();
     if ($is_variable) {
-        $variation_names = array();
-        $variation_prices = array();
         foreach ($product->get_available_variations() as $var) {
             $vid = (int) $var['variation_id'];
             $labels = array();
@@ -5275,8 +5281,6 @@ function somnia_single_product_sticky_bar()
             $variation_names[$vid] = implode(' / ', $labels);
             $variation_prices[$vid] = isset($var['price_html']) ? $var['price_html'] : '';
         }
-        $sticky_bar_attrs .= ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '"';
-        $sticky_bar_attrs .= ' data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
     }
     $default_variation_name = '';
     if ($is_variable) {
@@ -5286,7 +5290,11 @@ function somnia_single_product_sticky_bar()
         }
     }
 ?>
-    <div class="bt-single-product-sticky-bar" <?php echo $sticky_bar_attrs; ?>>
+    <div class="bt-single-product-sticky-bar" id="bt-single-product-sticky-bar" aria-hidden="true"<?php
+                    if ($is_variable) {
+                        echo ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '" data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
+                    }
+                    ?>>
         <div class="bt-single-product-sticky-bar__inner">
             <div class="bt-single-product-sticky-bar__product">
                 <div class="bt-single-product-sticky-bar__thumb">
@@ -5295,7 +5303,7 @@ function somnia_single_product_sticky_bar()
                 <div class="bt-single-product-sticky-bar__info">
                     <h3 class="bt-single-product-sticky-bar__title"><?php echo esc_html($title); ?></h3>
                     <?php if ($price_html) { ?>
-                        <div class="bt-single-product-sticky-bar__price<?php echo $is_variable ? ' bt-product-type-variable' : ''; ?>"><?php echo $price_html; ?></div>
+                        <div class="bt-single-product-sticky-bar__price<?php echo esc_attr($is_variable ? ' bt-product-type-variable' : ''); ?>"><?php echo wp_kses_post($price_html); ?></div>
                     <?php } ?>
                     <?php if ($is_variable) { ?>
                         <div class="bt-single-product-sticky-bar__variation">
@@ -5306,9 +5314,9 @@ function somnia_single_product_sticky_bar()
             </div>
             <div class="bt-single-product-sticky-bar__action">
                 <?php if ($is_simple) { ?>
-                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="simple"><?php echo $btn_label_add; ?></a>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="simple"><?php echo esc_html($btn_label_add); ?></a>
                 <?php } else { ?>
-                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo $btn_label_select; ?></a>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo esc_html($btn_label_select); ?></a>
                 <?php } ?>
             </div>
         </div>
@@ -5346,165 +5354,6 @@ function get_default_variation_id($product)
 
     return $variation_id;
 }
-
-/* Bundle Save Widget - Get bundle products for modal */
-function somnia_get_bundle_products()
-{
-    if (!isset($_POST['product_ids']) || empty($_POST['product_ids'])) {
-        wp_send_json_error(array('message' => 'No products found'));
-    }
-
-    $product_ids = array_map('intval', $_POST['product_ids']);
-    $html = '';
-
-    foreach ($product_ids as $item_id) {
-        $product = wc_get_product($item_id);
-        if (!$product) {
-            continue;
-        }
-
-        $is_variation = $product->is_type('variation');
-        $product_name = $product->get_name();
-
-        // Get variation attributes if applicable
-        $variation_text = '';
-        if ($is_variation) {
-            $attributes = $product->get_attributes();
-            $attr_labels = [];
-            foreach ($attributes as $attr_name => $attr_value) {
-                // Get term name if taxonomy
-                if (taxonomy_exists($attr_name)) {
-                    $term = get_term_by('slug', $attr_value, $attr_name);
-                    $attr_value = $term ? $term->name : $attr_value;
-                }
-
-                $attr_labels[] = ucfirst($attr_value);
-            }
-            if (!empty($attr_labels)) {
-                $variation_text = implode('/', $attr_labels);
-            }
-        }
-
-        $product_image = $product->get_image('thumbnail');
-        $regular_price = $product->get_regular_price();
-        $sale_price = $product->get_sale_price();
-        $price = $product->get_price();
-
-        ob_start();
-    ?>
-        <div class="bt-modal-product--item">
-            <?php echo '<div class="bt-product-thumb">' . $product_image . '</div>'; ?>
-
-            <div class="bt-product-info">
-                <h4 class="bt-product-name"><?php echo esc_html($product_name); ?></h4>
-                <div class="bt-product-price">
-                    <?php
-                    $price_html  = $product->get_price_html();
-                    echo wp_kses_post($price_html);
-                    ?>
-                </div>
-                <?php if ($variation_text) : ?>
-                    <div class="bt-product-variation"><?php echo esc_html($variation_text); ?></div>
-                <?php endif; ?>
-            </div>
-            <button class="bt-modal-add-product" data-product-id="<?php echo esc_attr($item_id); ?>">
-                <?php _e('Add', 'somnia'); ?>
-            </button>
-        </div>
-    <?php
-        $html .= ob_get_clean();
-    }
-
-    if (empty($html)) {
-        wp_send_json_error(array('message' => 'No valid products found'));
-    }
-
-    wp_send_json_success(array('html' => $html));
-}
-add_action('wp_ajax_somnia_get_bundle_products', 'somnia_get_bundle_products');
-add_action('wp_ajax_nopriv_somnia_get_bundle_products', 'somnia_get_bundle_products');
-
-/* Bundle Save Widget - Get single product item */
-function somnia_get_bundle_product_item()
-{
-    if (!isset($_POST['product_id'])) {
-        wp_send_json_error(array('message' => 'No product ID provided'));
-    }
-
-    $item_id = intval($_POST['product_id']);
-    $product = wc_get_product($item_id);
-
-    if (!$product) {
-        wp_send_json_error(array('message' => 'Product not found'));
-    }
-
-    $is_variation = $product->is_type('variation');
-    $parent_id = $is_variation ? $product->get_parent_id() : $item_id;
-    $variation_id = $is_variation ? $item_id : 0;
-
-    $product_link = get_permalink($parent_id);
-    $product_name = $product->get_name();
-
-    // Get variation attributes if applicable
-    $variation_text = '';
-    if ($is_variation) {
-        $attributes = $product->get_attributes();
-        $attr_labels = [];
-        foreach ($attributes as $attr_name => $attr_value) {
-            // Get term name if taxonomy
-            if (taxonomy_exists($attr_name)) {
-                $term = get_term_by('slug', $attr_value, $attr_name);
-                $attr_value = $term ? $term->name : $attr_value;
-            }
-
-            $attr_labels[] = ucfirst($attr_value);
-        }
-        if (!empty($attr_labels)) {
-            $variation_text = implode('/', $attr_labels);
-        }
-    }
-
-    $product_image = $product->get_image('thumbnail');
-    $regular_price = $product->get_regular_price();
-    $sale_price = $product->get_sale_price();
-    $price = $product->get_price();
-
-    ob_start();
-    ?>
-    <div class="bt-bundle-product--item"
-        data-product-id="<?php echo esc_attr($parent_id); ?>"
-        data-variation-id="<?php echo esc_attr($variation_id); ?>"
-        data-price="<?php echo esc_attr($price); ?>"
-        data-regular-price="<?php echo esc_attr($regular_price ? $regular_price : $price); ?>">
-        <div class="bt-product-thumb">
-            <?php echo '<a href="' . esc_url($product_link) . '">' . $product_image . '</a>'; ?>
-        </div>
-        <div class="bt-product-info">
-            <h4 class="bt-product-name">
-                <?php echo '<a href="' . esc_url($product_link) . '">' . esc_html($product_name) . '</a>'; ?>
-            </h4>
-            <div class="bt-product-price">
-                <?php
-                $price_html  = $product->get_price_html();
-                echo wp_kses_post($price_html);
-                ?>
-            </div>
-            <?php if ($variation_text) : ?>
-                <div class="bt-product-variation"><?php echo esc_html($variation_text); ?></div>
-            <?php endif; ?>
-        </div>
-        <div class="bt-product-actions">
-            <button class="bt-product-remove" data-item-id="<?php echo esc_attr($item_id); ?>">
-                <span class="bt-remove-text"><?php _e('REMOVE', 'somnia'); ?></span>
-            </button>
-        </div>
-    </div>
-<?php
-    $html = ob_get_clean();
-    wp_send_json_success(array('html' => $html));
-}
-add_action('wp_ajax_somnia_get_bundle_product_item', 'somnia_get_bundle_product_item');
-add_action('wp_ajax_nopriv_somnia_get_bundle_product_item', 'somnia_get_bundle_product_item');
 
 /**
  * Get Frequently Bought Together products for a given product
@@ -6106,3 +5955,148 @@ if (!function_exists('somnia_track_order_callback')) {
     add_action('wp_ajax_somnia_track_order', 'somnia_track_order_callback');
     add_action('wp_ajax_nopriv_somnia_track_order', 'somnia_track_order_callback');
 }
+
+// AJAX Login functionality
+if (!function_exists('somnia_ajax_login_user')) {
+    function somnia_ajax_login_user()
+    {
+        // Verify nonce (from wp_nonce_field in the form)
+        if (!isset($_POST['bt_login_nonce']) || !wp_verify_nonce($_POST['bt_login_nonce'], 'bt_login_nonce')) {
+            wp_send_json_error(['message' => esc_html__('Security check failed.', 'somnia')]);
+        }
+
+        $username = sanitize_text_field($_POST['username']);
+        $password = $_POST['password'];
+        $remember = isset($_POST['remember']) ? true : false;
+
+        if (empty($username) || empty($password)) {
+            wp_send_json_error(['message' => esc_html__('Please fill in all required fields.', 'somnia')]);
+        }
+
+        $creds = [
+            'user_login'    => $username,
+            'user_password' => $password,
+            'remember'      => $remember,
+        ];
+
+        $user = wp_signon($creds, false);
+
+        if (is_wp_error($user)) {
+            wp_send_json_error(['message' => $user->get_error_message()]);
+        }
+
+        // Get current page URL for redirect
+        $redirect_url = '';
+        if (isset($_POST['current_url']) && !empty($_POST['current_url'])) {
+            $redirect_url = esc_url_raw($_POST['current_url']);
+        } else {
+            // Fallback to referer or current page
+            $redirect_url = wp_get_referer();
+            if (!$redirect_url) {
+                $redirect_url = home_url('/');
+            }
+        }
+
+        wp_send_json_success([
+            'message' => esc_html__('Login successful! Redirecting...', 'somnia'),
+            'redirect_url' => $redirect_url,
+        ]);
+    }
+    add_action('wp_ajax_bt_login_user', 'somnia_ajax_login_user');
+    add_action('wp_ajax_nopriv_bt_login_user', 'somnia_ajax_login_user');
+}
+
+// AJAX Register functionality
+if (!function_exists('somnia_ajax_register_user')) {
+    function somnia_ajax_register_user()
+    {
+        // Verify nonce
+        if (!isset($_POST['bt_register_nonce']) || !wp_verify_nonce($_POST['bt_register_nonce'], 'bt_register_nonce')) {
+            wp_send_json_error(['message' => esc_html__('Security check failed.', 'somnia')]);
+        }
+
+        $username = sanitize_text_field($_POST['username']);
+        $email = sanitize_email($_POST['email']);
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
+        $agree_terms = isset($_POST['agree_terms']) ? true : false;
+
+        // Validation
+        if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+            wp_send_json_error(['message' => esc_html__('Please fill in all required fields.', 'somnia')]);
+        }
+
+        // Validate email format
+        if (!is_email($email)) {
+            wp_send_json_error(['message' => esc_html__('Please enter a valid email address.', 'somnia')]);
+        }
+
+        // Validate username format
+        if (!validate_username($username)) {
+            wp_send_json_error(['message' => esc_html__('Username contains invalid characters. Only letters, numbers, and underscores are allowed.', 'somnia')]);
+        }
+
+        // Check username length
+        if (strlen($username) < 3) {
+            wp_send_json_error(['message' => esc_html__('Username must be at least 3 characters long.', 'somnia')]);
+        }
+
+        if (strlen($username) > 60) {
+            wp_send_json_error(['message' => esc_html__('Username must be less than 60 characters long.', 'somnia')]);
+        }
+
+        // Check password strength
+        if (strlen($password) < 6) {
+            wp_send_json_error(['message' => esc_html__('Password must be at least 6 characters long.', 'somnia')]);
+        }
+
+        if ($password !== $confirm_password) {
+            wp_send_json_error(['message' => esc_html__('Passwords do not match. Please make sure both password fields are identical.', 'somnia')]);
+        }
+
+        if (!$agree_terms) {
+            wp_send_json_error(['message' => esc_html__('You must agree to the Terms of Use to create an account.', 'somnia')]);
+        }
+
+        // Check if username already exists
+        if (username_exists($username)) {
+            wp_send_json_error(['message' => sprintf(esc_html__('Username "%s" is already taken. Please choose a different username.', 'somnia'), $username)]);
+        }
+
+        // Check if email already exists
+        if (email_exists($email)) {
+            wp_send_json_error(['message' => esc_html__('An account with this email address already exists. Please use a different email or try logging in.', 'somnia')]);
+        }
+
+        // Create user
+        $user_id = wp_create_user($username, $password, $email);
+
+        if (is_wp_error($user_id)) {
+            wp_send_json_error(['message' => $user_id->get_error_message()]);
+        }
+
+        // Log the user in automatically
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id, true);
+
+        // Get current page URL for redirect
+        $redirect_url = '';
+        if (isset($_POST['current_url']) && !empty($_POST['current_url'])) {
+            $redirect_url = esc_url_raw($_POST['current_url']);
+        } else {
+            // Fallback to referer or current page
+            $redirect_url = wp_get_referer();
+            if (!$redirect_url) {
+                $redirect_url = home_url('/');
+            }
+        }
+
+        wp_send_json_success([
+            'message' => esc_html__('Account created successfully! Redirecting...', 'somnia'),
+            'redirect_url' => $redirect_url,
+        ]);
+    }
+    add_action('wp_ajax_bt_register_user', 'somnia_ajax_register_user');
+    add_action('wp_ajax_nopriv_bt_register_user', 'somnia_ajax_register_user');
+}
+

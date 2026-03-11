@@ -846,7 +846,7 @@ class Widget_MegaMenu extends Widget_Base
 				if ( $depth === 0 && $megamenu_enabled === '1' && $megamenu_block_id ) {
 					$content_width_class = 'bt-megamenu-' . esc_attr( $megamenu_content_width );
 					$horizontal_position_class = '';
-					if ( $megamenu_content_width === 'fit-to-content' && in_array( $megamenu_horizontal_position, array( 'left', 'center', 'right' ), true ) ) {
+					if ( $megamenu_content_width === 'fit-to-content' && in_array( $megamenu_horizontal_position, array( 'left', 'center', 'center-to-item', 'right' ), true ) ) {
 						$horizontal_position_class = 'bt-megamenu-horizontal-' . esc_attr( $megamenu_horizontal_position );
 					}
 					$dropdown_classes = trim( 'bt-megamenu-dropdown ' . $content_width_class . ' ' . $horizontal_position_class );

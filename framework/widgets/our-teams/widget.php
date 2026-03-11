@@ -389,6 +389,10 @@ class Widget_OurTeams extends Widget_Base
                                     ?>
 
                                 </div>
+                                <?php
+                                $has_social = ! empty( $member['facebook']['url'] ) || ! empty( $member['twitter']['url'] ) || ! empty( $member['pinterest']['url'] ) || ! empty( $member['instagram']['url'] );
+                                if ( $has_social ) :
+                                ?>
                                 <div class="bt-member-social">
                                     <?php if (!empty($member['facebook']['url'])) : ?>
                                         <a href="<?php echo esc_url($member['facebook']['url']); ?>" class="bt-social-link facebook">
@@ -422,6 +426,7 @@ class Widget_OurTeams extends Widget_Base
                                         </a>
                                     <?php endif; ?>
                                 </div>
+                                <?php endif; ?>
                             </div>
                             <div class="bt-member-info">
                                 <?php if (!empty($member['name'])) : ?>

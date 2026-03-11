@@ -1590,13 +1590,13 @@
                             "choices": {
                                 "search_form": "Search Form",
                                 "categories": "Product Categories",
+                                "brand": "Brand",
+                                "comfort_scale": "Comfort Scale",
+                                "mattress_type": "Mattress Type",
                                 "price": "Price",
                                 "customer_rating": "Customer Rating",
                                 "text_editor": "Text Editor",
-                                "pa_button": "Button",
-                                "pa_images": "images",
                                 "pa_size": "Size",
-                                "pa_background": "Background",
                                 "pa_color": "Color"
                             },
                             "default_value": false,

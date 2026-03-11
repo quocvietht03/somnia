@@ -373,7 +373,7 @@ class Widget_ProductPopupHotspot extends Widget_Base
                                 ?>
                                                 <li class="bt-hotspot-product-list__item"
                                                     data-product-currency="<?php echo esc_attr(get_woocommerce_currency_symbol(get_woocommerce_currency())); ?>"
-                                                    data-product-single-price="<?php echo esc_attr($product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price()); ?>"
+                                                    data-product-default-price="<?php echo esc_attr($product->get_sale_price() ? $product->get_sale_price() : $product->get_regular_price()); ?>"
                                                     data-product-id="<?php echo esc_attr($product_id); ?>">
                                                     <a class="bt-hotspot-product-thumbnail" href="<?php echo esc_url($product->get_permalink()); ?>">
                                                         <?php

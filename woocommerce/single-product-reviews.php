@@ -41,7 +41,7 @@ if (!empty($rating_counts)) {
 }
 ?>
 <div id="reviews" class="woocommerce-Reviews">
-    <div id="comments" class="<?php echo ($product->get_average_rating() > 0) ? 'bt-has-comments' : 'bt-no-comments'; ?>">
+    <div id="comments" class="<?php echo esc_attr(($product->get_average_rating() > 0) ? 'bt-has-comments' : 'bt-no-comments'); ?>">
         <?php if ($product->get_average_rating() > 0) { ?>
             <div class="bt-summary-rating">
                 <div class="bt-left-summary">

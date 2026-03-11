@@ -53,6 +53,18 @@ if (empty($product) || ! $product->is_visible()) {
 		do_action('somnia_woocommerce_template_loop_product_link_open');
 		do_action('somnia_woocommerce_template_loop_product_title');
 		do_action('somnia_woocommerce_template_loop_product_link_close');
+		// Display default attributes as "attribute_label : value" only for variable products with default attributes
+		if (isset($attributes_default) && !empty($attributes_default) && $product->is_type('variable')) {
+			echo '<div class="product-default-attributes">';
+			$attribute_pairs = array();
+			foreach ($attributes_default as $attribute_name => $attribute_value) {
+				// Get attribute label/name
+				$attribute_label = wc_attribute_label($attribute_name);
+				$attribute_pairs[] = esc_html($attribute_label) . ': ' . '<span>' . esc_html($attribute_value) . '</span>';
+			}
+			echo implode(' / ', $attribute_pairs);
+			echo '</div>';
+		}
 		do_action('somnia_woocommerce_template_loop_price');
 		?>
 		<?php if (is_archive() && 'product' === get_post_type() || $is_ajax_filter_product) : ?>

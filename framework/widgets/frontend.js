@@ -1128,7 +1128,6 @@
 		}
 	}
 	function SomniaFreeShippingMessage() {
-		console.log("trong");
 		$.ajax({
 			url: AJ_Options.ajax_url,
 			type: 'POST',
@@ -1156,6 +1155,7 @@
 			// Initialize the testimonial content slider
 			const testimonialContentSwiper = new Swiper($testimonialContent[0], {
 				slidesPerView: 1,
+				spaceBetween: 10,
 				loop: true,
 				speed: sliderSpeed,
 				autoplay: autoplay ? {
@@ -1204,185 +1204,6 @@
 			}
 		}
 	};
-	const TheStoryHandler = function ($scope) {
-		const $TheStory = $scope.find('.bt-elwg-the-story--default');
-		const $itemsSlider = $TheStory.find('.js-story-items-slider');
-		const $imageSlider = $TheStory.find('.js-story-image-slider');
-		const $items = $TheStory.find('.bt-the-story--item');
-
-		if ($itemsSlider.length > 0 && $imageSlider.length > 0) {
-			const $sliderSettings = $TheStory.data('slider-settings');
-			const sliderSpeed = $sliderSettings.speed || 1000;
-			const autoplay = $sliderSettings.autoplay || false;
-			const autoplayDelay = $sliderSettings.autoplay_delay || 5000;
-
-			// Initialize the items slider (thumbs)
-			var itemsSwiper = new Swiper($itemsSlider[0], {
-				spaceBetween: $sliderSettings.spaceBetween || 30,
-				slidesPerView: $sliderSettings.slidesPerView || 4,
-				freeMode: true,
-				watchSlidesProgress: true,
-				loop: false,
-				speed: sliderSpeed,
-				breakpoints: $sliderSettings.breakpoints || {}
-			});
-
-			// Initialize the image slider (main)
-			var imageSwiper = new Swiper($imageSlider[0], {
-				spaceBetween: 0,
-				loop: false,
-				speed: sliderSpeed,
-				allowTouchMove: true,
-				centeredSlides: false,
-				// Disable Swiper autoplay - we'll control it with progress animation
-				autoplay: false,
-				thumbs: {
-					swiper: itemsSwiper,
-				},
-			});
-
-			// Progress animation manager
-			const ProgressManager = {
-				animation: null,
-				startTime: null,
-				currentItem: null,
-				swiperInstance: null,
-
-				// Set swiper instance for triggering slide change
-				setSwiper(swiper) {
-					this.swiperInstance = swiper;
-				},
-
-				// Reset progress line to 0%
-				reset(item) {
-					if (!item) return;
-					const progressLine = item.querySelector('.bt-the-story--progress-line');
-					if (progressLine) {
-						progressLine.style.width = '0%';
-						progressLine.style.transition = 'none';
-					}
-				},
-
-				// Stop current animation
-				stop() {
-					if (this.animation) {
-						cancelAnimationFrame(this.animation);
-						this.animation = null;
-					}
-					this.startTime = null;
-					this.currentItem = null;
-				},
-
-				// Set progress line to 100% (when autoplay is off)
-				setFull(item) {
-					if (!item) return;
-					const progressLine = item.querySelector('.bt-the-story--progress-line');
-					if (progressLine) {
-						progressLine.style.width = '100%';
-						progressLine.style.transition = 'none';
-					}
-				},
-
-				// Start progress animation or set full (based on autoplay)
-				start(item) {
-					if (!item) return;
-
-					this.stop(); // Stop any existing animation
-
-					const progressLine = item.querySelector('.bt-the-story--progress-line');
-					if (!progressLine) return;
-
-					// If autoplay is off, just set progress line to 100% (color handled by CSS)
-					if (!autoplay) {
-						this.setFull(item);
-						return;
-					}
-
-					// If autoplay is on, start animation
-					// Setup progress line (color handled by CSS)
-					this.reset(item);
-
-					this.currentItem = item;
-					this.startTime = performance.now();
-
-					// Animation loop
-					const animate = (currentTime) => {
-						if (!this.startTime) this.startTime = currentTime;
-
-						const elapsed = currentTime - this.startTime;
-						const progress = Math.min((elapsed / autoplayDelay) * 100, 100);
-
-						if (progressLine && progressLine.parentElement) {
-							progressLine.style.width = progress + '%';
-						}
-
-						if (progress < 100) {
-							this.animation = requestAnimationFrame(animate);
-						} else {
-							this.stop();
-							// Trigger slide next when progress reaches 100%
-							if (this.swiperInstance) {
-								// If not at end, go to next slide, otherwise go to first slide
-								if (!this.swiperInstance.isEnd) {
-									this.swiperInstance.slideNext();
-								} else {
-									// If at end, go to first slide
-									this.swiperInstance.slideTo(0);
-								}
-							}
-						}
-					};
-
-					this.animation = requestAnimationFrame(animate);
-				}
-			};
-
-			// Set swiper instance to ProgressManager
-			ProgressManager.setSwiper(imageSwiper);
-
-			// Find active item by slide index
-			const findActiveItem = (slideIndex) => {
-				let activeItem = null;
-
-				$items.each(function () {
-					const itemIndex = parseInt(this.getAttribute('data-slide-index'), 10);
-					if (itemIndex === slideIndex) {
-						activeItem = this;
-						return false; // break
-					}
-				});
-
-				return activeItem || $items.eq(slideIndex)[0];
-			};
-
-			// Handle slide change
-			imageSwiper.on('slideChange', () => {
-				const activeItem = findActiveItem(imageSwiper.realIndex);
-				if (activeItem) {
-					// Reset all progress lines
-					$items.each(function () {
-						ProgressManager.reset(this);
-					});
-
-					// Start progress for active item (or set full if autoplay is off)
-					ProgressManager.start(activeItem);
-				}
-			});
-
-			// No need for autoplay events since we control it with progress animation
-
-			// Initialize progress for first slide on load
-			const firstActiveItem = findActiveItem(imageSwiper.realIndex);
-			if (firstActiveItem) {
-				// Reset all progress lines first
-				$items.each(function () {
-					ProgressManager.reset(this);
-				});
-				// Start progress for first active item (or set full if autoplay is off)
-				ProgressManager.start(firstActiveItem);
-			}
-		}
-	};
 	const TestimonialSliderHandler = function ($scope) {
 		const $TestimonialSlider = $scope.find('.js-data-testimonial-slider');
 		if ($TestimonialSlider.length > 0) {
@@ -1417,48 +1238,6 @@
 				});
 				$TestimonialSlider.find('.js-testimonial-slider')[0].addEventListener('mouseleave', () => {
 					swiper.autoplay.start();
-				});
-			}
-		}
-	};
-
-	const TestimonialsStaggeredSliderHandler = function ($scope) {
-		const $TestimonialsStaggeredSlider = $scope.find('.js-data-testimonials-staggered-slider');
-		if ($TestimonialsStaggeredSlider.length > 0) {
-			const $sliderSettings = $TestimonialsStaggeredSlider.data('slider-settings') || {};
-			// Initialize the testimonials staggered slider
-			const staggeredSlider = new Swiper($TestimonialsStaggeredSlider.find('.js-testimonials-staggered-slider')[0], {
-				slidesPerView: $sliderSettings.slidesPerView,
-				spaceBetween: $sliderSettings.spaceBetween,
-				loop: $sliderSettings.loop,
-				speed: $sliderSettings.speed,
-				autoplay: $sliderSettings.autoplay ? {
-					delay: $sliderSettings.autoplay_delay,
-					disableOnInteraction: false
-				} : false,
-				navigation: {
-					nextEl: $scope.find('.bt-button-next')[0],
-					prevEl: $scope.find('.bt-button-prev')[0],
-				},
-				pagination: {
-					el: $scope.find('.bt-swiper-pagination')[0],
-					clickable: true,
-					type: 'bullets',
-					renderBullet: function (index, className) {
-						return '<span class="' + className + '"></span>';
-					},
-				},
-				breakpoints: $sliderSettings.breakpoints,
-			});
-
-			// Pause autoplay on hover if autoplay is enabled
-			if ($sliderSettings.autoplay) {
-				$TestimonialsStaggeredSlider.find('.js-testimonials-staggered-slider')[0].addEventListener('mouseenter', () => {
-					staggeredSlider.autoplay.stop();
-				});
-
-				$TestimonialsStaggeredSlider.find('.js-testimonials-staggered-slider')[0].addEventListener('mouseleave', () => {
-					staggeredSlider.autoplay.start();
 				});
 			}
 		}
@@ -1865,263 +1644,6 @@
 		}
 	};
 
-	const AccordionWithProductSliderHandler = function ($scope) {
-		const $AccordionWithProductSlider = $scope.find('.bt-elwg-accordion-with-product-slider--default');
-		const $accordionProducts = $AccordionWithProductSlider.find('.js-accordion-products');
-
-		if ($accordionProducts.length > 0) {
-			const $sliderSettings = $AccordionWithProductSlider.data('slider-settings');
-			const sliderSpeed = $sliderSettings.speed || 1000;
-			const autoplay = $sliderSettings.autoplay || false;
-			const autoplayDelay = $sliderSettings.autoplay_delay || 3000;
-
-			// Clone first slide and append to end for smooth loop effect
-			const $swiperWrapper = $accordionProducts.find('.swiper-wrapper');
-			const $firstSlide = $swiperWrapper.find('.swiper-slide').first();
-
-			if ($firstSlide.length > 0) {
-				// Clone first two slides and append to end for smooth loop effect
-				const $secondSlide = $swiperWrapper.find('.swiper-slide').eq(1);
-
-				const $clonedFirstSlide = $firstSlide.clone();
-				$clonedFirstSlide.addClass('swiper-slide-duplicate-end'); // Add identifier class
-				$swiperWrapper.append($clonedFirstSlide);
-
-				if ($secondSlide.length > 0) {
-					const $clonedSecondSlide = $secondSlide.clone();
-					$clonedSecondSlide.addClass('swiper-slide-duplicate-end'); // Add identifier class
-					$swiperWrapper.append($clonedSecondSlide);
-				}
-			}
-
-			// Initialize the accordion products slider
-			const accordionProductsSwiper = new Swiper($accordionProducts[0], {
-				slidesPerView: 1,
-				spaceBetween: 20,
-				loop: false,
-				speed: sliderSpeed,
-				centeredSlides: false,
-				autoplay: autoplay ? {
-					delay: autoplayDelay,
-					disableOnInteraction: false
-				} : false,
-				allowTouchMove: true,
-				breakpoints: {
-					767: {
-						slidesPerView: 1,
-						centeredSlides: false,
-						spaceBetween: 20
-					},
-					1024: {
-						slidesPerView: 1.9,
-						centeredSlides: true,
-						spaceBetween: 30
-					}
-				},
-			});
-
-			// Handle accordion navigation item click
-			$AccordionWithProductSlider.find('.bt-accordion-nav-item').on('click', function () {
-				const clickedIndex = parseInt($(this).data('index'));
-
-				// Update active accordion nav item
-				$AccordionWithProductSlider.find('.bt-accordion-nav-item').removeClass('active');
-				$(this).addClass('active');
-
-				// Slide to corresponding products
-				accordionProductsSwiper.slideTo(clickedIndex);
-			});
-
-			// Get total number of original slides (not including cloned)
-			const totalOriginalSlides = $AccordionWithProductSlider.find('.bt-accordion-nav-item').length;
-
-			// Update accordion nav when slider changes (via navigation arrows or pagination)
-			accordionProductsSwiper.on('slideChange', function () {
-				const activeIndex = this.activeIndex;
-
-				// If we're on the cloned slide (last slide), jump to first slide without stopping autoplay
-				if (activeIndex >= totalOriginalSlides) {
-					// Store autoplay state before reset
-					const wasAutoplayRunning = this.autoplay && this.autoplay.running;
-
-					setTimeout(() => {
-						this.slideTo(0, 0); // Slide to first slide with 0 speed (no animation)
-
-						// Restart autoplay if it was running before reset
-						if (wasAutoplayRunning && autoplay) {
-							setTimeout(() => {
-								this.autoplay.start();
-							}, 50); // Small delay to ensure slide transition is complete
-						}
-					}, sliderSpeed); // Wait for current transition to complete
-				}
-
-				// Update accordion nav (use modulo to handle cloned slide)
-				const navIndex = activeIndex % totalOriginalSlides;
-				$AccordionWithProductSlider.find('.bt-accordion-nav-item').removeClass('active');
-				$AccordionWithProductSlider.find('.bt-accordion-nav-item[data-index="' + navIndex + '"]').addClass('active');
-			});
-
-			// Pause autoplay on hover if autoplay is enabled
-			if (autoplay) {
-				$accordionProducts[0].addEventListener('mouseenter', () => {
-					if (accordionProductsSwiper.autoplay) {
-						accordionProductsSwiper.autoplay.stop();
-					}
-				});
-
-				$accordionProducts[0].addEventListener('mouseleave', () => {
-					if (accordionProductsSwiper.autoplay) {
-						accordionProductsSwiper.autoplay.start();
-					}
-				});
-			}
-		}
-	};
-
-	const TitleNavWithSliderHandler = function ($scope) {
-		const $TitleNavWithSlider = $scope.find('.bt-elwg-title-nav-with-slider--default');
-		const $navContent = $TitleNavWithSlider.find('.js-title-nav-content');
-
-		if ($navContent.length > 0) {
-			const $sliderSettings = $TitleNavWithSlider.data('slider-settings');
-			const sliderSpeed = $sliderSettings.speed || 1000;
-			const autoplay = $sliderSettings.autoplay || false;
-			const autoplayDelay = $sliderSettings.autoplay_delay || 3000;
-
-			let titleNavContentSwiper;
-
-			function initSlider() {
-				if (titleNavContentSwiper) {
-					titleNavContentSwiper.destroy();
-				}
-
-				titleNavContentSwiper = new Swiper($navContent[0], {
-					direction: 'horizontal',
-					slidesPerView: 1,
-					spaceBetween: 15,
-					loop: true,
-					speed: sliderSpeed,
-					centeredSlides: false,
-					autoplay: autoplay ? {
-						delay: autoplayDelay,
-						disableOnInteraction: false
-					} : false,
-					allowTouchMove: true,
-					effect: 'slide',
-					mousewheel: {
-						enabled: true,
-						forceToAxis: true,
-					},
-					breakpoints: {
-						768: {
-							spaceBetween: 20,
-							loop: true,
-						},
-						1025: {
-							direction: 'vertical',
-							spaceBetween: 20,
-							loop: false,
-						},
-						1367: {
-							direction: 'vertical',
-							spaceBetween: 30,
-							loop: false,
-						}
-					}
-				});
-
-				// Handle navigation item click
-				$TitleNavWithSlider.find('.bt-nav-item').on('click', function () {
-					const clickedIndex = parseInt($(this).data('index'));
-
-					// Update active navigation item
-					$TitleNavWithSlider.find('.bt-nav-item').removeClass('active');
-					$(this).addClass('active');
-
-					// Slide to corresponding content
-					titleNavContentSwiper.slideTo(clickedIndex);
-				});
-
-				// Update navigation when slider changes
-				titleNavContentSwiper.on('slideChange', function () {
-					const activeIndex = this.activeIndex;
-
-					// Update navigation
-					$TitleNavWithSlider.find('.bt-nav-item').removeClass('active');
-					$TitleNavWithSlider.find('.bt-nav-item[data-index="' + activeIndex + '"]').addClass('active');
-				});
-
-				// Pause autoplay on hover if autoplay is enabled
-				if (autoplay) {
-					$navContent[0].addEventListener('mouseenter', () => {
-						if (titleNavContentSwiper.autoplay) {
-							titleNavContentSwiper.autoplay.stop();
-						}
-					});
-
-					$navContent[0].addEventListener('mouseleave', () => {
-						if (titleNavContentSwiper.autoplay) {
-							titleNavContentSwiper.autoplay.start();
-						}
-					});
-				}
-				// Trigger click on second nav item programmatically for desktop
-				if (window.innerWidth > 1024) {
-					setTimeout(() => {
-						$TitleNavWithSlider.find('.bt-nav-item').eq(1).trigger('click');
-					}, 100);
-				}
-			}
-
-			// Initialize slider
-			initSlider();
-
-			// Reinitialize on window resize
-			let resizeTimer;
-			window.addEventListener('resize', () => {
-				clearTimeout(resizeTimer);
-				resizeTimer = setTimeout(() => {
-					initSlider();
-				}, 250);
-			});
-		}
-	};
-
-	const CollectionBannerHandler = function ($scope, $) {
-		var $collectionBanner = $scope.find('.bt-collection-banner');
-
-		if ($collectionBanner.length) {
-			// Store the index of the default active item on page load
-			var $defaultActiveItem = $collectionBanner.find('.collection-item.active').first();
-			var defaultActiveIndex = $defaultActiveItem.length ? $defaultActiveItem.data('index') : null;
-
-			// Handle hover events
-			$collectionBanner.find('.collection-item').on('mouseenter', function () {
-				var $this = $(this);
-				var $container = $this.closest('.bt-collection-banner');
-
-				// Remove active class from all items
-				$container.find('.collection-item').removeClass('active');
-
-				// Add active class to hovered item
-				$this.addClass('active');
-			});
-
-			// Optional: Reset to default active item when mouse leaves container
-			$collectionBanner.on('mouseleave', function () {
-				var $container = $(this);
-
-				// Remove active class from all items
-				$container.find('.collection-item').removeClass('active');
-
-				// If we have a default active item, restore it
-				if (defaultActiveIndex !== null) {
-					$container.find('.collection-item[data-index="' + defaultActiveIndex + '"]').addClass('active');
-				}
-			});
-		}
-	};
 	const InstagramPostsHandler = function ($scope) {
 		const $instagramPosts = $scope.find('.bt-elwg-instagram-posts');
 
@@ -2262,73 +1784,6 @@
 		}
 	};
 
-	const OffersSliderHandler = function ($scope) {
-		const $offersSlider = $scope.find('.bt-elwg-offers-slider');
-
-		if ($offersSlider.length > 0) {
-			const $sliderSettings = $offersSlider.data('slider-settings');
-			const swiperOptions = {
-				slidesPerView: $sliderSettings.slidesPerView,
-				loop: $sliderSettings.loop,
-				spaceBetween: $sliderSettings.spaceBetween,
-				speed: $sliderSettings.speed,
-				autoplay: $sliderSettings.autoplay ? {
-					delay: $sliderSettings.autoplay_delay,
-					disableOnInteraction: false
-				} : false,
-				navigation: {
-					nextEl: $offersSlider.find('.bt-button-next')[0],
-					prevEl: $offersSlider.find('.bt-button-prev')[0],
-				},
-				pagination: {
-					el: $offersSlider.find('.bt-swiper-pagination')[0],
-					clickable: true,
-					type: 'bullets',
-					renderBullet: function (index, className) {
-						return '<span class="' + className + '"></span>';
-					},
-				},
-				breakpoints: $sliderSettings.breakpoints
-			};
-
-			const swiper = new Swiper($offersSlider.find('.swiper')[0], swiperOptions);
-
-			if ($sliderSettings.autoplay) {
-				$offersSlider.find('.swiper')[0].addEventListener('mouseenter', () => {
-					swiper.autoplay.stop();
-				});
-
-				$offersSlider.find('.swiper')[0].addEventListener('mouseleave', () => {
-					swiper.autoplay.start();
-				});
-			}
-		}
-	};
-
-	const TextSliderHandler = function ($scope, $) {
-		var $textslider = $scope.find('.bt-elwg-text-slider--default');
-		if ($textslider.length > 0) {
-			var $direction = $textslider.data('direction');
-			var $speed = $textslider.data('speed');
-			var $spaceBetween = $textslider.data('spacebetween');
-
-			var $swiper = new Swiper($textslider[0], {
-				slidesPerView: 'auto',
-				loop: true,
-				spaceBetween: $spaceBetween,
-				speed: $speed,
-				freeMode: true,
-				allowTouchMove: true,
-				autoplay:
-				{
-					delay: 0,
-					reverseDirection: $direction == 'rtl' ? true : false,
-					disableOnInteraction: false,
-				}
-			});
-		}
-	};
-
 	// product showcase
 	const ProductShowcaseHandler = function ($scope) {
 		const $productShowcase = $scope.find('.js-product-showcase');
@@ -2449,13 +1904,16 @@
 				});
 			});
 		}
-		// Function to update variation_id in data-ids for a given product
-		function updateHotspotProductVariationId(productItem, variationId, $container) {
+		// Function to update price product
+		function updateHotspotProductPrice(productItem, variationId, $container) {
 
 			const $productItem = productItem;
 			const $productId = $productItem.data('product-id');
-
 			const $product_currencySymbol = $productItem.data('product-currency');
+			const $product_html_price_default = $productItem.attr('data-product-html-price-default');
+			if ($product_html_price_default) {
+				$productItem.find(".woocommerce-loop-product__infor .price").html($product_html_price_default);
+			}
 			const $variationForm = $productItem.find('.variations_form');
 			if (typeof variationId === 'undefined' || !variationId || typeof variationId === 'object') {
 				variationId = parseInt($variationForm.find('input.variation_id').val(), 10) || 0;
@@ -2539,7 +1997,7 @@
 						} else {
 							// Simple product - get price from data attribute
 							if ($productItemId.length) {
-								const simplePrice = $productItemId.data('product-single-price');
+								const simplePrice = $productItemId.attr('data-product-default-price');
 								if (simplePrice) {
 									totalPrice += parseFloat(simplePrice);
 								}
@@ -2565,10 +2023,12 @@
 				$addSetToCartBtn.find('.bt-btn-price').html(' - ' + $product_currencySymbol + totalPrice);
 			}
 		}
+		window.updateHotspotProductPrice = updateHotspotProductPrice;
+
 
 		// Initial update on load
 		$productItems.each(function () {
-			updateHotspotProductVariationId($(this), null, $container);
+			updateHotspotProductPrice($(this), null, $container);
 		});
 		// Update on variation change
 		$variationForm.find('select').on('change', function () {
@@ -2584,7 +2044,7 @@
 						$ItemProduct.removeClass('out-of-stock');
 						$ItemProduct.attr('data-in-stock', '1');
 					}
-					updateHotspotProductVariationId($ItemProduct, variationId, $container);
+					updateHotspotProductPrice($ItemProduct, variationId, $container);
 					var variations = $form.data('product_variations');
 					if (variations) {
 						var variation = variations.find(function (v) {
@@ -2602,6 +2062,73 @@
 				}
 
 			});
+		});
+		/* Function to update price product in quickview */
+		$productItems.on('click', '.bt-loop-add-to-cart-btn', function (e) {
+			e.preventDefault();
+			// Find the nearest .elementor-widget-bt-product-tooltip-hotspot and get data-id
+			var widgetId = $(this).closest('.elementor-widget-bt-product-tooltip-hotspot').data('id');
+			var defaultAttributesData = $(this).closest('.bt-hotspot-product-list__item').attr('data-product-default-attributes');
+
+			// Store data for use when quick view is loaded
+			if (widgetId && defaultAttributesData) {
+				window.pendingQuickViewData = {
+					widgetId: widgetId,
+					defaultAttributesData: defaultAttributesData
+				};
+			}
+		});
+
+		// Listen for quick view loaded event
+		$(document).on('somniaQuickViewLoaded', function () {
+			if (window.pendingQuickViewData) {
+				var widgetId = window.pendingQuickViewData.widgetId;
+				var defaultAttributesData = window.pendingQuickViewData.defaultAttributesData;
+				var $quickviewWrap = $('.bt-popup-quick-view .bt-quick-view-load');
+
+				if ($quickviewWrap.length && widgetId) {
+					var $productContainer = $quickviewWrap.find('.product');
+					if ($productContainer.length) {
+						$productContainer.attr('data-widget-id', widgetId);
+						if (defaultAttributesData) {
+							try {
+								var attributes = JSON.parse(defaultAttributesData);
+
+								// Clean attributes by removing 'attribute_' prefix if present
+								var cleanAttributes = {};
+								$.each(attributes, function (attributeName, attributeValue) {
+									var cleanName = attributeName.replace(/^attribute_/, '');
+									cleanAttributes[cleanName] = attributeValue;
+								});
+
+								var $attributesWrap = $productContainer.find('.bt-attributes-wrap');
+								var tableAttributes = $productContainer.find('table.variations');
+								if ($attributesWrap.length && typeof cleanAttributes === 'object' && cleanAttributes !== null) {
+									// Loop through each attribute to re-add active class for the corresponding option
+									$.each(cleanAttributes, function (attributeName, attributeValue) {
+										var $group = $attributesWrap.find('[data-attribute-name="' + attributeName + '"]');
+										$group.find('.bt-js-item').removeClass('active');
+										var $optionBtn = $group.find('[data-value="' + attributeValue + '"]');
+										if ($optionBtn.length) {
+											$optionBtn.addClass('active').attr('aria-checked', 'true');
+										}
+										// WooCommerce uses select[name^="attribute_"]
+										var $select = tableAttributes.find('select[name="attribute_' + attributeName + '"]');
+										if ($select.length) {
+											$select.val(attributeValue).trigger('change'); // set value and trigger events
+										}
+									});
+								}
+							} catch (e) {
+								console.error('Cannot parse data-product-default-attributes', e);
+							}
+						}
+					}
+				}
+
+				// Clear pending data after processing
+				window.pendingQuickViewData = null;
+			}
 		});
 		/* ajax add to cart */
 		$container.find('.bt-button-add-set-to-cart').on('click', function (e) {
@@ -2681,141 +2208,7 @@
 			}
 		});
 	}
-	// Product list hotspot
-	const ProductListHotspotHandler = function ($scope) {
-		const $hotspotProductNormal = $scope.find('.bt-elwg-product-list-hotspot--default');
-		if ($hotspotProductNormal.length > 0) {
-			// Handle hotspot point clicks
-			const $hotspotPoints = $hotspotProductNormal.find('.bt-hotspot-point');
-			const $productItems = $hotspotProductNormal.find('.bt-hotspot-product-list__item');
 
-			$hotspotPoints.on('click', function (e) {
-				e.preventDefault();
-				const $this = $(this);
-				const productId = $this.data('product-id');
-
-				// Remove active state from all points and products
-				$hotspotPoints.removeClass('active');
-				$productItems.removeClass('active');
-
-				// Add active state to clicked point
-				$this.addClass('active');
-
-				// Show corresponding product
-				$productItems.filter(`[data-product-id="${productId}"]`).addClass('active');
-
-				// Scroll to product list on mobile/tablet (<=991px)
-				if ($(window).width() <= 991) {
-					const $productList = $hotspotProductNormal.find('.bt-hotspot-product-list');
-					if ($productList.length > 0) {
-						$('html, body').animate({
-							scrollTop: $productList.offset().top - 100
-						}, 500);
-					}
-				}
-			});
-			SomniaProductHotspotAddSetCart($hotspotProductNormal);
-		}
-	}
-	const ProductSliderBottomHotspotHandler = function ($scope) {
-		const $productSliderBottomHotspot = $scope.find('.bt-elwg-product-slider-bottom-hotspot--default');
-		if ($productSliderBottomHotspot.length > 0) {
-			// Get width of container
-			const $itemdesktop = $productSliderBottomHotspot.width() < 1560 ? 3 : 4;
-			// Get slider direction from data attribute
-			const sliderDirection = $productSliderBottomHotspot.data('slider-direction') || 'ltr';
-			const isRTL = sliderDirection === 'rtl';
-
-			const swiperOptions = {
-				slidesPerView: 1,
-				loop: false,
-				spaceBetween: 30,
-				speed: 1000,
-				autoplay: false,
-				rtl: isRTL,
-				navigation: {
-					nextEl: $productSliderBottomHotspot.find('.bt-button-next')[0],
-					prevEl: $productSliderBottomHotspot.find('.bt-button-prev')[0],
-				},
-				pagination: {
-					el: $productSliderBottomHotspot.find('.bt-swiper-pagination')[0],
-					clickable: true,
-					type: 'bullets',
-					renderBullet: function (index, className) {
-						return '<span class="' + className + '"></span>';
-					},
-				},
-				breakpoints: {
-					1560: {
-						slidesPerView: $itemdesktop,
-						spaceBetween: 30
-					},
-					1200: {
-						slidesPerView: 3,
-						spaceBetween: 20
-					},
-					800: {
-						slidesPerView: 2,
-						spaceBetween: 20
-					}
-				}
-			};
-
-			const swiper = new Swiper($productSliderBottomHotspot.find('.swiper')[0], swiperOptions);
-
-			// Handle hotspot point clicks
-			const $hotspotPoints = $productSliderBottomHotspot.find('.bt-hotspot-point');
-			const $productItems = $productSliderBottomHotspot.find('.bt-hotspot-product-list__item');
-
-			$hotspotPoints.on('click', function (e) {
-				e.preventDefault();
-				const $this = $(this);
-				const productId = $this.data('product-id');
-
-				// Remove active state from all points and products
-				$hotspotPoints.removeClass('active');
-				$productItems.removeClass('active');
-
-				// Add active state to clicked point
-				$this.addClass('active');
-
-				// Show corresponding product
-				const $targetProduct = $productItems.filter(`[data-product-id="${productId}"]`);
-				$targetProduct.addClass('active');
-
-				// Find the slide index containing the target product
-				const $targetSlide = $targetProduct.closest('.swiper-slide');
-				const slideIndex = $targetSlide.index();
-				// Get number of visible items
-				const visibleItemsCount = swiper.params.slidesPerView;
-				// Scroll to the slide if it exists
-				if (slideIndex >= 0) {
-					// Only scroll if target slide is outside visible range
-					const currentIndex = swiper.activeIndex;
-					const lastVisibleIndex = currentIndex + visibleItemsCount - 1;
-
-					if (slideIndex < currentIndex || slideIndex > lastVisibleIndex) {
-						swiper.slideTo(slideIndex);
-					}
-				}
-
-				// Scroll page so slider bottom is 20px from bottom of screen
-				setTimeout(function () {
-					const sliderBottom = $productSliderBottomHotspot.offset().top + $productSliderBottomHotspot.outerHeight();
-					const windowHeight = $(window).height();
-					const currentScroll = $(window).scrollTop();
-					const targetScroll = sliderBottom - windowHeight + 20;
-
-					if (targetScroll > currentScroll) {
-						$('html, body').animate({
-							scrollTop: targetScroll
-						}, 600);
-					}
-				}, 100);
-			});
-			SomniaProductHotspotAddSetCart($productSliderBottomHotspot);
-		}
-	};
 	const ProductTooltipHotspotHandler = function ($scope) {
 		const $HotspotProduct = $scope.find('.bt-elwg-product-tooltip-hotspot--default');
 		if ($HotspotProduct.length > 0) {
@@ -2987,12 +2380,16 @@
 					disableOnInteraction: false
 				} : false,
 				breakpoints: {
-					1560: {
+					1581: {
 						slidesPerView: 3,
 						spaceBetween: $sliderSettings.spaceBetween.desktop
 					},
-					1025: {
+					1200: {
 						slidesPerView: 2,
+						spaceBetween: $sliderSettings.spaceBetween.desktop
+					},
+					1025: {
+						slidesPerView: 1,
 						spaceBetween: $sliderSettings.spaceBetween.desktop
 					},
 					767: {
@@ -3044,139 +2441,6 @@
 		}
 	};
 
-	const ProductHotspotOverlayStyle1Handler = function ($scope) {
-		const $productHotspotOverlayStyle1 = $scope.find('.bt-elwg-product-overlay-hotspot-style-1--default');
-
-		if ($productHotspotOverlayStyle1.length > 0) {
-			const $shopPanel = $productHotspotOverlayStyle1.find('.bt-shop-the-look-panel');
-			const $shopPanelHeader = $shopPanel.find('.bt-shop-panel-header');
-			const $shopPanelContent = $shopPanel.find('.bt-shop-panel-content');
-			const $shopPanelClose = $shopPanelHeader.find('.bt-shop-panel-close');
-			const $hotspotPoints = $productHotspotOverlayStyle1.find('.bt-hotspot-point');
-
-			// Function to check and update responsive class
-			const checkResponsive = function () {
-				const panelWidth = $shopPanel.outerWidth();
-				if (panelWidth < 350) {
-					$shopPanel.addClass('bt-responsive-panel');
-				} else {
-					$shopPanel.removeClass('bt-responsive-panel');
-				}
-			};
-
-			// Check on load and resize
-			checkResponsive();
-			$(window).on('resize', function () {
-				checkResponsive();
-			});
-
-			// Function to open panel
-			const openPanel = function () {
-				if (!$shopPanel.hasClass('bt-panel-open')) {
-					$shopPanel.addClass('bt-panel-open');
-					$shopPanelContent.slideDown(300);
-					// Recheck responsive after opening
-					setTimeout(checkResponsive, 300);
-				}
-			};
-
-			// Function to close panel
-			const closePanel = function () {
-				$shopPanel.removeClass('bt-panel-open');
-				$shopPanelContent.slideUp(300);
-			};
-
-			// Handle click on "SHOP THE LOOK" header to toggle panel
-			$shopPanelHeader.on('click', function (e) {
-				e.preventDefault();
-				// Don't toggle if clicking the close button
-				if ($(e.target).closest('.bt-shop-panel-close').length) {
-					return;
-				}
-				const isOpen = $shopPanel.hasClass('bt-panel-open');
-				if (isOpen) {
-					closePanel();
-				} else {
-					openPanel();
-				}
-			});
-
-			// Handle click on hotspot points to open panel
-			$hotspotPoints.on('click', function (e) {
-				e.preventDefault();
-				openPanel();
-			});
-
-			// Handle click on close button in header
-			$shopPanelClose.on('click', function (e) {
-				e.preventDefault();
-				e.stopPropagation();
-				closePanel();
-			});
-
-			// Initialize add to cart functionality
-			SomniaProductHotspotAddSetCart($productHotspotOverlayStyle1);
-		}
-	};
-
-	const StoreLocationsHandler = function ($scope) {
-		const $storeLocationsSlider = $scope.find('.bt-elwg-store-locations-slider');
-
-		if ($storeLocationsSlider.length > 0) {
-			const $sliderSettings = $storeLocationsSlider.data('slider-settings');
-			const swiperOptions = {
-				slidesPerView: $sliderSettings.slidesPerView,
-				loop: $sliderSettings.loop,
-				spaceBetween: $sliderSettings.spaceBetween,
-				speed: $sliderSettings.speed,
-				autoplay: $sliderSettings.autoplay ? {
-					delay: $sliderSettings.autoplay_delay,
-					disableOnInteraction: false
-				} : false,
-				navigation: {
-					nextEl: $storeLocationsSlider.find('.bt-button-next')[0],
-					prevEl: $storeLocationsSlider.find('.bt-button-prev')[0],
-				},
-				pagination: {
-					el: $storeLocationsSlider.find('.bt-swiper-pagination')[0],
-					clickable: true,
-					type: 'bullets',
-					renderBullet: function (index, className) {
-						return '<span class="' + className + '"></span>';
-					},
-				},
-				breakpoints: $sliderSettings.breakpoints
-			};
-
-			const swiper = new Swiper($storeLocationsSlider.find('.swiper')[0], swiperOptions);
-
-			if ($sliderSettings.autoplay) {
-				$storeLocationsSlider.find('.swiper')[0].addEventListener('mouseenter', () => {
-					swiper.autoplay.stop();
-				});
-
-				$storeLocationsSlider.find('.swiper')[0].addEventListener('mouseleave', () => {
-					swiper.autoplay.start();
-				});
-			}
-		}
-	};
-
-	const ProductNavImageHandler = function ($scope) {
-		const $productNavImage = $scope.find('.bt-elwg-product-nav-image--default');
-		if ($productNavImage.length > 0) {
-			const $productNavImageTabs = $productNavImage.find('.bt-product-nav-image--tabs');
-			const $productNavImageThumb = $productNavImage.find('.bt-product-nav-image--thumb');
-			$productNavImageTabs.find('.bt-product-nav-image--tab-item').on('click', function () {
-				const $this = $(this);
-				const index = $this.data('index');
-				$productNavImageTabs.find('.bt-product-nav-image--tab-item').removeClass('active');
-				$this.addClass('active');
-				$productNavImageThumb.find('.bt-product-nav-image--thumb-item').removeClass('active');
-				$productNavImageThumb.find('.bt-product-nav-image--thumb-item').eq(index).addClass('active');
-			});
-		}
-	}
 	const BrandSliderHandler = function ($scope) {
 		const $brandSlider = $scope.find('.bt-elwg-brand-slider--default');
 
@@ -3318,271 +2582,6 @@
 			$(window).off('resize.bannerSlider').on('resize.bannerSlider', handleAutoRotation);
 		}
 	}
-	/* Bundle Save Handler */
-	const BundleSaveHandler = function ($scope) {
-		const $bundleSave = $scope.find('.bt-bundle-save');
-		if ($bundleSave.length === 0) return;
-
-		// Update data-ids and subtotal on load
-		updateBundleDataIds($bundleSave);
-
-		// Add More Button - Show modal
-		$bundleSave.find('.bt-bundle-save--add-more-btn').on('click', function (e) {
-			e.preventDefault();
-			showModal($bundleSave);
-		});
-
-		// Modal Close
-		$bundleSave.find('.bt-modal-close, .bt-modal-overlay').on('click', function (e) {
-			e.preventDefault();
-			$bundleSave.find('.bt-bundle-save--modal').fadeOut();
-		});
-
-		// Add product from modal
-		$bundleSave.on('click', '.bt-modal-add-product', function (e) {
-			e.preventDefault();
-			const $button = $(this);
-			const productId = $button.data('product-id');
-			addProductToBundle($bundleSave, productId, $button);
-		});
-
-		// Remove product
-		$bundleSave.on('click', '.bt-product-remove', function (e) {
-			e.preventDefault();
-			const $item = $(this).closest('.bt-bundle-product--item');
-			$item.fadeOut(300, function () {
-				$(this).remove();
-				updateBundleDataIds($bundleSave);
-			});
-		});
-
-		// Add all to cart
-		$bundleSave.find('.bt-bundle-save--add-cart-btn').on('click', function (e) {
-			e.preventDefault();
-			addBundleToCart($bundleSave, $(this));
-		});
-
-		function showModal($widget) {
-			const $modal = $widget.find('.bt-bundle-save--modal');
-			const $modalBody = $modal.find('.bt-modal-body');
-			const $productsContainer = $widget.find('.bt-bundle-save--products');
-
-			const bundleProducts = $productsContainer.data('bundle-products') || [];
-			const currentProducts = [];
-
-			// Collect all current product/variation IDs
-			$widget.find('.bt-bundle-product--item').each(function () {
-				const variationId = parseInt($(this).data('variation-id'));
-				const productId = parseInt($(this).data('product-id'));
-
-				// If it's a variation, use variation ID, otherwise use product ID
-				const itemId = variationId > 0 ? variationId : productId;
-				currentProducts.push(itemId);
-			});
-
-			// Filter out products that are already in the bundle
-			const availableProducts = bundleProducts.filter(function (id) {
-				return currentProducts.indexOf(parseInt(id)) === -1;
-			});
-
-			if (availableProducts.length === 0) {
-				$modalBody.html('<p class="bt-no-products">All products are already added to the bundle.</p>');
-			} else {
-				loadAvailableProducts($widget, availableProducts, $modalBody);
-			}
-
-			$modal.fadeIn();
-		}
-
-		function loadAvailableProducts($widget, productIds, $container) {
-			$container.html('<p class="bt-loading">Loading products...</p>');
-
-			$.ajax({
-				url: AJ_Options.ajax_url,
-				type: 'POST',
-				data: {
-					action: 'somnia_get_bundle_products',
-					product_ids: productIds
-				},
-				success: function (response) {
-					if (response.success && response.data.html) {
-						$container.html(response.data.html);
-					} else {
-						$container.html('<p class="bt-error">Failed to load products.</p>');
-					}
-				},
-				error: function () {
-					$container.html('<p class="bt-error">Failed to load products.</p>');
-				}
-			});
-		}
-
-		function addProductToBundle($widget, productId, $button) {
-			const $productsContainer = $widget.find('.bt-bundle-save--products');
-			$button.prop('disabled', true).text('Adding...');
-
-			$.ajax({
-				url: AJ_Options.ajax_url,
-				type: 'POST',
-				data: {
-					action: 'somnia_get_bundle_product_item',
-					product_id: productId
-				},
-				success: function (response) {
-					if (response.success && response.data.html) {
-						$productsContainer.append(response.data.html);
-						updateBundleDataIds($widget);
-
-						// Remove this product item from modal
-						$button.closest('.bt-modal-product--item').fadeOut(300, function () {
-							$(this).remove();
-
-							// Check if any products left in modal
-							const $modal = $widget.find('.bt-bundle-save--modal');
-							const $modalBody = $modal.find('.bt-modal-body');
-							const remainingProducts = $modalBody.find('.bt-modal-product--item').length;
-
-							if (remainingProducts === 0) {
-								$modalBody.html('<p class="bt-no-products">All products are already added to the bundle.</p>');
-								setTimeout(function () {
-									$modal.fadeOut();
-								}, 1000);
-							}
-						});
-					} else {
-						$button.prop('disabled', false).text('Add');
-					}
-				},
-				error: function () {
-					$button.prop('disabled', false).text('Add');
-				}
-			});
-		}
-
-		function updateBundleDataIds($widget) {
-			const $productsContainer = $widget.find('.bt-bundle-save--products');
-			const $addCartBtn = $widget.find('.bt-bundle-save--add-cart-btn');
-			const idsArr = [];
-			let subtotal = 0;
-			let regularTotal = 0;
-			let productCount = 0;
-
-			$widget.find('.bt-bundle-product--item').each(function () {
-				const $item = $(this);
-				const productId = parseInt($item.data('product-id'));
-				const variationId = parseInt($item.data('variation-id')) || 0;
-				const price = parseFloat($item.data('price')) || 0;
-				const regularPrice = parseFloat($item.data('regular-price')) || price;
-
-				idsArr.push({
-					product_id: productId,
-					variation_id: variationId
-				});
-
-				subtotal += price;
-				regularTotal += regularPrice;
-				productCount++;
-			});
-
-			// Calculate savings
-			const savings = regularTotal - subtotal;
-			const savingsPercent = regularTotal > 0 ? ((savings / regularTotal) * 100) : 0;
-
-			// Update progress bar
-			const $progressBar = $widget.find('.bt-progress-fill');
-			const $discountText = $widget.find('.bt-discount-text');
-
-			if ($progressBar.length) {
-				$progressBar.css('width', savingsPercent.toFixed(0) + '%');
-			}
-
-			if ($discountText.length) {
-				let template = $discountText.data('template');
-				if (!template) {
-					return;
-				}
-				let text = template;
-
-				// Replace placeholders with styled spans
-				text = text.replace(/\{count\}/g, '<span>' + productCount + '</span>');
-				text = text.replace(/\{discount\}/g, '<span>' + savingsPercent.toFixed(0) + '%</span>');
-
-				$discountText.html(text);
-			}
-
-			// Update button data-ids
-			$addCartBtn.attr('data-ids', JSON.stringify(idsArr));
-			// Check if no products 
-			if (idsArr.length === 0) {
-				$addCartBtn.prop('disabled', true);
-			} else {
-				$addCartBtn.prop('disabled', false);
-			}
-
-			// Update subtotal display
-			const currencySymbol = AJ_Options.currency_symbol || '$';
-			const formattedSubtotal = currencySymbol + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-			$widget.find('.bt-subtotal-amount').text(formattedSubtotal);
-		}
-
-		function addBundleToCart($widget, $button) {
-			let productIds = $button.data('ids');
-
-			if (typeof productIds === 'string') {
-				try {
-					productIds = JSON.parse(productIds);
-				} catch (e) {
-					console.error('Invalid data-ids JSON', e);
-					productIds = [];
-				}
-			}
-			if ($button.hasClass('bt-view-cart')) {
-				window.location.href = AJ_Options.cart;
-				return;
-			}
-			if (!Array.isArray(productIds) || productIds.length === 0) {
-				alert('Please add products to the bundle first.');
-				return;
-			}
-
-			const originalText = $button.text();
-			$button.prop('disabled', true).addClass('loading');
-
-
-			$.ajax({
-				url: AJ_Options.ajax_url,
-				type: 'POST',
-				data: {
-					action: 'somnia_add_multiple_to_cart_variable',
-					product_ids: productIds
-				},
-				success: function (response) {
-					$button.removeClass('loading');
-					if (response.success) {
-						$(document.body).trigger('updated_wc_div');
-						SomniaFreeShippingMessage();
-						$button.text('View Cart').prop('disabled', false).addClass('bt-view-cart');
-						// Handle cart action for each product
-						productIds.forEach((item, idx) => {
-							const productId = item.variation_id && item.variation_id !== 0 ? item.variation_id : item.product_id;
-							setTimeout(() => {
-								SomniaHandleCartAction(productId);
-							}, idx * 300);
-						});
-					} else {
-						alert('Failed to add products to cart.');
-						$button.prop('disabled', false).text(originalText);
-					}
-				},
-				error: function () {
-					$button.removeClass('loading');
-					alert('Failed to add products to cart.');
-					$button.prop('disabled', false).text(originalText);
-				}
-			});
-		}
-	};
-
 	const OrderTrackingHandler = function ($scope, $) {
 		const $form = $scope.find('.bt-order-tracking-form');
 		const $message = $scope.find('.bt-order-tracking-message');
@@ -3665,209 +2664,6 @@
 		}
 	};
 
-	const FlickerCollageHandler = function ($scope, $) {
-		const $widget = $scope.find('.bt-elwg-flicker-collage');
-		if (!$widget.length) return;
-
-		// Don't run animation in Elementor editor
-		const isEditor = $widget.data('elementor-editor') === 'true' ||
-			$('body').hasClass('elementor-editor-active') ||
-			(typeof elementorFrontend !== 'undefined' && elementorFrontend.isEditMode && elementorFrontend.isEditMode());
-
-		if (isEditor) {
-			return;
-		}
-
-		const $block = $widget.find('.bt-flicker-collage--list-images');
-		if (!$block.length) return;
-
-		const $items = $block.find('.bt-flicker-collage_item');
-		if (!$items.length) return;
-
-		const items = $items.toArray();
-		let currentIndex = 0;
-		let animationInterval;
-
-		function getPositions() {
-			const currentWidth = window.innerWidth;
-
-			// Get grid-positions data from block
-			const gridPositionsData = $block.data('grid-positions');
-
-			if (!gridPositionsData || !gridPositionsData.breakpoints) {
-				return [];
-			}
-
-			let gridAreas = [];
-
-			// Get all breakpoint values (excluding 'default')
-			const breakpointValues = Object.keys(gridPositionsData.breakpoints)
-				.map(Number)
-				.filter(function (val) { return !isNaN(val); })
-				.sort(function (a, b) { return a - b; }); // Sort ascending (767, 1024, 1200, 1366)
-
-			// If currentWidth > largest breakpoint (1366), use default
-			if (breakpointValues.length > 0 && currentWidth > breakpointValues[breakpointValues.length - 1]) {
-				gridAreas = gridPositionsData.breakpoints.default || [];
-			} else {
-				// Find the smallest breakpoint that is >= currentWidth
-				let selectedBreakpoint = null;
-				for (let i = 0; i < breakpointValues.length; i++) {
-					if (currentWidth <= breakpointValues[i]) {
-						selectedBreakpoint = breakpointValues[i];
-						break;
-					}
-				}
-
-				// Use selected breakpoint or fallback to default
-				if (selectedBreakpoint !== null && gridPositionsData.breakpoints[selectedBreakpoint]) {
-					gridAreas = gridPositionsData.breakpoints[selectedBreakpoint];
-				} else {
-					gridAreas = gridPositionsData.breakpoints.default || [];
-				}
-			}
-
-			// Convert array of grid_area strings to array of objects with gridArea property
-			const positions = gridAreas.map(function (gridArea) {
-				// Trim whitespace from gridArea string
-				return { gridArea: String(gridArea).trim() };
-			});
-
-			return positions;
-		}
-
-		// Get random position from all items' positions
-		function getRandomPosition() {
-			const positions = getPositions();
-			return positions[Math.floor(Math.random() * positions.length)];
-		}
-
-		// Check if position overlaps with visible items
-		function isOverlapping(newPosition) {
-			return items.some(function (item) {
-				if (item.classList.contains('visible')) {
-					return window.getComputedStyle(item).gridArea === newPosition.gridArea;
-				}
-				return false;
-			});
-		}
-
-		// Get unique position that doesn't overlap
-		function getUniquePosition() {
-			let newPosition;
-			let tries = 0;
-			const maxTries = 10;
-
-			do {
-				newPosition = getRandomPosition();
-				tries++;
-			} while (isOverlapping(newPosition) && tries < maxTries);
-
-			return newPosition;
-		}
-
-		// Update visibility and positions
-		function updateVisibility() {
-			// Remove visible class from all items
-			items.forEach(function (item) {
-				item.classList.remove('visible');
-			});
-
-			// Add visible class to 2 items (current and next)
-			for (let i = 0; i < 2; i++) {
-				const index = (currentIndex + i) % items.length;
-				items[index].classList.add('visible');
-			}
-
-			// Move disappearing item to new position after delay
-			const disappearingIndex = (currentIndex + 3) % items.length;
-			const disappearingItem = items[disappearingIndex];
-
-			setTimeout(function () {
-				const newPosition = getUniquePosition();
-				disappearingItem.style.gridArea = newPosition.gridArea;
-				disappearingItem.classList.add('visible');
-			}, 1500);
-
-			// Update current index
-			currentIndex = (currentIndex + 1) % items.length;
-		}
-
-		// Start animation
-		function startAnimation() {
-			if (animationInterval) {
-				clearInterval(animationInterval);
-			}
-			animationInterval = setInterval(updateVisibility, 1500);
-		}
-
-		// Initialize
-		startAnimation();
-
-		// Handle window resize
-		let resizeTimer;
-		$(window).on('resize', function () {
-			clearTimeout(resizeTimer);
-			resizeTimer = setTimeout(function () {
-				// Reset visibility on resize
-				items.forEach(function (item) {
-					item.classList.remove('visible');
-				});
-				// Restart animation
-				startAnimation();
-			}, 250);
-		});
-	};
-
-	const ImageListWidgetHandler = function ($scope, $) {
-		const $widget = $scope.find('.bt-elwg-list-text-image-hover--default');
-		if (!$widget.length) return;
-
-		const $list = $widget.find('.list-text-image-hover--list');
-		const $items = $widget.find('.list-text-image-hover--item');
-		const $images = $widget.find('.list-text-image-hover--image');
-		const defaultActive = parseInt($widget.data('default-active')) || 0;
-
-		// Set active item by index
-		const setActive = (index) => {
-			$items.removeClass('active');
-			$images.removeClass('active');
-			$items.filter('[data-index="' + index + '"]').addClass('active');
-			$images.filter('[data-image-index="' + index + '"]').addClass('active');
-		};
-
-		// Get index of item being hovered
-		const getHoveredIndex = () => {
-			let index = null;
-			$items.each(function () {
-				const $item = $(this);
-				if ($item.is(':hover') || $item.find(':hover').length) {
-					index = parseInt($item.data('index'));
-					return false;
-				}
-			});
-			return index;
-		};
-
-		// Initialize: check hover first, then default
-		const init = () => {
-			const hovered = getHoveredIndex();
-			setActive(hovered !== null ? hovered : defaultActive);
-		};
-
-		// Initialize on load
-		init();
-		setTimeout(init, 100);
-
-		// Hover events
-		$items.on('mouseenter', function () {
-			setActive(parseInt($(this).data('index')));
-		});
-
-		$list.on('mouseleave', () => {
-			setActive(defaultActive);
-		});
-	};
 	const ProductTestimonialSliderHandler = function ($scope) {
 		const $ProductTestimonialSlider = $scope.find('.js-data-product-testimonial-slider');
 		if ($ProductTestimonialSlider.length > 0) {
@@ -4262,6 +3058,423 @@
 		});
 	};
 
+	const LocationListHandler = function ($scope, $) {
+		const $locationFinder = $scope.find('.bt-elwg-location-list--finder');
+
+		if ($locationFinder.length === 0) return;
+
+		const $locationItems = $locationFinder.find('.bt-location-item');
+		const $searchInput = $locationFinder.find('#location-search');
+		const $searchButton = $locationFinder.find('.bt-search-button');
+		const $mapContainer = $locationFinder.find('.bt-location-finder--map .bt-map-container');
+		const $mapInfoCard = $locationFinder.find('#map-info-card');
+
+		// Create locations JSON data
+		let locationsData = [];
+		$locationItems.each(function (index) {
+			const $item = $(this);
+			locationsData.push({
+				index: index,
+				title: $item.find('.bt-location-title').text().trim().toLowerCase(),
+				address: $item.find('.bt-location-address').text().trim().toLowerCase(),
+				phone: $item.find('.bt-location-phone').text().trim().toLowerCase(),
+				mapAddress: $item.data('address'),
+				zoom: $item.data('zoom') || 15,
+				element: $item
+			});
+		});
+
+		// Create all maps and hide them initially
+		function createAllMaps() {
+			$mapContainer.empty();
+
+			locationsData.forEach(function (location, index) {
+				if (location.mapAddress) {
+					const mapSrc = 'https://maps.google.com/maps?q=' + encodeURIComponent(location.mapAddress) +
+						'&t=m&z=' + location.zoom + '&output=embed&iwloc=near';
+
+					const $iframe = $('<iframe>', {
+						id: 'location-map-' + index,
+						class: 'location-map-iframe',
+						src: mapSrc,
+						loading: 'lazy',
+						title: location.mapAddress,
+						'aria-label': location.mapAddress,
+						style: index === 0 ? 'display: block;' : 'display: none;'
+					});
+
+					$mapContainer.append($iframe);
+				}
+			});
+		}
+
+		// Initialize maps
+		createAllMaps();
+
+		// Location click handler
+		$locationItems.on('click', function (e) {
+			// Allow links (a tags) inside location item to work normally
+			if ($(e.target).closest('a').length) {
+				return;
+			}
+			e.preventDefault();
+
+			const $this = $(this);
+			const locationIndex = $this.data('location-index');
+			const locationData = locationsData[locationIndex];
+
+			if (!locationData) return;
+
+			// Update active state
+			$locationItems.removeClass('active');
+			$this.addClass('active');
+
+			// Show corresponding map
+			$mapContainer.find('.location-map-iframe').hide();
+			$mapContainer.find('#location-map-' + locationIndex).show();
+
+			// Update info card
+			$mapInfoCard.find('.bt-map-info-title').text($this.find('.bt-location-title').text());
+			$mapInfoCard.find('.bt-map-info-address').text($this.find('.bt-location-address').text());
+			$mapInfoCard.find('.bt-map-info-location').text($this.find('.bt-location-address').text());
+
+			// Scroll to map on mobile
+			if ($(window).width() <= 1024) {
+				$('html, body').animate({
+					scrollTop: $locationFinder.find('.bt-location-finder--map').offset().top - 20
+				}, 500);
+			}
+		});
+
+		// Enhanced search functionality using JSON data
+		function performSearch() {
+			const searchTerm = $searchInput.val().toLowerCase().trim();
+			let visibleCount = 0;
+
+			// Search through JSON data
+			locationsData.forEach(function (location) {
+				const isMatch = searchTerm === '' ||
+					location.title.includes(searchTerm) ||
+					location.address.includes(searchTerm) ||
+					location.phone.includes(searchTerm);
+
+				if (isMatch) {
+					location.element.removeClass('bt-hidden').addClass('bt-visible');
+					visibleCount++;
+				} else {
+					location.element.removeClass('bt-visible').addClass('bt-hidden');
+				}
+			});
+
+			// Show no results message
+			let $noResults = $locationFinder.find('.bt-no-results');
+			if (visibleCount === 0 && searchTerm !== '') {
+				if ($noResults.length === 0) {
+					$noResults = $('<div class="bt-no-results">No locations found matching your search.</div>');
+					$locationFinder.find('.bt-location-list').after($noResults);
+				}
+				$noResults.addClass('show');
+			} else {
+				$noResults.removeClass('show');
+			}
+
+			// Auto-select first visible item
+			if (searchTerm !== '' && visibleCount > 0) {
+				const $firstVisible = $locationItems.filter(':visible').first();
+				if (!$firstVisible.hasClass('active')) {
+					$firstVisible.trigger('click');
+				}
+			}
+		}
+
+		// Search input handler with debounce
+		let searchTimeout;
+		$searchInput.on('input', function () {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(performSearch, 300);
+		});
+
+		// Search on Enter key
+		$searchInput.on('keypress', function (e) {
+			if (e.which === 13) {
+				e.preventDefault();
+				clearTimeout(searchTimeout);
+				performSearch();
+			}
+		});
+
+		// Search button click
+		$searchButton.on('click', function (e) {
+			e.preventDefault();
+			clearTimeout(searchTimeout);
+			performSearch();
+		});
+
+		// Keyboard navigation
+		$searchInput.on('keydown', function (e) {
+			const $visibleItems = $locationItems.filter(':visible');
+			const $activeItem = $visibleItems.filter('.active');
+			const currentIndex = $visibleItems.index($activeItem);
+
+			switch (e.which) {
+				case 38: // Up arrow
+					e.preventDefault();
+					if (currentIndex > 0) {
+						$visibleItems.eq(currentIndex - 1).trigger('click');
+					}
+					break;
+				case 40: // Down arrow
+					e.preventDefault();
+					if (currentIndex < $visibleItems.length - 1) {
+						$visibleItems.eq(currentIndex + 1).trigger('click');
+					} else if (currentIndex === -1 && $visibleItems.length > 0) {
+						$visibleItems.eq(0).trigger('click');
+					}
+					break;
+			}
+		});
+
+		// Initialize: Select first item by default
+		if ($locationItems.length > 0) {
+			$locationItems.first().addClass('active');
+		}
+
+	};
+
+	// Account Login Handler
+	const AccountLoginHandler = function ($scope, $) {
+		const $loginPopup = $scope.find('.bt-js-open-popup-link');
+		const $loginForm = $scope.find('.bt-login-form');
+		const $registerForm = $scope.find('.bt-register-form');
+		const $togglePassword = $scope.find('.bt-toggle-password');
+		const $passwordInput = $scope.find('input[type="password"]');
+		const $loginMessagesContainer = $scope.find('.bt-login-messages');
+		const $registerMessagesContainer = $scope.find('.bt-register-messages');
+		const $tabBtns = $scope.find('.bt-tab-btn');
+		const $tabContents = $scope.find('.bt-tab-content');
+
+
+		// Initialize magnificPopup for login popup
+		if ($loginPopup.length > 0) {
+			$loginPopup.magnificPopup({
+				type: 'inline',
+				midClick: true,
+				mainClass: 'mfp-fade mfp-login-popup',
+				removalDelay: 300,
+				callbacks: {
+					open: function () {
+						// Focus on username field when popup opens
+						setTimeout(function () {
+							const $activeTab = $scope.find('.bt-tab-content.active');
+							$activeTab.find('input[name="username"]').focus();
+						}, 100);
+					},
+					close: function () {
+						// Clear forms and messages when popup closes
+						if ($loginForm.length) $loginForm[0].reset();
+						if ($registerForm.length) $registerForm[0].reset();
+						$loginMessagesContainer.empty().removeClass('bt-success bt-error');
+						$registerMessagesContainer.empty().removeClass('bt-success bt-error');
+
+						// Reset to login tab
+						$tabBtns.removeClass('active');
+						$tabBtns.filter('[data-tab="login"]').addClass('active');
+						$tabContents.removeClass('active');
+						$tabContents.filter('[data-tab="login"]').addClass('active');
+					}
+				}
+			});
+		}
+
+		// Handle tab switching
+		$tabBtns.on('click', function (e) {
+			e.preventDefault();
+			const targetTab = $(this).data('tab');
+
+			// Update tab buttons
+			$tabBtns.removeClass('active');
+			$(this).addClass('active');
+
+			// Update tab content
+			$tabContents.removeClass('active');
+			$tabContents.filter('[data-tab="' + targetTab + '"]').addClass('active');
+
+			// Clear messages
+			$loginMessagesContainer.empty().removeClass('bt-success bt-error');
+			$registerMessagesContainer.empty().removeClass('bt-success bt-error');
+
+			// Focus on first input
+			setTimeout(function () {
+				const $activeContent = $tabContents.filter('.active');
+				$activeContent.find('input[name="username"]').focus();
+			}, 100);
+		});
+
+		// Handle switch to register link
+		$scope.find('.bt-switch-to-register').on('click', function (e) {
+			e.preventDefault();
+			$tabBtns.filter('[data-tab="register"]').trigger('click');
+		});
+
+		// Handle switch to login link
+		$scope.find('.bt-switch-to-login').on('click', function (e) {
+			e.preventDefault();
+			$tabBtns.filter('[data-tab="login"]').trigger('click');
+		});
+
+		// Toggle password visibility
+		$togglePassword.on('click', function (e) {
+			e.preventDefault();
+			const $btn = $(this);
+			const $eyeIcon = $btn.find('.bt-eye-icon');
+			const $eyeOffIcon = $btn.find('.bt-eye-off-icon');
+			const $targetInput = $btn.siblings('input[type="password"], input[type="text"]');
+
+			if ($targetInput.attr('type') === 'password') {
+				$targetInput.attr('type', 'text');
+				$eyeIcon.hide();
+				$eyeOffIcon.show();
+				$btn.attr('aria-label', $btn.attr('aria-label').replace('Show', 'Hide'));
+			} else {
+				$targetInput.attr('type', 'password');
+				$eyeIcon.show();
+				$eyeOffIcon.hide();
+				$btn.attr('aria-label', $btn.attr('aria-label').replace('Hide', 'Show'));
+			}
+		});
+
+		// Handle login form submission
+		$loginForm.on('submit', function (e) {
+			e.preventDefault();
+
+			// Check if AJ_Options is defined
+			if (typeof AJ_Options === 'undefined') {
+				$loginMessagesContainer.addClass('bt-error').html('<p>Login system is not properly loaded. Please refresh the page.</p>');
+				return;
+			}
+
+			const $submitBtn = $(this).find('.bt-login-btn');
+			const formData = new FormData(this);
+
+			// Add AJAX data
+			formData.append('action', 'bt_login_user');
+			formData.append('current_url', window.location.href);
+			
+			// Disable submit button and show loading
+			$submitBtn.prop('disabled', true).addClass('bt-loading');
+			$loginMessagesContainer.empty().removeClass('bt-success bt-error');
+
+			// Send AJAX request
+			$.ajax({
+				url: AJ_Options.ajax_url,
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					if (response.success) {
+						// Redirect after successful login
+						if (response.data.redirect_url) {
+							window.location.href = response.data.redirect_url;
+						} else {
+							window.location.reload();
+						}
+					} else {
+						// Show specific error message from server
+						var errorMessage = response.data && response.data.message ? response.data.message : 'Login failed. Please try again.';
+						$loginMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+						$submitBtn.prop('disabled', false).removeClass('bt-loading');
+					}
+				},
+				error: function (xhr, status, error) {
+					// More detailed error handling
+					var errorMessage = 'Login failed. ';
+
+					if (xhr.status === 0) {
+						errorMessage += 'Please check your internet connection.';
+					} else if (xhr.status === 404) {
+						errorMessage += 'Login service not found.';
+					} else if (xhr.status === 500) {
+						errorMessage += 'Server error. Please try again later.';
+					} else if (status === 'timeout') {
+						errorMessage += 'Request timed out. Please try again.';
+					} else {
+						errorMessage += 'Please try again or contact support if the problem persists.';
+					}
+
+					$loginMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+					$submitBtn.prop('disabled', false).removeClass('bt-loading');
+				}
+			});
+		});
+
+		// Handle register form submission
+		$registerForm.on('submit', function (e) {
+			e.preventDefault();
+
+			// Check if AJ_Options is defined
+			if (typeof AJ_Options === 'undefined') {
+				$registerMessagesContainer.addClass('bt-error').html('<p>Registration system is not properly loaded. Please refresh the page.</p>');
+				return;
+			}
+
+			const $submitBtn = $(this).find('.bt-register-btn');
+			const originalText = $submitBtn.text();
+			const formData = new FormData(this);
+
+			// Add AJAX data
+			formData.append('action', 'bt_register_user');
+
+			// Disable submit button and show loading
+			$submitBtn.prop('disabled', true).addClass('bt-loading');
+			$registerMessagesContainer.empty().removeClass('bt-success bt-error');
+
+			// Send AJAX request
+			$.ajax({
+				url: AJ_Options.ajax_url,
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function (response) {
+					if (response.success) {
+						if (response.data.redirect_url) {
+							window.location.href = response.data.redirect_url;
+						} else {
+							window.location.reload();
+						}
+					} else {
+						// Show specific error message from server
+						var errorMessage = response.data && response.data.message ? response.data.message : 'Registration failed. Please try again.';
+						$registerMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+						$submitBtn.prop('disabled', false).removeClass('bt-loading');
+					}
+				},
+				error: function (xhr, status, error) {
+					// More detailed error handling
+					var errorMessage = 'Registration failed. ';
+
+					if (xhr.status === 0) {
+						errorMessage += 'Please check your internet connection.';
+					} else if (xhr.status === 404) {
+						errorMessage += 'Registration service not found.';
+					} else if (xhr.status === 500) {
+						errorMessage += 'Server error. Please try again later.';
+					} else if (status === 'timeout') {
+						errorMessage += 'Request timed out. Please try again.';
+					} else {
+						errorMessage += 'Please try again or contact support if the problem persists.';
+					}
+
+					$registerMessagesContainer.addClass('bt-error').html('<p>' + errorMessage + '</p>');
+					$submitBtn.prop('disabled', false).removeClass('bt-loading');
+				}
+			});
+		});
+
+
+	};
+
 	// Make sure you run this code under Elementor.
 	$(window).on('elementor/frontend/init', function () {
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-mobile-menu.default', SubmenuToggleHandler);
@@ -4271,43 +3484,32 @@
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-search-product-style-1.default', SearchProductStyle1Handler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-heading-animation.default', headingAnimationHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-instagram-posts.default', InstagramPostsHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-spotlight-item.default', VideoAutoPlayHoverHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-banner-product-slider.default', BannerProductSliderHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-offers-slider.default', OffersSliderHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-tooltip-hotspot.default', ProductTooltipHotspotHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-testimonial.default', ProductTestimonialHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-testimonial-slider.default', ProductTestimonialSliderHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-the-story.default', TheStoryHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-testimonial-slider.default', TestimonialSliderHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-testimonials-staggered-slider.default', TestimonialsStaggeredSliderHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-countdown.default', countDownHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-site-notification.default', NotificationSliderHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-mini-cart.default', MiniCartHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-currency-switcher.default', SwitcherHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-language-switcher.default', SwitcherHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-with-product-slider.default', AccordionWithProductSliderHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-title-nav-with-slider.default', TitleNavWithSliderHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-collection-banner.default', CollectionBannerHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-overlay-hotspot.default', ProductHotspotOverlayHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-overlay-hotspot-style-1.default', ProductHotspotOverlayStyle1Handler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-text-slider.default', TextSliderHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-showcase.default', ProductShowcaseHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-showcase-style-1.default', ProductShowcaseHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-showcase-style-2.default', ProductShowcaseHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-showcase-style-2.default', ProductShowcaseStyle2Handler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-list-hotspot.default', ProductListHotspotHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-store-locations-slider.default', StoreLocationsHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-slider-bottom-hotspot.default', ProductSliderBottomHotspotHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-nav-image.default', ProductNavImageHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-brand-slider.default', BrandSliderHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-vertical-banner-slider.default', VerticalBannerSliderHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/bt-bundle-save.default', BundleSaveHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-order-tracking.default', OrderTrackingHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/list-text-image-hover.default', ImageListWidgetHandler);
-		elementorFrontend.hooks.addAction('frontend/element_ready/flicker-collage.default', FlickerCollageHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-popup-hotspot.default', ProductPopupHotspotHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-product-spotlight-item.default', VideoAutoPlayHoverHandler);
+
+
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-accordion-hotspot.default', AccordionHotspotHandler);
 		elementorFrontend.hooks.addAction('frontend/element_ready/bt-megamenu.default', MegaMenuHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-location-list.default', LocationListHandler);
+		elementorFrontend.hooks.addAction('frontend/element_ready/bt-account-login.default', AccountLoginHandler);
 	});
 
 })(jQuery);

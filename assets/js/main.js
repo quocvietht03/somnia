@@ -371,7 +371,7 @@
 				} else {
 					gallerylayout = 'slider-thumb';
 				}
-
+			
 
 				// update js variations_form woo (only in product loop)
 				var $currentForm = $(this).closest('.variations_form');
@@ -414,6 +414,62 @@
 								// Update add to cart button text
 								$form.find(".single_add_to_cart_button")
 									.html("Add to cart" + formattedPrice);
+							}
+							// Update price data attribute for hotspot widget
+
+							var $quickviewProduct = $(this).closest('.bt-quickview-wrap').find('.product');
+							if ($quickviewProduct.length && $quickviewProduct.data('widget-id')) {
+								var widgetId = $quickviewProduct.data('widget-id');
+
+								// Find the corresponding widget element
+								var $widget = $('.elementor-element-' + widgetId);
+								if ($widget.length) {
+									// Find the product item in the widget that matches current product
+									var currentProductId = $quickviewProduct.data('product-id') || $form.find('input[name="product_id"]').val();
+									var $widgetProductItem = $widget.find('.bt-hotspot-product-list__item[data-product-id="' + currentProductId + '"]');
+
+									if ($widgetProductItem.length && variation) {
+										// Update data attributes with variation info
+										if (variation.price_html) {
+											$widgetProductItem.attr('data-product-html-price-default', variation.price_html);
+										}
+										if (variation.display_price) {
+											$widgetProductItem.attr('data-product-default-price', variation.display_price);
+										}
+										if (variation.attributes) {
+											// Only update if current attributes is not empty
+											var currentData = $widgetProductItem.attr('data-product-default-attributes');
+											var isCurrentEmpty = false;
+											
+											if (currentData) {
+												try {
+													var current = JSON.parse(currentData);
+													isCurrentEmpty = (Array.isArray(current) && current.length === 0) || 
+																	(typeof current === 'object' && Object.keys(current).length === 0);
+												} catch (e) {}
+											}
+											
+											if (!isCurrentEmpty) {
+												$widgetProductItem.attr('data-product-default-attributes', JSON.stringify(variation.attributes));
+											}
+											let attributePairs = [];
+											for (let key in variation.attributes) {
+												if (variation.attributes.hasOwnProperty(key)) {
+													// Remove 'attribute_pa_' prefix from key
+													let cleanKey = key.replace('attribute_pa_', '');
+													attributePairs.push(cleanKey + ': <span>' + variation.attributes[key] + '</span>');
+												}
+											}
+											$widgetProductItem.find('.product-default-attributes').html(attributePairs.join(' / '));
+										}
+										// Call updateHotspotProductPrice function if available
+										if (typeof updateHotspotProductPrice === 'function') {
+											updateHotspotProductPrice($widgetProductItem, variationId, $widget);
+										}
+									}
+								}
+
+
 							}
 						}
 						// Check if variation has custom image before loading gallery
@@ -1331,7 +1387,10 @@
 						$('.bt-product-quick-view-btn, .bt-loop-add-to-cart-btn').removeClass('loading');
 						if (response.success) {
 							showQuickViewPopup();
-							$('.bt-popup-quick-view .bt-quick-view-load').html(response.data['product']).fadeIn('slow');
+							$('.bt-popup-quick-view .bt-quick-view-load').html(response.data['product']).fadeIn('slow', function() {
+								// Trigger custom event when quick view content is fully loaded and visible
+								$(document).trigger('somniaQuickViewLoaded');
+							});
 							SomniaLoadShopQuickView();
 							SomniaProductButtonStatus();
 							SomniaLoadDefaultActiveVariations('.bt-popup-quick-view');
@@ -1418,24 +1477,25 @@
 
 	/* Helper function to open mini cart sidebar */
 	function SomniaOpenMiniCart() {
-		if ($('.bt-mini-cart-sidebar').length > 0) {
-			const $sidebar = $('.bt-mini-cart-sidebar');
-			$sidebar.addClass('active');
-			const scrollbarWidth = window.innerWidth - $(window).width();
-			$('body').css({
-				'overflow': 'hidden',
-				'padding-right': scrollbarWidth + 'px'
-			});
-			// Update bottom cart padding
-			setTimeout(function () {
-				const $bottomCart = $sidebar.find('.bt-bottom-mini-cart');
-				const $sidebarBody = $sidebar.find('.bt-mini-cart-sidebar-body');
-				if ($bottomCart.length && $sidebarBody.length) {
-					const height = $bottomCart.outerHeight(true);
-					$sidebarBody.css('--padding-bottom', height + 'px');
-				}
-			}, 100);
+		const $sidebar = $('.bt-mini-cart-sidebar');
+		if ($sidebar.length === 0 || $sidebar.hasClass('active')) {
+			return;
 		}
+		$sidebar.addClass('active');
+		const scrollbarWidth = window.innerWidth - $(window).width();
+		$('body').css({
+			'overflow': 'hidden',
+			'padding-right': scrollbarWidth + 'px'
+		});
+		// Update bottom cart padding
+		setTimeout(function () {
+			const $bottomCart = $sidebar.find('.bt-bottom-mini-cart');
+			const $sidebarBody = $sidebar.find('.bt-mini-cart-sidebar-body');
+			if ($bottomCart.length && $sidebarBody.length) {
+				const height = $bottomCart.outerHeight(true);
+				$sidebarBody.css('--padding-bottom', height + 'px');
+			}
+		}, 100);
 	}
 	function SomniashowToast(idproduct, tools = 'wishlist', status = 'add') {
 		// ajax load product toast
@@ -3732,7 +3792,7 @@
 			if ($mainVariableAddToCartButton.length === 0) {
 				return;
 			}
-		
+
 			var isMainButtonDisabled = $mainVariableAddToCartButton.hasClass('disabled');
 			var addToCartLabel = $stickyAddToCartButton.attr('data-label-add') || 'Add to cart';
 			var selectOptionsLabel = $stickyAddToCartButton.attr('data-label-select') || 'Select options';
@@ -3754,7 +3814,7 @@
 
 		// Sync sticky button, variation name and price with main variable form on variation change
 		$('.bt-product-inner .variations_form').off('show_variation.somniasingleproductSticky hide_variation.somniasingleproductSticky').on('show_variation.somniasingleproductSticky', function (event, variation) {
-			setTimeout(function() {
+			setTimeout(function () {
 				updateStickyAddToCartButtonState();
 			}, 500);
 			var variationId = variation && variation.variation_id ? variation.variation_id : 0;
@@ -3779,7 +3839,7 @@
 				}
 			}
 		}).on('hide_variation.somniasingleproductSticky', function () {
-			setTimeout(function() {
+			setTimeout(function () {
 				updateStickyAddToCartButtonState();
 			}, 500);
 			$stickyBar.find('.bt-single-product-sticky-bar__variation-name').text('');
