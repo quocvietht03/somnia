@@ -13,11 +13,8 @@
                 color: #ffffff;
                 padding: 24px !important;
             }
-            .handle-actions > *:not(.acf-js-tooltip) {
-                display: none;
-            }
             .acf-hndle-cog {
-                color: #ffffff;
+                color: #787c82;
             }
         }
         .acf-tab-wrap.-left .acf-tab-group li {
@@ -57,5 +54,46 @@
         .acf-gallery-attachment {
             width: 64px;
         }
+    }
+
+    @media(min-width: 851px) {
+         #poststuff #post-body.columns-2 {
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 20px;
+            margin-right: 0;
+            width: 100%;
+            #postbox-container-1 {
+                margin-right: 0;
+                #side-sortables {
+                    height: 100%;
+                    #submitdiv {
+                        position: sticky;
+                        top: 52px;
+                    }
+                }
+            }
+            #postbox-container-2 {
+                width: calc(100% - 300px);
+            }
+        }
+    }
+
+    @media (max-width:767px), (min-width: 851px) and (max-width: 1199px) {
+        .acf-fields {
+            > .acf-field {
+                width: 100% !important;
+            }
+            &.-sidebar {
+                padding-left: 26% !important;
+                &:before {
+                    width: 26%;
+                }
+            }
+        }
+        .acf-tab-wrap.-left .acf-tab-group {
+            width: 26%;
+        }
+        
     }
 }
