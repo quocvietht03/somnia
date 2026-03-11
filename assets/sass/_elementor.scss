@@ -6881,6 +6881,7 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    display: flex;
     .bt-has-dropdown {
       position: relative;
       font-size: 14px;
@@ -6890,6 +6891,7 @@
       line-height: 24px;
       padding: 12px 0;
       margin: -12px 0;
+      display: inline-block;
       > a {
         display: flex;
         align-items: center;
@@ -7306,12 +7308,11 @@
           }
           &--add-to-cart {
             a {
-              width: calc(60% - 6px);
-              display: flex;
+              display: inline-flex;
               justify-content: center;
               align-items: center;
-              padding: 12px 19px;
-              background: #df4242;
+              padding: 12px 36px;
+              background: $color-red;
               color: #fff;
               text-align: center;
               font-size: 16px;
@@ -7339,6 +7340,7 @@
                 opacity: 0;
               }
               &.loading {
+                color: transparent;
                 &::after {
                   opacity: 0.9;
                 }
@@ -7919,7 +7921,7 @@
             color: $color-secondary;
             margin: 0 0 4px 0;
             a {
-              color: $color-secondary;
+              color: $color-secondary-2;
             }
           }
           &--title {
@@ -8000,11 +8002,10 @@
           &--add-to-cart {
             margin-top: 28px;
             a {
-              width: calc(60% - 6px);
-              display: flex;
+              display: inline-flex;
               justify-content: center;
               align-items: center;
-              padding: 12px 19px;
+              padding: 12px 36px;
               background: $color-primary;
               color: #fff;
               text-align: center;
@@ -8033,6 +8034,7 @@
                 opacity: 0;
               }
               &.loading {
+                color: transparent;
                 &::after {
                   opacity: 0.9;
                 }
@@ -11236,7 +11238,7 @@
           display: inline-flex;
           align-items: center;
           gap: 0;
-          padding: 10px;
+          padding: 10px 8px;
           background-color: #fff;
           color: $color-primary;
           border: 1px solid #d9d9d9;
