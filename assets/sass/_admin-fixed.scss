@@ -9,25 +9,37 @@ html :where(.editor-styles-wrapper) {
   a {
     text-decoration: none;
     color: inherit;
-    -webkit-transition: all .3s;
-    transition: all .3s;
-    &:hover, &:focus {
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    &:hover,
+    &:focus {
       color: $color-accent;
     }
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: $primary-font;
     font-weight: 500;
     line-height: 130%;
     color: $color-primary;
   }
-  input, input[type="search"], input[type="text"], input[type="password"],
-  input[type="email"], input[type="tel"], select, textarea {
+  input,
+  input[type="search"],
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="tel"],
+  select,
+  textarea {
     font-size: 16px;
     line-height: 24px;
-    background: #FFFFFF;
+    background: #ffffff;
     padding: 16px 24px;
-    border: 1px solid #C7C7C7;
+    border: 1px solid #c7c7c7;
     border-radius: 15px;
   }
   input {
@@ -38,14 +50,15 @@ html :where(.editor-styles-wrapper) {
     width: 100%;
     cursor: pointer;
     padding-right: 35px;
-    background-image: url('../images/alt-arrow-down.svg');
+    background-image: url("../images/alt-arrow-down.svg");
     background-repeat: no-repeat;
     background-position: center right 15px;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
   }
-  button, input[type="submit"] {
+  button,
+  input[type="submit"] {
     @extend .__bt-button-style;
     min-height: 58px;
     cursor: pointer;
@@ -63,10 +76,10 @@ html :where(.editor-styles-wrapper) {
   line-height: 0;
   span {
     &.bt-filled svg {
-      fill: #EFCF0A;
+      fill: #efcf0a;
     }
     svg {
-      fill: #CDCDCD;
+      fill: #cdcdcd;
       width: 16px;
       height: auto;
     }
@@ -77,7 +90,7 @@ div[data-name="more_information"] {
     height: 85px !important;
   }
 }
-._product_start_datetime_field{
+._product_start_datetime_field {
   display: none;
 }
 .variation-gallery-images {
@@ -109,10 +122,23 @@ div[data-name="more_information"] {
   line-height: 18px;
   text-decoration: none;
 }
-.wp-admin .form-field input[type=url]{
+.wp-admin .form-field input[type="url"] {
   width: 50%;
 }
-
+.wp-admin.post-type-product {
+  .postbox-container {
+    #normal-sortables {
+      display: flex;
+      flex-direction: column;
+      .acf-postbox {
+        order: 1;
+      }
+      #somnia_extra_content_box,#commentsdiv{
+        order: 2;
+      }
+    }
+  }
+}
 /**
  * Product Extra Content - Admin Styles
  * Styles for Meta Box and buttons
@@ -121,9 +147,151 @@ div[data-name="more_information"] {
 /* Meta Box Container */
 .somnia-extra-content-box {
   padding: 12px;
-  a{
-    display: flex;
+  a {
+    display: inline-flex;
     align-items: center;
+    gap: 4px;
+  }
+}
+
+/* Extra Content Mode Select */
+.somnia-extra-mode-wrap {
+  margin-bottom: 16px !important;
+
+  label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1d2327;
+  }
+  .somnia-extra-mode-select {
+    min-width: 400px;
+    padding: 8px 36px 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    border: 1px solid #2271b1;
+    height: 44px;
+    border-radius: 4px;
+    color: #1d2327;
+    &:focus {
+      border-color: #135e96;
+      box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.25);
+      outline: none;
+    }
+  }
+}
+
+/* Hook note */
+.somnia-extra-hook-note {
+  margin-top: 14px !important;
+  padding: 10px 12px !important;
+  background: #f0f6fc;
+  border-left: 3px solid #2271b1;
+  font-size: 12px;
+  color: #50575e;
+
+  .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    vertical-align: middle;
+    color: #2271b1;
+  }
+
+  code {
+    padding: 1px 4px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 2px;
+    font-size: 11px;
+  }
+}
+
+.somnia-global-extra-section-wrap {
+  margin-bottom: 16px !important;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  .somnia-global-extra-section-inner label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d2327;
+  }
+
+  .somnia-global-extra-section-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .somnia-global-extra-section-row select {
+    min-width: 300px;
+    max-width: 100%;
+    padding: 6px 32px 6px 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 38px;
+  }
+
+  .somnia-edit-elementor-link,
+  .somnia-create-elementor-link {
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px !important;
+    height: auto !important;
+    font-size: 12px !important;
+    text-decoration: none !important;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    .dashicons {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .somnia-edit-elementor-link {
+    border: 1px solid #2271b1;
+    background: #f0f6fc;
+    color: #2271b1;
+
+    &:hover {
+      background: #2271b1;
+      color: #fff;
+      border-color: #135e96;
+    }
+  }
+
+  .somnia-create-elementor-link {
+    display: inline-flex !important;
+    border: 1px solid #00a32a;
+    background: #edfaef;
+    color: #00a32a;
+
+    &:hover {
+      background: #00a32a;
+      color: #fff;
+      border-color: #008a20;
+    }
+  }
+
+  .somnia-elementor-section-note {
+    margin: 10px 0 0 0 !important;
+    padding: 8px 10px !important;
+    font-size: 12px;
+    color: #50575e;
+    background: #f6f7f7;
+    border-radius: 4px;
+    line-height: 1.5;
   }
 }
 
@@ -257,18 +425,18 @@ div[data-name="more_information"] {
 /* Responsive */
 @media screen and (max-width: 782px) {
   .somnia-extra-content-box {
-      padding: 8px;
+    padding: 8px;
   }
-  
+
   .somnia-create-extra-content,
   .somnia-edit-extra-content {
-      padding: 8px 12px;
-      font-size: 13px;
+    padding: 8px 12px;
+    font-size: 13px;
   }
-  
+
   .somnia-delete-extra-content {
-      padding: 6px 10px;
-      font-size: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }
 
@@ -321,9 +489,38 @@ div[data-name="more_information"] {
       flex-direction: column;
       align-items: stretch;
     }
-    a{
-      display: flex;
+    a {
+      display: inline-flex;
     }
+  }
+
+  .somnia-global-extra-section-wrap {
+    flex: 0 0 auto;
+    margin-bottom: 16px !important;
+
+    @media (max-width: 782px) {
+      .somnia-global-extra-section-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .somnia-global-extra-section-row select {
+        min-width: 100%;
+      }
+
+      .somnia-edit-elementor-link {
+        justify-content: center;
+      }
+    }
+  }
+
+  .somnia-extra-status-row {
+    margin-top: 4px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
   }
 
   .somnia-extra-status {
@@ -332,7 +529,7 @@ div[data-name="more_information"] {
     gap: 10px;
     margin: 0;
     padding: 12px 20px;
-    background: #fff;
+    background: #f5f5f5;
     border-left: 4px solid #2271b1;
     border-radius: 4px;
     font-weight: 500;
@@ -442,4 +639,18 @@ div[data-name="more_information"] {
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid #ddd;
+}
+
+// Mega Menu badge on menu item bar (when Enable Mega Menu is checked)
+.somnia-megamenu-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #fff;
+  background: #2171b1;
+  border-radius: 3px;
+  vertical-align: middle;
 }
