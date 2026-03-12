@@ -377,7 +377,7 @@ function somnia_save_term_metafields($term_id, $tt_id = '', $taxonomy = '')
 	}
 	
 	// Verify this is a POST request
-	if ('POST' !== filter_input(INPUT_SERVER, 'REQUEST_METHOD')) {
+	if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 		return;
 	}
 
