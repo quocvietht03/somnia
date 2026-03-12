@@ -155,7 +155,7 @@ function somnia_extra_content_meta_box_callback($post)
                 <option value="current" <?php selected($extra_mode, 'current'); ?>><?php _e('Use Product-Specific Content', 'somnia'); ?></option>
             </select>
         </p>
-        <div class="somnia-global-extra-section-wrap" style="<?php echo $extra_mode === 'global' ? '' : 'display:none;'; ?>">
+        <div class="somnia-global-extra-section-wrap" style="<?php echo esc_attr( $extra_mode === 'global' ? '' : 'display:none;' ); ?>">
             <div class="somnia-global-extra-section-inner">
                 <label for="somnia_global_extra_content_section_id"><?php _e('Elementor Section', 'somnia'); ?></label>
                 <div class="somnia-global-extra-section-row">
@@ -177,7 +177,7 @@ function somnia_extra_content_meta_box_callback($post)
                         class="button button-small somnia-edit-elementor-link"
                         target="_blank"
                         data-base-url="<?php echo esc_attr($edit_base); ?>"
-                        <?php echo !$default_sid ? ' style="display:none;"' : ''; ?>>
+                        <?php if ( ! $default_sid ) : ?> style="display:none;"<?php endif; ?>>
                         <span class="dashicons dashicons-edit"></span>
                         <?php _e('Edit in Elementor', 'somnia'); ?>
                     </a>
@@ -185,7 +185,7 @@ function somnia_extra_content_meta_box_callback($post)
                         id="somnia_global_create_elementor"
                         class="button button-small somnia-create-elementor-link"
                         target="_blank"
-                        <?php echo $default_sid ? ' style="display:none;"' : ''; ?>>
+                        <?php if ( $default_sid ) : ?> style="display:none;"<?php endif; ?>>
                         <span class="dashicons dashicons-plus-alt"></span>
                         <?php _e('Create Elementor Section', 'somnia'); ?>
                     </a>
@@ -200,7 +200,7 @@ function somnia_extra_content_meta_box_callback($post)
                 </p>
             </div>
         </div>
-        <div class="somnia-extra-status-row" style="<?php echo $extra_mode === 'current' ? '' : 'display:none;'; ?>">
+        <div class="somnia-extra-status-row" style="<?php echo esc_attr( $extra_mode === 'current' ? '' : 'display:none;' ); ?>">
         <?php if ($extra_content_id && get_post_status($extra_content_id) !== false):
             $edit_link = admin_url('post.php?post=' . $extra_content_id . '&action=elementor');
         ?>

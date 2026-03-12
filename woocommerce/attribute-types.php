@@ -371,15 +371,6 @@ function somnia_save_term_metafields($term_id, $tt_id = '', $taxonomy = '')
 		return;
 	}
 
-	// Check if this is an autosave
-	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-		return;
-	}
-	
-	// Verify this is a POST request
-	if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-		return;
-	}
 
 	// Get attribute ID
 	$attribute_id = wc_attribute_taxonomy_id_by_name(str_replace('pa_', '', $taxonomy));
