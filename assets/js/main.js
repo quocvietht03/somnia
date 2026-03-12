@@ -357,6 +357,7 @@
 				var nameItem = (attributeName == colorTaxonomy) ? $(this).find('label').html() : $(this).html();
 				attributesItem.find('.bt-result').html(nameItem);
 				$(this).closest('.variations_form').find('select#' + attributeName).val(valueItem).trigger('change');
+				$('.somnia-sold-individually-notice').remove();
 				var gallerylayout = '';
 				var $productContainer = $(this).closest('.bt-product-inner, .bt-quickview-product');
 
@@ -1473,6 +1474,48 @@
 			SomniaOpenMiniCart();
 		}
 		// If both are false, do nothing
+	}
+
+	/* Refresh sold-individually buttons' data-in-cart-ids when cart is updated (e.g. item removed) */
+	function SomniaRefreshSoldIndividuallyCartState() {
+		var $buttons = $('.bt-js-add-to-cart-simple[data-sold-individually="1"], .bt-js-add-to-cart-variable[data-sold-individually="1"]');
+		if (!$buttons.length) return;
+		var seen = {};
+		$buttons.each(function () {
+			var pid = $(this).data('product-id');
+			if (pid && !seen[pid]) {
+				seen[pid] = true;
+				var isVariable = $(this).hasClass('bt-js-add-to-cart-variable');
+				$.post(AJ_Options.ajax_url, {
+					action: 'somnia_get_sold_individually_in_cart',
+					product_id: pid,
+					is_variable: isVariable ? 1 : 0
+				}).done(function (r) {
+					if (r.success && r.data && r.data.in_cart_ids) {
+						var ids = r.data.in_cart_ids;
+						var idsJson = JSON.stringify(ids);
+						$('.bt-js-add-to-cart-simple[data-product-id="' + pid + '"], .bt-js-add-to-cart-variable[data-product-id="' + pid + '"]')
+							.filter('[data-sold-individually="1"]')
+							.data('in-cart-ids', ids).attr('data-in-cart-ids', idsJson);
+						$('.somnia-sold-individually-notice').remove();
+					}
+				});
+			}
+		});
+	}
+
+	/* Show sold-individually notice when product already in cart */
+	function SomniaShowSoldIndividuallyNotice($context) {
+		var msg = (AJ_Options && AJ_Options.sold_individually_message) ? AJ_Options.sold_individually_message : 'This product is sold individually. You can only add 1 item per order. It is already in your cart.';
+		var $notice = $('<ul class="woocommerce-info somnia-sold-individually-notice" role="alert"><li>' + msg + '</li></ul>');
+		var $parent = $context.closest('.summary').length ? $context.closest('.summary') : $context.parent();
+		var $wrapper = $parent.find('.woocommerce-notices-wrapper');
+		if (!$wrapper.length) {
+			$wrapper = $('<div class="woocommerce-notices-wrapper"></div>');
+			$context.before($wrapper);
+		}
+		$wrapper.find('.somnia-sold-individually-notice').remove();
+		$wrapper.append($notice).show();
 	}
 
 	/* Helper function to open mini cart sidebar */
@@ -3661,6 +3704,19 @@
 				return;
 			}
 
+			// Sold-individually: show notice when product/variation already in cart
+			if ($button.data('sold-individually') === 1) {
+				var variation_id = $form.find('input.variation_id').val();
+				var product_id = $button.data('product-id');
+				var checkId = variation_id ? parseInt(variation_id, 10) : parseInt(product_id, 10);
+				var inCartIds = $button.data('in-cart-ids');
+				inCartIds = inCartIds ? (typeof inCartIds === 'string' ? JSON.parse(inCartIds) : inCartIds) : [];
+				if (checkId && inCartIds.indexOf(checkId) !== -1) {
+					SomniaShowSoldIndividuallyNotice($form);
+					return;
+				}
+			}
+
 			$button.addClass('loading');
 
 			// Get the latest values from the variations form
@@ -3697,6 +3753,15 @@
 						$('.bt-js-add-to-cart-variable').removeClass('loading');
 						var productId = variation_id || product_id;
 						var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
+
+						// Sold-individually: update in-cart-ids after add (for next click to show notice)
+						if ($button.data('sold-individually') === 1) {
+							var ids = $button.data('in-cart-ids');
+							ids = ids ? (typeof ids === 'string' ? JSON.parse(ids) : ids) : [];
+							var addId = variation_id ? parseInt(variation_id, 10) : parseInt(product_id, 10);
+							if (addId && ids.indexOf(addId) === -1) ids.push(addId);
+							$button.data('in-cart-ids', ids).attr('data-in-cart-ids', JSON.stringify(ids));
+						}
 
 						// Update mini cart after successful add to cart
 						$.ajax({
@@ -3885,8 +3950,15 @@
 			var $button = $(this);
 			var $form = $button.closest('form.cart');
 
-			if ($button.hasClass('disabled')) {
-				return;
+			// Sold-individually: show notice when product already in cart
+			if ($button.data('sold-individually') === 1) {
+				var product_id = parseInt($button.data('product-id'), 10);
+				var inCartIds = $button.data('in-cart-ids');
+				inCartIds = inCartIds ? (typeof inCartIds === 'string' ? JSON.parse(inCartIds) : inCartIds) : [];
+				if (product_id && inCartIds.indexOf(product_id) !== -1) {
+					SomniaShowSoldIndividuallyNotice($form);
+					return;
+				}
 			}
 
 			$button.addClass('loading');
@@ -3919,6 +3991,15 @@
 					if (response.success) {
 						$('.bt-js-add-to-cart-simple').removeClass('loading');
 						var fbtProductId = response.data && response.data.fbt_product_id ? response.data.fbt_product_id : null;
+
+						// Sold-individually: update in-cart-ids after add (for next click to show notice)
+						if ($button.data('sold-individually') === 1) {
+							var ids = $button.data('in-cart-ids');
+							ids = ids ? (typeof ids === 'string' ? JSON.parse(ids) : ids) : [];
+							var addId = parseInt($button.data('product-id'), 10);
+							if (addId && ids.indexOf(addId) === -1) ids.push(addId);
+							$button.data('in-cart-ids', ids).attr('data-in-cart-ids', JSON.stringify(ids));
+						}
 
 						// Update mini cart after successful add to cart
 						$.ajax({
@@ -4389,6 +4470,7 @@
 	});
 	$(document).on('removed_from_cart', function () {
 		SomniaFreeShippingMessage();
+		SomniaRefreshSoldIndividuallyCartState();
 	});
 
 	jQuery(window).on('resize', function () {
@@ -4399,7 +4481,7 @@
 	$(document.body).on('updated_cart_totals', function () {
 		SomniaFreeShippingMessage();
 	});
-	/* Check if cart is empty */
+	/* Check if cart is empty & refresh sold-individually state */
 	$(document.body).on('wc_fragments_loaded wc_fragments_refreshed', function () {
 		const cartCount = parseInt($('.bt-mini-cart .cart_total').text());
 		if (cartCount === 0) {
@@ -4407,6 +4489,7 @@
 		} else {
 			$(".bt-mini-cart-sidebar .bt-progress-content").removeClass("bt-hide");
 		}
+		SomniaRefreshSoldIndividuallyCartState();
 	});
 	// Handle search-product-style-1 widget in Elementor popup
 	jQuery(window).on('elementor/popup/show', function (event, id, instance) {

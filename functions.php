@@ -162,6 +162,7 @@ if (!function_exists('somnia_enqueue_scripts')) {
 			'user_info' => wp_get_current_user(),
 			'order_tracking_nonce' => wp_create_nonce('somnia_order_tracking_nonce'),
 			'color_taxonomy' => function_exists('somnia_get_color_taxonomy') ? somnia_get_color_taxonomy() : 'pa_color',
+			'sold_individually_message' => __('This product is sold individually. You can only add 1 item per order. It is already in your cart.', 'somnia'),
 		);
 
 		wp_localize_script('somnia-main', 'AJ_Options', $js_options);

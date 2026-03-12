@@ -5166,6 +5166,36 @@ function somnia_load_product_toast()
 add_action('wp_ajax_somnia_load_product_toast', 'somnia_load_product_toast');
 add_action('wp_ajax_nopriv_somnia_load_product_toast', 'somnia_load_product_toast');
 
+/**
+ * AJAX: Get current in-cart IDs for sold-individually product (used when cart is updated e.g. item removed).
+ */
+function somnia_get_sold_individually_in_cart()
+{
+    $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
+    if (!$product_id || !WC()->cart) {
+        wp_send_json_success(array('in_cart_ids' => array()));
+    }
+    $product = wc_get_product($product_id);
+    if (!$product || !is_a($product, 'WC_Product') || !$product->is_sold_individually()) {
+        wp_send_json_success(array('in_cart_ids' => array()));
+    }
+    $in_cart_ids = array();
+    foreach (WC()->cart->get_cart() as $cart_item) {
+        if ((int) $cart_item['product_id'] !== (int) $product_id) {
+            continue;
+        }
+        if ($product->is_type('variable')) {
+            $vid = !empty($cart_item['variation_id']) ? (int) $cart_item['variation_id'] : (int) $product_id;
+            $in_cart_ids[] = $vid;
+        } else {
+            $in_cart_ids[] = (int) $product_id;
+            break;
+        }
+    }
+    wp_send_json_success(array('in_cart_ids' => array_values($in_cart_ids)));
+}
+add_action('wp_ajax_somnia_get_sold_individually_in_cart', 'somnia_get_sold_individually_in_cart');
+add_action('wp_ajax_nopriv_somnia_get_sold_individually_in_cart', 'somnia_get_sold_individually_in_cart');
 
 add_action('somnia_woocommerce_template_loop_add_to_cart_variable', 'somnia_woocommerce_template_loop_add_to_cart_variable', 10);
 function somnia_woocommerce_template_loop_add_to_cart_variable()
@@ -5205,17 +5235,39 @@ function somnia_woocommerce_after_add_to_cart_button()
         $variation_id = intval($_REQUEST['variation_id']);
     }
 
+    // Check sold-individually and cart state
+    $is_sold_individually = $product->is_sold_individually();
+    $in_cart_ids = array();
+    if ($is_sold_individually && WC()->cart) {
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            if ($product->is_type('simple')) {
+                if ((int) $cart_item['product_id'] === (int) $product->get_id()) {
+                    $in_cart_ids[] = (int) $product->get_id();
+                    break;
+                }
+            } elseif ($product->is_type('variable') && (int) $cart_item['product_id'] === (int) $product->get_id()) {
+                $vid = !empty($cart_item['variation_id']) ? (int) $cart_item['variation_id'] : (int) $product->get_id();
+                $in_cart_ids[] = $vid;
+            }
+        }
+    }
+    $in_cart_ids_json = wp_json_encode(array_values($in_cart_ids));
+
     if ($product->is_type('simple')) {
         echo '<a href="#"
         class="single_add_to_cart_button bt-button-hover bt-js-add-to-cart-simple"
-        data-product-id="' . esc_attr($product->get_id()) . '">' . esc_html__('Add To Cart', 'somnia') . '</a>';
+        data-product-id="' . esc_attr($product->get_id()) . '"
+        data-sold-individually="' . ($is_sold_individually ? '1' : '0') . '"
+        data-in-cart-ids="' . esc_attr($in_cart_ids_json) . '">' . esc_html__('Add To Cart', 'somnia') . '</a>';
     }
     if ($product->is_type('variable')) {
         echo '<a href="#"
         class="bt-btn-add-to-cart-variable single_add_to_cart_button bt-button-hover bt-js-add-to-cart-variable disabled"
         data-product-quantity="1"
         data-product-id="' . esc_attr($product->get_id()) . '"
-        data-variation="' . esc_attr($variation_id) . '">'
+        data-variation="' . esc_attr($variation_id) . '"
+        data-sold-individually="' . ($is_sold_individually ? '1' : '0') . '"
+        data-in-cart-ids="' . esc_attr($in_cart_ids_json) . '">'
             . esc_html__('Add To Cart', 'somnia') .
             '</a>';
 

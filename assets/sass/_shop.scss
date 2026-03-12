@@ -3023,12 +3023,14 @@
       border-top-color: $color-green;
       font-size: 16px;
       line-height: 1.5;
-      display: grid;
+      display: flex;
       gap: 10px;
       font-weight: 400;
-      grid-template-columns: 85% 15%;
+      flex-direction: column;
+      li{
+        flex: 1;
+      }
       @media (max-width: $break-md) {
-        grid-template-columns: 1fr;
         a {
           margin: 0 !important;
         }
@@ -4620,16 +4622,16 @@
       }
       .bt-product-inner {
         flex-direction: column;
-      }
-      div.images {
-        width: 100%;
-      }
-      div.summary {
-        width: 100%;
-        display: flex;
-        flex-direction: row-reverse;
-        flex-wrap: wrap;
-        gap: 60px;
+        div.images {
+          width: 100%;
+        }
+        div.summary {
+          width: 100%;
+          display: flex;
+          flex-direction: row-reverse;
+          flex-wrap: wrap;
+          gap: 60px;
+        }
       }
       .bt-single-product-info {
         width: calc(42% - 30px);
@@ -4695,16 +4697,16 @@
       }
       .bt-product-inner {
         flex-direction: column;
-      }
-      div.images {
-        width: 100%;
-      }
-      div.summary {
-        width: 100%;
-        display: flex;
-        flex-direction: row-reverse;
-        flex-wrap: wrap;
-        gap: 60px;
+        div.images {
+          width: 100%;
+        }
+        div.summary {
+          width: 100%;
+          display: flex;
+          flex-direction: row-reverse;
+          flex-wrap: wrap;
+          gap: 60px;
+        }
       }
       .bt-single-product-info {
         width: calc(42% - 30px);
@@ -4763,7 +4765,7 @@
         }
       }
 
-      @media (max-width: $break-sm) {
+      @media (max-width: $break-md) {
         flex-direction: column;
         div.images,
         div.summary {
@@ -4828,7 +4830,16 @@
         }
       }
     }
-
+    &.bt-right-bottom{
+      .bt-product-inner{
+        @media (max-width: $break-sm) {
+          div.images,
+          div.summary {
+            width: 100%;
+          }
+        }
+      }
+    }
     div.images {
       width: calc(50% - 30px);
       margin: 0;
@@ -10259,6 +10270,10 @@
   position: absolute;
   right: 0;
   margin: 0;
+  .product-type-simple.sold-individually &{
+    position: relative;
+    width: 100%;
+  }
   .bt-size-guide-button {
     display: inline-block;
     color: $color-primary;
