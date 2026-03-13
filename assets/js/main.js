@@ -3924,7 +3924,7 @@
 				} else {
 					$variationNameEl.empty();
 				}
-				var priceHtml = (variation && variation.price_html) ? variation.price_html : null;
+				var priceHtml = (variation && variation.price_html) ? variation.price_html : $stickyReadyButton.attr('data-price-text') || '';
 				if (!priceHtml) {
 					var variationPricesRaw = $stickyBar.attr('data-variation-prices');
 					var variationPrices = variationPricesRaw ? (typeof variationPricesRaw === 'string' ? JSON.parse(variationPricesRaw) : variationPricesRaw) : null;

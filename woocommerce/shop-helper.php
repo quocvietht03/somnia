@@ -5417,7 +5417,7 @@ function somnia_single_product_sticky_bar()
                     <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo esc_html($btn_label_select); ?></a>
                 </div>
                 <?php } ?>
-                <div class="bt-single-product-sticky-bar__add-to-cart-wrap bt-single-product-sticky-bar__add-to-cart-wrap--ready <?php echo esc_attr($is_sold_individually ? 'bt-single-product-no-quantity' : ''); ?>" data-mode="add-to-cart"<?php echo esc_attr($is_variable ? ' style="display:none;"' : ''); ?>>
+                <div class="bt-single-product-sticky-bar__add-to-cart-wrap bt-single-product-sticky-bar__add-to-cart-wrap--ready <?php echo esc_attr($is_sold_individually ? 'bt-single-product-no-quantity' : ''); ?>" data-mode="add-to-cart" <?php if($is_variable) { echo ' style="display:none;"'; } ?>>
                     <?php if (!$is_sold_individually) { ?>
                     <div class="bt-single-product-sticky-bar__quantity quantity">
                         <span class="qty-minus"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg></span>
