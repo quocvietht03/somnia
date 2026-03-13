@@ -5261,14 +5261,35 @@ function somnia_woocommerce_after_add_to_cart_button()
         data-in-cart-ids="' . esc_attr($in_cart_ids_json) . '">' . esc_html__('Add To Cart', 'somnia') . '</a>';
     }
     if ($product->is_type('variable')) {
+        // Use default variation when no variation from request (initial load)
+        $effective_variation_id = $variation_id;
+        if (!$effective_variation_id && function_exists('get_default_variation_id')) {
+            $effective_variation_id = get_default_variation_id($product);
+        }
+
+        $add_to_cart_text = esc_html__('Add To Cart', 'somnia');
+        $has_valid_default = false;
+        if ($effective_variation_id) {
+            $variation_product = wc_get_product($effective_variation_id);
+            if ($variation_product && $variation_product->is_in_stock()) {
+                $has_valid_default = true;
+                $price_html = $variation_product->get_price_html();
+                if ($price_html) {
+                    $add_to_cart_text .= '<span class="bt-price-add-cart"> - ' . wp_kses_post($price_html) . '</span>';
+                }
+            }
+        }
+
+        $disabled_class = $has_valid_default ? '' : ' disabled';
+        $output_variation_id = $has_valid_default ? $effective_variation_id : $variation_id;
         echo '<a href="#"
-        class="bt-btn-add-to-cart-variable single_add_to_cart_button bt-button-hover bt-js-add-to-cart-variable disabled"
+        class="bt-btn-add-to-cart-variable single_add_to_cart_button bt-button-hover bt-js-add-to-cart-variable' . esc_attr($disabled_class) . '"
         data-product-quantity="1"
         data-product-id="' . esc_attr($product->get_id()) . '"
-        data-variation="' . esc_attr($variation_id) . '"
+        data-variation="' . esc_attr($output_variation_id) . '"
         data-sold-individually="' . ($is_sold_individually ? '1' : '0') . '"
         data-in-cart-ids="' . esc_attr($in_cart_ids_json) . '">'
-            . esc_html__('Add To Cart', 'somnia') .
+            . $add_to_cart_text .
             '</a>';
 
         echo '<a href="' . esc_url($product->get_permalink()) . '" 
@@ -5315,40 +5336,57 @@ function somnia_single_product_sticky_bar()
 
     $variation_names = array();
     $variation_prices = array();
+    $variation_labels_full = array();
     if ($is_variable) {
         foreach ($product->get_available_variations() as $var) {
             $vid = (int) $var['variation_id'];
             $labels = array();
+            $labels_full = array();
             if (!empty($var['attributes']) && is_array($var['attributes'])) {
                 foreach ($var['attributes'] as $attr_key => $value_slug) {
                     if ((string) $value_slug === '') {
                         continue;
                     }
                     $attr_name = str_replace('attribute_', '', $attr_key);
+                    $attr_label = function_exists('wc_attribute_label') ? wc_attribute_label($attr_name, $product) : $attr_name;
+                    $value_display = '';
                     if (taxonomy_exists($attr_name)) {
                         $term = get_term_by('slug', $value_slug, $attr_name);
-                        $labels[] = $term && !is_wp_error($term) ? $term->name : $value_slug;
+                        $value_display = $term && !is_wp_error($term) ? $term->name : $value_slug;
                     } else {
-                        $labels[] = $value_slug;
+                        $value_display = $value_slug;
                     }
+                    $labels[] = $value_display;
+                    $labels_full[] = array('label' => $attr_label, 'value' => $value_display);
                 }
             }
             $variation_names[$vid] = implode(' / ', $labels);
             $variation_prices[$vid] = isset($var['price_html']) ? $var['price_html'] : '';
+            $variation_labels_full[$vid] = $labels_full;
         }
     }
     $default_variation_name = '';
+    $default_variation_labels_full = array();
     if ($is_variable) {
         $default_variation_id = get_default_variation_id($product);
         if ($default_variation_id && !empty($variation_names[$default_variation_id])) {
             $default_variation_name = $variation_names[$default_variation_id];
+            $default_variation_labels_full = isset($variation_labels_full[$default_variation_id]) ? $variation_labels_full[$default_variation_id] : array();
         }
     }
+
+    $min_qty = $product->get_min_purchase_quantity();
+    $max_qty = $product->get_max_purchase_quantity();
+    $is_sold_individually = $product->is_sold_individually();
+    $step = 1;
 ?>
     <div class="bt-single-product-sticky-bar" id="bt-single-product-sticky-bar" aria-hidden="true"<?php
                     if ($is_variable) {
-                        echo ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '" data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
+                        echo ' data-variation-names="' . esc_attr(wp_json_encode($variation_names)) . '"';
+                        echo ' data-variation-prices="' . esc_attr(wp_json_encode($variation_prices)) . '"';
+                        echo ' data-variation-labels-full="' . esc_attr(wp_json_encode($variation_labels_full)) . '"';
                     }
+                    echo ' data-qty-min="' . esc_attr($min_qty) . '" data-qty-max="' . esc_attr($max_qty) . '" data-qty-step="' . esc_attr($step) . '"';
                     ?>>
         <div class="bt-single-product-sticky-bar__inner">
             <div class="bt-single-product-sticky-bar__product">
@@ -5357,22 +5395,38 @@ function somnia_single_product_sticky_bar()
                 </div>
                 <div class="bt-single-product-sticky-bar__info">
                     <h3 class="bt-single-product-sticky-bar__title"><?php echo esc_html($title); ?></h3>
-                    <?php if ($price_html) { ?>
-                        <div class="bt-single-product-sticky-bar__price<?php echo esc_attr($is_variable ? ' bt-product-type-variable' : ''); ?>"><?php echo wp_kses_post($price_html); ?></div>
-                    <?php } ?>
                     <?php if ($is_variable) { ?>
-                        <div class="bt-single-product-sticky-bar__variation">
-                            <div class="bt-single-product-sticky-bar__variation-name"><?php echo esc_html($default_variation_name); ?></div>
+                        <div class="bt-single-product-sticky-bar__variation bt-single-product-sticky-bar__variation--full">
+                            <div class="bt-single-product-sticky-bar__variation-name">
+                                <?php
+                                foreach ($default_variation_labels_full as $item) {
+                                    echo '<div class="bt-single-product-sticky-bar__variation-row"><strong>' . esc_html($item['label'] . ':') . '</strong> <span>' . esc_html($item['value']) . '</span></div>';
+                                }
+                                ?>
+                            </div>
                         </div>
+                    <?php } ?>
+                    <?php if ($price_html && $is_variable) { ?>
+                        <div class="bt-single-product-sticky-bar__price bt-single-product-sticky-bar__price--standalone bt-product-type-variable"><?php echo wp_kses_post($price_html); ?></div>
                     <?php } ?>
                 </div>
             </div>
             <div class="bt-single-product-sticky-bar__action">
-                <?php if ($is_simple) { ?>
-                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="simple"><?php echo esc_html($btn_label_add); ?></a>
-                <?php } else { ?>
+                <?php if ($is_variable) { ?>
+                <div class="bt-single-product-sticky-bar__add-to-cart-wrap bt-single-product-no-quantity" data-mode="select-options">
                     <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-button-hover" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="variable" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>"><?php echo esc_html($btn_label_select); ?></a>
+                </div>
                 <?php } ?>
+                <div class="bt-single-product-sticky-bar__add-to-cart-wrap bt-single-product-sticky-bar__add-to-cart-wrap--ready <?php echo esc_attr($is_sold_individually ? 'bt-single-product-no-quantity' : ''); ?>" data-mode="add-to-cart"<?php echo esc_attr($is_variable ? ' style="display:none;"' : ''); ?>>
+                    <?php if (!$is_sold_individually) { ?>
+                    <div class="bt-single-product-sticky-bar__quantity quantity">
+                        <span class="qty-minus"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z"/></svg></span>
+                        <input type="number" class="qty bt-sticky-bar-qty" value="<?php echo esc_attr($min_qty); ?>" min="<?php echo esc_attr($min_qty); ?>" max="<?php echo esc_attr(0 < $max_qty ? $max_qty : ''); ?>" step="<?php echo esc_attr($step); ?>" inputmode="numeric" />
+                        <span class="qty-plus"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg></span>
+                    </div>
+                    <?php } ?>
+                    <a href="#" class="bt-single-product-sticky-bar__btn bt-js-sticky-add-to-cart bt-js-sticky-add-to-cart-ready bt-button-hover bt-style-add-to-cart" data-product-id="<?php echo esc_attr($product_id); ?>" data-type="<?php echo esc_attr($is_simple ? 'simple' : 'variable'); ?>" data-label-add="<?php echo esc_attr($btn_label_add); ?>" data-label-select="<?php echo esc_attr($btn_label_select); ?>" data-price-text="<?php echo esc_attr($price_html); ?>"><?php echo esc_html($btn_label_add); ?></a>
+                </div>
             </div>
         </div>
     </div>

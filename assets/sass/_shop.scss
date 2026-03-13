@@ -3027,7 +3027,7 @@
       gap: 10px;
       font-weight: 400;
       flex-direction: column;
-      li{
+      li {
         flex: 1;
       }
       @media (max-width: $break-md) {
@@ -4784,6 +4784,9 @@
           &.loading {
             color: transparent !important;
             opacity: 0.5;
+            *{
+              color: transparent !important;
+            }
             &::after {
               content: "" !important;
               position: absolute;
@@ -4830,8 +4833,8 @@
         }
       }
     }
-    &.bt-right-bottom{
-      .bt-product-inner{
+    &.bt-right-bottom {
+      .bt-product-inner {
         @media (max-width: $break-sm) {
           div.images,
           div.summary {
@@ -5418,6 +5421,15 @@
             &:hover:not(.disabled) {
               background-color: $color-primary;
               color: $color-accent;
+              .bt-price-add-cart{
+                color: $color-accent;
+                .price{
+                  color: $color-accent;
+                  ins{
+                    color: $color-accent;
+                  }
+                }
+              }
             }
           }
           @media (max-width: $break-xs), (min-width: 768px) and (max-width: $break-md) {
@@ -10270,7 +10282,7 @@
   position: absolute;
   right: 0;
   margin: 0;
-  .product-type-simple.sold-individually &{
+  .product-type-simple.sold-individually & {
     position: relative;
     width: 100%;
   }
@@ -10468,7 +10480,7 @@
   z-index: 999;
   background: #fff;
   box-shadow: 0 -1px 25px rgba(0, 0, 0, 0.08);
-  padding: 12px 15px;
+  padding: 20px;
   opacity: 0;
   visibility: hidden;
   transform: translateY(100%);
@@ -10476,10 +10488,11 @@
     opacity 0.25s ease,
     transform 0.25s ease,
     visibility 0.25s ease;
-  max-width: 700px;
+  max-width: 1200px;
   margin: 0 auto;
-  bottom: 10px;
+  bottom: 30px;
   border-radius: 12px;
+  box-sizing: border-box;
   &.is-visible {
     opacity: 1;
     visibility: visible;
@@ -10504,8 +10517,8 @@
 
   &__thumb {
     flex-shrink: 0;
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: 8px;
     overflow: hidden;
     background: #f5f5f5;
@@ -10521,11 +10534,11 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 6px;
   }
 
   &__title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 500;
     line-height: 1.3;
     color: $color-primary;
@@ -10538,7 +10551,7 @@
   }
 
   &__price {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     line-height: 1.2;
     color: $color-primary;
@@ -10563,21 +10576,97 @@
     }
   }
   &__variation {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 1.2;
     color: $color-text;
+
+    &--full .bt-single-product-sticky-bar__variation-name {
+      display: flex;
+      gap: 4px 12px;
+      flex-wrap: wrap;
+    }
+
+    &-row {
+      strong {
+        font-weight: 500;
+        color: $color-primary;
+      }
+      span {
+        font-weight: 400;
+        color: $color-text;
+      }
+    }
   }
 
   &__action {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__add-to-cart-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    &--ready {
+      display: flex;
+      gap: 0;
+      background: $color-accent;
+      padding: 8px 0 8px 10px;
+      border-radius: 8px;
+    }
+  }
+  &__quantity.quantity {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid $color-accent;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+
+    .qty {
+      border: none;
+      text-align: center;
+      width: 110px;
+      padding: 8px 4px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .qty-minus,
+    .qty-plus {
+      width: 36px;
+      height: 42px;
+      min-width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      color: $color-accent;
+      transition: background 0.2s, color 0.2s;
+      padding: 0;
+
+      &:hover {
+        background: rgba($color-accent, 0.1);
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
   }
 
   &__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 45px;
+    padding: 10px 25px 10px 18px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 500;
@@ -10602,7 +10691,7 @@
         transform: translate(-50%, -50%);
         width: 16px;
         height: 16px;
-        background-image: url("../images/loading-white.svg");
+        background-image: url("../images/loading.svg");
         background-repeat: no-repeat;
         background-size: cover;
         animation-name: effectSpin;
@@ -10611,11 +10700,33 @@
         animation-timing-function: linear;
       }
     }
-    @media (min-width: $break-sm) {
-      &:hover {
-        color: $color-accent;
-        background: $color-primary;
-      }
+  }
+  .bt-single-product-no-quantity{
+    padding: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    .bt-single-product-sticky-bar__btn{
+      padding: 10px 30px !important;
+    }
+  }
+  @media (max-width: 1240px) {
+    width: 100%;
+    bottom: 0;
+  }
+  @media (max-width: $break-tl) {
+    padding: 12px 20px;
+    &__thumb{
+      width: 70px;
+      height: 70px;
+    }
+    &__title {
+      font-size: 18px;
+    }
+    &__add-to-cart-wrap--ready{
+      padding: 4px 0 4px 8px;
+    }
+    &__btn {
+      padding: 10px 15px 10px 12px;
     }
   }
   @media (max-width: $break-sm) {
@@ -10625,9 +10736,27 @@
     bottom: 0;
     box-sizing: border-box;
     border-radius: 10px 10px 0 0;
+    &__thumb{
+      width: 60px;
+      height: 60px;
+    }
+    &__add-to-cart-wrap {
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+    }
+
+    &__quantity.quantity {
+      display: none;
+    }
+    .bt-single-product-no-quantity{
+      .bt-single-product-sticky-bar__btn{
+        padding: 0 !important;
+      }
+    }
     &__btn {
       color: transparent;
-      padding: 0;
+      padding: 0 !important;
       width: 40px;
       height: 40px;
       &:before {

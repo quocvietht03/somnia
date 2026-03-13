@@ -1753,7 +1753,7 @@
             "sub_fields": [
                 {
                     "key": "field_698942177700f",
-                    "label": "Enable Custom Reviews",
+                    "label": "Enable Custom Reviews (Heading and Description)",
                     "name": "enable_custom_reviews",
                     "aria-label": "",
                     "type": "true_false",
@@ -2915,5 +2915,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1773218849
+    "modified": 1773390719
 }

@@ -69,7 +69,9 @@ html :where(.editor-styles-wrapper) {
     font-size: 15px;
   }
 }
-
+html{
+  scrollbar-gutter: stable;
+}
 *:focus {
   outline: 0;
 }

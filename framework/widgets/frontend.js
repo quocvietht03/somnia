@@ -1026,10 +1026,8 @@
 	function SomniaOpenMiniCart() {
 		const $sidebar = $('.bt-mini-cart-sidebar');
 		$sidebar.addClass('active');
-		const scrollbarWidth = window.innerWidth - $(window).width();
 		$('body').css({
 			'overflow': 'hidden',
-			'padding-right': scrollbarWidth + 'px'
 		});
 
 		// Update bottom cart padding
@@ -1344,10 +1342,8 @@
 		$miniCart.find('.js-cart-sidebar').on('click', function (e) {
 			e.preventDefault();
 			$sidebar.addClass('active'); // Add active class to sidebar
-			const scrollbarWidth = window.innerWidth - $(window).width();
 			$('body').css({
 				'overflow': 'hidden',
-				'padding-right': scrollbarWidth + 'px' // Prevent layout shift
 			});
 		});
 
@@ -1368,7 +1364,6 @@
 			$sidebar.removeClass('active');
 			$('body').css({
 				'overflow': 'auto', // Restore body scroll
-				'padding-right': '0' // Reset padding-right
 			});
 		}
 
